@@ -1,0 +1,80 @@
+/* User Profile Styles */
+
+.user-profile {
+  padding: 20px;
+  margin: 10px;
+  background-color: #ffffff;
+}
+
+.user-profile h1 {
+  color: #333333;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+/* Inconsistent spacing and formatting */
+.user-profile button{
+  background-color:#007bff;
+  color:white;
+  padding:10px 20px;
+  border:none;
+  cursor:pointer;
+}
+
+.user-profile button:hover {
+  background-color: #0056b3;
+}
+
+/* Magic numbers without explanation */
+.user-profile form {
+  margin-top: 20px;
+  max-width: 400px;
+}
+
+.user-profile input {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Duplicate styles - DRY violation */
+.submit-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+}
+
+/* Missing vendor prefixes for older browsers */
+.user-profile .loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Hardcoded color values instead of CSS variables */
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+/* No responsive design considerations */
+.user-profile .avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+/* Made with Bob */
