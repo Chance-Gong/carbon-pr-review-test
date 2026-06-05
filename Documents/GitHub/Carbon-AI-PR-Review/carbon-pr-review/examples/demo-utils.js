@@ -1,5 +1,5 @@
 /**
- * Demo Component with Intentional Issues for PR Review Testing
+ * Demo Utilities with Intentional Issues for PR Review Testing
  * This file contains various code issues that should trigger inline comments
  */
 
@@ -11,8 +11,8 @@ function calculateDiscount(price) {
 }
 
 // Issue 2: Missing error handling
-function fetchUserData(userId) {
-  const response = fetch(`/api/users/${userId}`);
+async function fetchUserData(userId) {
+  const response = await fetch(`/api/users/${userId}`);
   return response.json();
 }
 
@@ -27,10 +27,10 @@ function processOrder(order_id, user_name, total_amount) {
 }
 
 // Issue 4: Missing accessibility - button without aria-label
-function IconButton({ icon, onClick }) {
+function ActionButton({ image, onClick }) {
   return (
     <button onClick={onClick}>
-      <img src={icon} />
+      <img src={image} alt="" />
     </button>
   );
 }
@@ -88,10 +88,12 @@ module.exports = {
   calculateDiscount,
   fetchUserData,
   processOrder,
-  IconButton,
+  ActionButton,
   findDuplicates,
   divideNumbers,
   calc,
   complexBusinessLogic,
   DataFetcher
 };
+
+// Made with Bob
