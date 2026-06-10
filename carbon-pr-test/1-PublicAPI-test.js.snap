@@ -1,0 +1,19 @@
+// Sample from Carbon PR #22353
+// Original file: packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
+// Status: modified
+// Changes: +6/-1
+
+@@ -6730,7 +6730,12 @@ Map {
+   "ModalBody" => {
+     "$$typeof": Symbol(react.forward_ref),
+     "propTypes": {
+-      "aria-label": [Function],
++      "aria-label": {
++        "type": "string",
++      },
++      "aria-labelledby": {
++        "type": "string",
++      },
+       "children": {
+         "type": "node",
+       },
