@@ -1,0 +1,346 @@
+diff --git a/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap b/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
+index efc488a9253c..fc26c0cfd549 100644
+--- a/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
++++ b/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
+@@ -6730,7 +6730,12 @@ Map {
+   "ModalBody" => {
+     "$$typeof": Symbol(react.forward_ref),
+     "propTypes": {
+-      "aria-label": [Function],
++      "aria-label": {
++        "type": "string",
++      },
++      "aria-labelledby": {
++        "type": "string",
++      },
+       "children": {
+         "type": "node",
+       },
+diff --git a/packages/react/src/components/ComposedModal/ComposedModal-test.js b/packages/react/src/components/ComposedModal/ComposedModal-test.js
+index 7e4c67bcf2e4..0ca3ef4c6cf6 100644
+--- a/packages/react/src/components/ComposedModal/ComposedModal-test.js
++++ b/packages/react/src/components/ComposedModal/ComposedModal-test.js
+@@ -1,5 +1,5 @@
+ /**
+- * Copyright IBM Corp. 2016, 2023
++ * Copyright IBM Corp. 2016, 2026
+  *
+  * This source code is licensed under the Apache-2.0 license found in the
+  * LICENSE file in the root directory of this source tree.
+@@ -1111,3 +1111,74 @@ describe('state with hof withModalPresence', () => {
+     expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
+   });
+ });
++
++describe('ModalBody scrollable content accessibility', () => {
++  it('should apply aria-labelledby to scrollable content using label from ModalHeader', () => {
++    render(
++      <ComposedModal open>
++        <ModalHeader label="Test Label" title="Test Title" />
++        <ModalBody hasScrollingContent data-testid="modal-body">
++          Scrollable content
++        </ModalBody>
++      </ComposedModal>
++    );
++
++    const modalBody = screen.getByTestId('modal-body');
++    expect(modalBody).toHaveAttribute('role', 'region');
++
++    const ariaLabelledBy = modalBody.getAttribute('aria-labelledby');
++    expect(ariaLabelledBy).toBeTruthy();
++    expect(ariaLabelledBy).toContain('modal-header__label');
++  });
++
++  it('should apply aria-labelledby to scrollable content using title from ModalHeader when no label', () => {
++    render(
++      <ComposedModal open>
++        <ModalHeader title="Test Title" />
++        <ModalBody hasScrollingContent data-testid="modal-body">
++          Scrollable content
++        </ModalBody>
++      </ComposedModal>
++    );
++
++    const modalBody = screen.getByTestId('modal-body');
++    expect(modalBody).toHaveAttribute('role', 'region');
++
++    const ariaLabelledBy = modalBody.getAttribute('aria-labelledby');
++    expect(ariaLabelledBy).toBeTruthy();
++    expect(ariaLabelledBy).toContain('modal-header__heading');
++  });
++
++  it('should use explicit aria-labelledby prop over default from context', () => {
++    render(
++      <ComposedModal open>
++        <ModalHeader label="Test Label" title="Test Title" />
++        <ModalBody
++          hasScrollingContent
++          aria-labelledby="custom-label-id"
++          data-testid="modal-body">
++          Scrollable content
++        </ModalBody>
++      </ComposedModal>
++    );
++
++    const modalBody = screen.getByTestId('modal-body');
++    expect(modalBody).toHaveAttribute('role', 'region');
++
++    expect(modalBody).toHaveAttribute('aria-labelledby', 'custom-label-id');
++  });
++
++  it('should not apply region role or labelling when content is not scrollable', () => {
++    render(
++      <ComposedModal open>
++        <ModalHeader label="Test Label" title="Test Title" />
++        <ModalBody data-testid="modal-body">Non-scrollable content</ModalBody>
++      </ComposedModal>
++    );
++
++    const modalBody = screen.getByTestId('modal-body');
++    expect(modalBody).not.toHaveAttribute('role', 'region');
++    expect(modalBody).not.toHaveAttribute('aria-label');
++    expect(modalBody).not.toHaveAttribute('aria-labelledby');
++  });
++});
+diff --git a/packages/react/src/components/ComposedModal/ComposedModal.tsx b/packages/react/src/components/ComposedModal/ComposedModal.tsx
+index 75cbd4c50a17..13e8b1f86f1f 100644
+--- a/packages/react/src/components/ComposedModal/ComposedModal.tsx
++++ b/packages/react/src/components/ComposedModal/ComposedModal.tsx
+@@ -8,6 +8,7 @@
+ import React, {
+   Children,
+   cloneElement,
++  useState,
+   useContext,
+   useEffect,
+   useRef,
+@@ -26,7 +27,6 @@ import { ModalFooter } from './ModalFooter';
+ import { mergeRefs } from '../../tools/mergeRefs';
+ import cx from 'classnames';
+ import { toggleClass } from '../../tools/toggleClass';
+-import { requiredIfGivenPropIsTruthy } from '../../prop-types/requiredIfGivenPropIsTruthy';
+ import {
+   elementOrParentIsFloatingMenu,
+   wrapFocus,
+@@ -50,8 +50,19 @@ import {
+ import { useId } from '../../internal/useId';
+ import { useComposedModalState } from './useComposedModalState';
+ import { isTopmostVisibleModal } from '../Modal/isTopmostVisibleModal';
++import { ComposedModalContext } from './ComposedModalContext';
+ 
+ export interface ModalBodyProps extends HTMLAttributes<HTMLDivElement> {
++  /**
++   * Specify the aria-label for the modal body when it is scrollable
++   */
++  'aria-label'?: string;
++
++  /**
++   * Specify the aria-labelledby for the modal body when it is scrollable
++   */
++  'aria-labelledby'?: string;
++
+   /** Specify the content to be placed in the ModalBody. */
+   children?: ReactNode;
+ 
+@@ -70,6 +81,8 @@ export interface ModalBodyProps extends HTMLAttributes<HTMLDivElement> {
+ export const ModalBody = React.forwardRef<HTMLDivElement, ModalBodyProps>(
+   function ModalBody(
+     {
++      ['aria-label']: ariaLabelProp,
++      ['aria-labelledby']: ariaLabelledByProp,
+       className: customClassName,
+       children,
+       hasForm,
+@@ -80,6 +93,7 @@ export const ModalBody = React.forwardRef<HTMLDivElement, ModalBodyProps>(
+   ) {
+     const prefix = usePrefix();
+     const contentRef = useRef<HTMLDivElement>(null);
++    const { labelId, titleId } = useContext(ComposedModalContext);
+ 
+     const { height } = useResizeObserver({ ref: contentRef });
+ 
+@@ -102,9 +116,16 @@ export const ModalBody = React.forwardRef<HTMLDivElement, ModalBodyProps>(
+       customClassName
+     );
+ 
++    const ariaLabelledBy = ariaLabelledByProp || labelId || titleId;
++
+     const hasScrollingContentProps =
+       hasScrollingContent || isScrollable
+-        ? { tabIndex: 0, role: 'region' }
++        ? {
++            tabIndex: 0,
++            role: 'region',
++            'aria-label': ariaLabelProp,
++            'aria-labelledby': ariaLabelledBy,
++          }
+         : {};
+ 
+     return (
+@@ -121,12 +142,14 @@ export const ModalBody = React.forwardRef<HTMLDivElement, ModalBodyProps>(
+ 
+ ModalBody.propTypes = {
+   /**
+-   * Required props for the accessibility label of the header
++   * Specify the aria-label for the modal body when it is scrollable
+    */
+-  ['aria-label']: requiredIfGivenPropIsTruthy(
+-    'hasScrollingContent',
+-    PropTypes.string
+-  ),
++  ['aria-label']: PropTypes.string,
++
++  /**
++   * Specify the aria-labelledby for the modal body when it is scrollable
++   */
++  ['aria-labelledby']: PropTypes.string,
+ 
+   /**
+    * Specify the content to be placed in the ModalBody
+@@ -290,6 +313,9 @@ const ComposedModalDialog = React.forwardRef<
+ ) {
+   const prefix = usePrefix();
+ 
++  const [labelId, setLabelId] = useState<string | undefined>(undefined);
++  const [titleId, setTitleId] = useState<string | undefined>(undefined);
++
+   const innerModal = useRef<HTMLDivElement>(null);
+   const button = useRef<HTMLButtonElement>(null);
+   const startSentinel = useRef<HTMLButtonElement>(null);
+@@ -634,21 +660,33 @@ const ComposedModalDialog = React.forwardRef<
+     </div>
+   );
+ 
++  const contextValue = {
++    labelId,
++    titleId,
++    setLabelId,
++    setTitleId,
++  };
++
+   return (
+-    <Layer
+-      {...rest}
+-      level={0}
+-      role="presentation"
+-      ref={mergedRefs}
+-      aria-hidden={!open}
+-      onBlur={handleBlur}
+-      onClick={composeEventHandlers([rest?.onClick, handleOnClick])}
+-      onMouseDown={composeEventHandlers([rest?.onMouseDown, handleOnMouseDown])}
+-      onKeyDown={handleKeyDown}
+-      className={modalClass}
+-      data-exiting={presenceContext?.isExiting || undefined}>
+-      {modalBody}
+-    </Layer>
++    <ComposedModalContext.Provider value={contextValue}>
++      <Layer
++        {...rest}
++        level={0}
++        role="presentation"
++        ref={mergedRefs}
++        aria-hidden={!open}
++        onBlur={handleBlur}
++        onClick={composeEventHandlers([rest?.onClick, handleOnClick])}
++        onMouseDown={composeEventHandlers([
++          rest?.onMouseDown,
++          handleOnMouseDown,
++        ])}
++        onKeyDown={handleKeyDown}
++        className={modalClass}
++        data-exiting={presenceContext?.isExiting || undefined}>
++        {modalBody}
++      </Layer>
++    </ComposedModalContext.Provider>
+   );
+ });
+ 
+diff --git a/packages/react/src/components/ComposedModal/ComposedModalContext.ts b/packages/react/src/components/ComposedModal/ComposedModalContext.ts
+new file mode 100644
+index 000000000000..59b2eda95f55
+--- /dev/null
++++ b/packages/react/src/components/ComposedModal/ComposedModalContext.ts
+@@ -0,0 +1,15 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { createContext } from 'react';
++
++export const ComposedModalContext = createContext<{
++  labelId?: string;
++  titleId?: string;
++  setLabelId?: (id: string | undefined) => void;
++  setTitleId?: (id: string | undefined) => void;
++}>({});
+diff --git a/packages/react/src/components/ComposedModal/ModalHeader.tsx b/packages/react/src/components/ComposedModal/ModalHeader.tsx
+index 482ff008cd62..054b7ffbe067 100644
+--- a/packages/react/src/components/ComposedModal/ModalHeader.tsx
++++ b/packages/react/src/components/ComposedModal/ModalHeader.tsx
+@@ -9,12 +9,16 @@ import React, {
+   type ReactNode,
+   type MouseEvent,
+   type HTMLAttributes,
++  useContext,
++  useEffect,
+ } from 'react';
+ import PropTypes from 'prop-types';
+ import cx from 'classnames';
+ import { Close } from '@carbon/icons-react';
+ import { usePrefix } from '../../internal/usePrefix';
+ import { IconButton } from '../IconButton';
++import { useId } from '../../internal/useId';
++import { ComposedModalContext } from './ComposedModalContext';
+ 
+ export type DivProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'>;
+ export interface ModalHeaderProps extends DivProps {
+@@ -95,6 +99,25 @@ export const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
+     ref
+   ) {
+     const prefix = usePrefix();
++    const modalId = useId();
++    const { setLabelId, setTitleId } = useContext(ComposedModalContext);
++
++    const generatedLabelId = `${prefix}--modal-header__label--${modalId}`;
++    const generatedTitleId = `${prefix}--modal-header__heading--${modalId}`;
++
++    useEffect(() => {
++      if (label && setLabelId) {
++        setLabelId(generatedLabelId);
++        return () => setLabelId(undefined);
++      }
++    }, [label, generatedLabelId, setLabelId]);
++
++    useEffect(() => {
++      if (title && setTitleId) {
++        setTitleId(generatedTitleId);
++        return () => setTitleId(undefined);
++      }
++    }, [title, generatedTitleId, setTitleId]);
+ 
+     function handleCloseButtonClick(evt: MouseEvent) {
+       closeModal?.(evt);
+@@ -122,9 +145,17 @@ export const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
+ 
+     return (
+       <div className={headerClass} {...rest} ref={ref}>
+-        {label && <h2 className={labelClass}>{label}</h2>}
+-
+-        {title && <h2 className={titleClass}>{title}</h2>}
++        {label && (
++          <h2 id={generatedLabelId} className={labelClass}>
++            {label}
++          </h2>
++        )}
++
++        {title && (
++          <h2 id={generatedTitleId} className={titleClass}>
++            {title}
++          </h2>
++        )}
+ 
+         {children}
+ 
