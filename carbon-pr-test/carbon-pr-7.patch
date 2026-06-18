@@ -1,0 +1,259 @@
+diff --git a/carbon-pr-test/1-_button.scss b/carbon-pr-test/1-_button.scss
+new file mode 100644
+index 0000000..cd8f692
+--- /dev/null
++++ b/carbon-pr-test/1-_button.scss
+@@ -0,0 +1,87 @@
++// Sample from Carbon PR #22385
++// Original file: packages/styles/scss/components/button/_button.scss
++// Status: modified
++// Changes: +26/-0
++
++@@ -139,6 +139,10 @@
++   }
++ 
++   .#{$prefix}--btn--secondary {
+++    display: inline-block;
+++    overflow: hidden;
+++    text-overflow: ellipsis;
+++    white-space: nowrap;
++     @include button-theme(
++       $button-secondary,
++       transparent,
++@@ -155,6 +159,10 @@
++   }
++ 
++   .#{$prefix}--btn--tertiary {
+++    display: inline-block;
+++    overflow: hidden;
+++    text-overflow: ellipsis;
+++    white-space: nowrap;
++     @include button-theme(
++       transparent,
++       $button-tertiary,
++@@ -194,6 +202,9 @@
++   }
++ 
++   .#{$prefix}--btn--ghost {
+++    display: inline-block;
+++    overflow: hidden;
+++
++     @include button-theme(
++       transparent,
++       transparent,
++@@ -206,6 +217,8 @@
++     padding-inline-end: calc(
++       layout.density('padding-inline') - convert.to-rem(1px)
++     );
+++    text-overflow: ellipsis;
+++    white-space: nowrap;
++ 
++     .#{$prefix}--btn__icon {
++       position: static;
++@@ -329,6 +342,10 @@
++   }
++ 
++   .#{$prefix}--btn--danger {
+++    display: inline-block;
+++    overflow: hidden;
+++    text-overflow: ellipsis;
+++    white-space: nowrap;
++     @include button-theme(
++       $button-danger-primary,
++       transparent,
++@@ -343,6 +360,10 @@
++     }
++ 
++     &--tertiary {
+++      display: inline-block;
+++      overflow: hidden;
+++      text-overflow: ellipsis;
+++      white-space: nowrap;
++       @include button-theme(
++         transparent,
++         $button-danger-secondary,
++@@ -383,6 +404,9 @@
++     }
++ 
++     &--ghost {
+++      display: inline-block;
+++      overflow: hidden;
+++
++       @include button-theme(
++         transparent,
++         transparent,
++@@ -395,6 +419,8 @@
++       padding-inline-end: calc(
++         layout.density('padding-inline') - convert.to-rem(1px)
++       );
+++      text-overflow: ellipsis;
+++      white-space: nowrap;
++ 
++       .#{$prefix}--btn__icon {
++         position: static;
+diff --git a/carbon-pr-test/PR-22385-summary.md b/carbon-pr-test/PR-22385-summary.md
+new file mode 100644
+index 0000000..f05d248
+--- /dev/null
++++ b/carbon-pr-test/PR-22385-summary.md
+@@ -0,0 +1,68 @@
++# Test PR from Carbon #22385
++
++## Original PR
++- **Title**: fix: button text overflow issue fix
++- **Author**: @Praveen111
++- **URL**: https://github.com/carbon-design-system/carbon/pull/22385
++- **Status**: open
++
++## Changes
++- **Files**: 1
++- **Additions**: +26
++- **Deletions**: -0
++
++## Description
++Closes #22314 
++
++This fixes the text overflow issue for the ButtonBase component highlighted in the issue #22314 
++
++### Changelog
++
++**New**
++
++- N/A
++
++**Changed**
++
++- Button with longer text should display ellipsis if it overflows the button container.
++
++**Removed**
++
++- N/A
++
++#### Testing / Reviewing
++
++- Navigate to Button component in storybook
++- Add longer text content within button and see the ellipsis if the content exceeds the button container.
++
++## PR Checklist
++
++<!-- 
++  Do not remove checklist items.
++  If some are incomplete, create a draft pull request using the create button dropdown.
++  If some do not apply, ~strike through the item text with tildes~.
++-->
++
++As the author of this PR, before marking ready for review, confirm you:
++
++- [ ] Reviewed every line of the diff
++- [ ] Updated documentation and storybook examples
++- [ ] Wrote passing tests that cover this change
++- [ ] Addressed any impact on accessibility (a11y)
++- [ ] Tested for cross-browser consistency
++- [ ] Validated that this code is ready for review and status checks should pass
++
++More details can be found in the [pull request guide](https://github.com/carbon-design-system/carbon/blob/main/docs/guides/reviewing-pull-requests.md)
++
++
++## Files Changed
++- packages/styles/scss/components/button/_button.scss (+26/-0)
++
++## Testing Instructions
++1. Review the changes in this PR
++2. Run the review agent: `npm start`
++3. Check the comments and review summary
++4. All reviews will be posted to this repository
++
++---
++*This is a test PR created from Carbon Design System for local review testing.*
+diff --git a/carbon-pr-test/carbon-pr-22385.patch b/carbon-pr-test/carbon-pr-22385.patch
+new file mode 100644
+index 0000000..bbfa5fb
+--- /dev/null
++++ b/carbon-pr-test/carbon-pr-22385.patch
+@@ -0,0 +1,86 @@
++diff --git a/packages/styles/scss/components/button/_button.scss b/packages/styles/scss/components/button/_button.scss
++index 395f0b57b1d1..6978cda790e1 100644
++--- a/packages/styles/scss/components/button/_button.scss
+++++ b/packages/styles/scss/components/button/_button.scss
++@@ -139,6 +139,10 @@
++   }
++ 
++   .#{$prefix}--btn--secondary {
+++    display: inline-block;
+++    overflow: hidden;
+++    text-overflow: ellipsis;
+++    white-space: nowrap;
++     @include button-theme(
++       $button-secondary,
++       transparent,
++@@ -155,6 +159,10 @@
++   }
++ 
++   .#{$prefix}--btn--tertiary {
+++    display: inline-block;
+++    overflow: hidden;
+++    text-overflow: ellipsis;
+++    white-space: nowrap;
++     @include button-theme(
++       transparent,
++       $button-tertiary,
++@@ -194,6 +202,9 @@
++   }
++ 
++   .#{$prefix}--btn--ghost {
+++    display: inline-block;
+++    overflow: hidden;
+++
++     @include button-theme(
++       transparent,
++       transparent,
++@@ -206,6 +217,8 @@
++     padding-inline-end: calc(
++       layout.density('padding-inline') - convert.to-rem(1px)
++     );
+++    text-overflow: ellipsis;
+++    white-space: nowrap;
++ 
++     .#{$prefix}--btn__icon {
++       position: static;
++@@ -329,6 +342,10 @@
++   }
++ 
++   .#{$prefix}--btn--danger {
+++    display: inline-block;
+++    overflow: hidden;
+++    text-overflow: ellipsis;
+++    white-space: nowrap;
++     @include button-theme(
++       $button-danger-primary,
++       transparent,
++@@ -343,6 +360,10 @@
++     }
++ 
++     &--tertiary {
+++      display: inline-block;
+++      overflow: hidden;
+++      text-overflow: ellipsis;
+++      white-space: nowrap;
++       @include button-theme(
++         transparent,
++         $button-danger-secondary,
++@@ -383,6 +404,9 @@
++     }
++ 
++     &--ghost {
+++      display: inline-block;
+++      overflow: hidden;
+++
++       @include button-theme(
++         transparent,
++         transparent,
++@@ -395,6 +419,8 @@
++       padding-inline-end: calc(
++         layout.density('padding-inline') - convert.to-rem(1px)
++       );
+++      text-overflow: ellipsis;
+++      white-space: nowrap;
++ 
++       .#{$prefix}--btn__icon {
++         position: static;
