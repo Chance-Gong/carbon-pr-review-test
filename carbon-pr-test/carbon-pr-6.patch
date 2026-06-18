@@ -1,0 +1,370 @@
+diff --git a/carbon-pr-test/1-Menu-test.js b/carbon-pr-test/1-Menu-test.js
+new file mode 100644
+index 0000000..8736770
+--- /dev/null
++++ b/carbon-pr-test/1-Menu-test.js
+@@ -0,0 +1,54 @@
++// Sample from Carbon PR #22405
++// Original file: packages/react/src/components/Menu/Menu-test.js
++// Status: modified
++// Changes: +35/-0
++
++@@ -7,6 +7,7 @@
++ 
++ import React from 'react';
++ import { useState } from 'react';
+++import { Checkmark } from '@carbon/icons-react';
++ import { Menu, MenuItem, MenuItemSelectable, MenuItemRadioGroup } from './';
++ import {
++   act,
++@@ -325,6 +326,40 @@ describe('MenuItem', () => {
++ 
++       expect(screen.getByText('item')).toBeInTheDocument();
++     });
+++
+++    it('should mark the menu as having icons when a menu item renders an icon', () => {
+++      render(
+++        <Menu open>
+++          <MenuItem label="item" renderIcon={Checkmark} />
+++        </Menu>
+++      );
+++
+++      expect(screen.getByRole('menu')).toHaveClass(
+++        'cds--menu',
+++        'cds--menu--sm',
+++        'cds--menu--open',
+++        'cds--menu--shown',
+++        'cds--menu--with-icons',
+++        { exact: true }
+++      );
+++    });
+++
+++    it('should mark the menu as having selectable items when a selectable item is rendered', () => {
+++      render(
+++        <Menu open>
+++          <MenuItemSelectable label="item" />
+++        </Menu>
+++      );
+++
+++      expect(screen.getByRole('menu')).toHaveClass(
+++        'cds--menu',
+++        'cds--menu--sm',
+++        'cds--menu--open',
+++        'cds--menu--shown',
+++        'cds--menu--with-selectable-items',
+++        { exact: true }
+++      );
+++    });
++   });
++ 
++   it('should call MenuItemRadioGroup onChange once', async () => {
+diff --git a/carbon-pr-test/2-MenuContext.ts b/carbon-pr-test/2-MenuContext.ts
+new file mode 100644
+index 0000000..6026384
+--- /dev/null
++++ b/carbon-pr-test/2-MenuContext.ts
+@@ -0,0 +1,57 @@
++// Sample from Carbon PR #22405
++// Original file: packages/react/src/components/Menu/MenuContext.ts
++// Status: modified
++// Changes: +14/-15
++
++@@ -7,19 +7,26 @@
++ 
++ import { createContext, KeyboardEvent, RefObject } from 'react';
++ 
++-type ActionType = {
++-  type: 'enableIcons' | 'enableSelectableItems' | 'registerItem';
++-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/carbon-design-system/carbon/issues/20452
++-  payload: any;
+++type RegisterItemPayload = {
+++  ref: RefObject<HTMLLIElement | null>;
+++  disabled: boolean;
++ };
++ 
+++type ActionType =
+++  | {
+++      type: 'enableIcons' | 'enableSelectableItems';
+++    }
+++  | {
+++      type: 'registerItem';
+++      payload: RegisterItemPayload;
+++    };
+++
++ type StateType = {
++   isRoot: boolean;
++   hasIcons: boolean;
++   hasSelectableItems: boolean;
++   size: 'xs' | 'sm' | 'md' | 'lg' | null;
++-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/carbon-design-system/carbon/issues/20452
++-  items: any[];
+++  items: RegisterItemPayload[];
++   requestCloseRoot: (e: Pick<KeyboardEvent<HTMLUListElement>, 'type'>) => void;
++ };
++ 
++@@ -55,17 +62,9 @@ function menuReducer(state: StateType, action: ActionType) {
++   }
++ }
++ 
++-type DispatchFuncProps = {
++-  type: ActionType['type'];
++-  payload: {
++-    ref: RefObject<HTMLLIElement | null>;
++-    disabled: boolean;
++-  };
++-};
++-
++ type MenuContextProps = {
++   state: StateType;
++-  dispatch: (props: DispatchFuncProps) => void;
+++  dispatch: (props: ActionType) => void;
++ };
++ 
++ const MenuContext = createContext<MenuContextProps>({
+diff --git a/carbon-pr-test/3-MenuItem.tsx b/carbon-pr-test/3-MenuItem.tsx
+new file mode 100644
+index 0000000..78e4df6
+--- /dev/null
++++ b/carbon-pr-test/3-MenuItem.tsx
+@@ -0,0 +1,29 @@
++// Sample from Carbon PR #22405
++// Original file: packages/react/src/components/Menu/MenuItem.tsx
++// Status: modified
++// Changes: +0/-3
++
++@@ -282,7 +282,6 @@ export const MenuItem = forwardRef<HTMLLIElement, MenuItemProps>(
++ 
++     useEffect(() => {
++       if (IconElement && !context.state.hasIcons) {
++-        // @ts-expect-error - TODO: Should we be passing payload?
++         context.dispatch({ type: 'enableIcons' });
++       }
++     }, [IconElement, context.state.hasIcons, context]);
++@@ -445,7 +444,6 @@ export const MenuItemSelectable = forwardRef<
++ 
++   useEffect(() => {
++     if (!context.state.hasSelectableItems) {
++-      // @ts-expect-error - TODO: Should we be passing payload?
++       context.dispatch({ type: 'enableSelectableItems' });
++     }
++   }, [context.state.hasSelectableItems, context]);
++@@ -608,7 +606,6 @@ export const MenuItemRadioGroup = forwardRef(function MenuItemRadioGroup<Item>(
++ 
++   useEffect(() => {
++     if (!context.state.hasSelectableItems) {
++-      // @ts-expect-error - TODO: Should we be passing payload?
++       context.dispatch({ type: 'enableSelectableItems' });
++     }
++   }, [context.state.hasSelectableItems, context]);
+diff --git a/carbon-pr-test/PR-22405-summary.md b/carbon-pr-test/PR-22405-summary.md
+new file mode 100644
+index 0000000..1f13991
+--- /dev/null
++++ b/carbon-pr-test/PR-22405-summary.md
+@@ -0,0 +1,63 @@
++# Test PR from Carbon #22405
++
++## Original PR
++- **Title**: fix: add MenuContext action types
++- **Author**: @adamalston
++- **URL**: https://github.com/carbon-design-system/carbon/pull/22405
++- **Status**: open
++
++## Changes
++- **Files**: 3
++- **Additions**: +49
++- **Deletions**: -18
++
++## Description
++Partially addresses https://github.com/carbon-design-system/carbon/issues/20452
++
++Added `MenuContext` action types.
++
++### Changelog
++
++**New**
++
++- Added `MenuContext` action types.
++
++#### Testing / Reviewing
++
++```sh
++yarn test packages/react/src/components/Menu/Menu-test.js
++```
++
++## PR Checklist
++
++<!-- 
++  Do not remove checklist items.
++  If some are incomplete, create a draft pull request using the create button dropdown.
++  If some do not apply, ~strike through the item text with tildes~.
++-->
++
++As the author of this PR, before marking ready for review, confirm you:
++
++- [x] Reviewed every line of the diff
++- [ ] ~Updated documentation and storybook examples~
++- [x] Wrote passing tests that cover this change
++- [ ] ~Addressed any impact on accessibility (a11y)~
++- [ ] ~Tested for cross-browser consistency~
++- [x] Validated that this code is ready for review and status checks should pass
++
++More details can be found in the [pull request guide](https://github.com/carbon-design-system/carbon/blob/main/docs/guides/reviewing-pull-requests.md)
++
++
++## Files Changed
++- packages/react/src/components/Menu/Menu-test.js (+35/-0)
++- packages/react/src/components/Menu/MenuContext.ts (+14/-15)
++- packages/react/src/components/Menu/MenuItem.tsx (+0/-3)
++
++## Testing Instructions
++1. Review the changes in this PR
++2. Run the review agent: `npm start`
++3. Check the comments and review summary
++4. All reviews will be posted to this repository
++
++---
++*This is a test PR created from Carbon Design System for local review testing.*
+diff --git a/carbon-pr-test/carbon-pr-22405.patch b/carbon-pr-test/carbon-pr-22405.patch
+new file mode 100644
+index 0000000..4c36bb7
+--- /dev/null
++++ b/carbon-pr-test/carbon-pr-22405.patch
+@@ -0,0 +1,137 @@
++diff --git a/packages/react/src/components/Menu/Menu-test.js b/packages/react/src/components/Menu/Menu-test.js
++index 974c46deb85e..2e4b65dd9cae 100644
++--- a/packages/react/src/components/Menu/Menu-test.js
+++++ b/packages/react/src/components/Menu/Menu-test.js
++@@ -7,6 +7,7 @@
++ 
++ import React from 'react';
++ import { useState } from 'react';
+++import { Checkmark } from '@carbon/icons-react';
++ import { Menu, MenuItem, MenuItemSelectable, MenuItemRadioGroup } from './';
++ import {
++   act,
++@@ -325,6 +326,40 @@ describe('MenuItem', () => {
++ 
++       expect(screen.getByText('item')).toBeInTheDocument();
++     });
+++
+++    it('should mark the menu as having icons when a menu item renders an icon', () => {
+++      render(
+++        <Menu open>
+++          <MenuItem label="item" renderIcon={Checkmark} />
+++        </Menu>
+++      );
+++
+++      expect(screen.getByRole('menu')).toHaveClass(
+++        'cds--menu',
+++        'cds--menu--sm',
+++        'cds--menu--open',
+++        'cds--menu--shown',
+++        'cds--menu--with-icons',
+++        { exact: true }
+++      );
+++    });
+++
+++    it('should mark the menu as having selectable items when a selectable item is rendered', () => {
+++      render(
+++        <Menu open>
+++          <MenuItemSelectable label="item" />
+++        </Menu>
+++      );
+++
+++      expect(screen.getByRole('menu')).toHaveClass(
+++        'cds--menu',
+++        'cds--menu--sm',
+++        'cds--menu--open',
+++        'cds--menu--shown',
+++        'cds--menu--with-selectable-items',
+++        { exact: true }
+++      );
+++    });
++   });
++ 
++   it('should call MenuItemRadioGroup onChange once', async () => {
++diff --git a/packages/react/src/components/Menu/MenuContext.ts b/packages/react/src/components/Menu/MenuContext.ts
++index f69041669c07..c8926e05a0b6 100644
++--- a/packages/react/src/components/Menu/MenuContext.ts
+++++ b/packages/react/src/components/Menu/MenuContext.ts
++@@ -7,19 +7,26 @@
++ 
++ import { createContext, KeyboardEvent, RefObject } from 'react';
++ 
++-type ActionType = {
++-  type: 'enableIcons' | 'enableSelectableItems' | 'registerItem';
++-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/carbon-design-system/carbon/issues/20452
++-  payload: any;
+++type RegisterItemPayload = {
+++  ref: RefObject<HTMLLIElement | null>;
+++  disabled: boolean;
++ };
++ 
+++type ActionType =
+++  | {
+++      type: 'enableIcons' | 'enableSelectableItems';
+++    }
+++  | {
+++      type: 'registerItem';
+++      payload: RegisterItemPayload;
+++    };
+++
++ type StateType = {
++   isRoot: boolean;
++   hasIcons: boolean;
++   hasSelectableItems: boolean;
++   size: 'xs' | 'sm' | 'md' | 'lg' | null;
++-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/carbon-design-system/carbon/issues/20452
++-  items: any[];
+++  items: RegisterItemPayload[];
++   requestCloseRoot: (e: Pick<KeyboardEvent<HTMLUListElement>, 'type'>) => void;
++ };
++ 
++@@ -55,17 +62,9 @@ function menuReducer(state: StateType, action: ActionType) {
++   }
++ }
++ 
++-type DispatchFuncProps = {
++-  type: ActionType['type'];
++-  payload: {
++-    ref: RefObject<HTMLLIElement | null>;
++-    disabled: boolean;
++-  };
++-};
++-
++ type MenuContextProps = {
++   state: StateType;
++-  dispatch: (props: DispatchFuncProps) => void;
+++  dispatch: (props: ActionType) => void;
++ };
++ 
++ const MenuContext = createContext<MenuContextProps>({
++diff --git a/packages/react/src/components/Menu/MenuItem.tsx b/packages/react/src/components/Menu/MenuItem.tsx
++index 0cff247bf9a6..75cf82073b9f 100644
++--- a/packages/react/src/components/Menu/MenuItem.tsx
+++++ b/packages/react/src/components/Menu/MenuItem.tsx
++@@ -282,7 +282,6 @@ export const MenuItem = forwardRef<HTMLLIElement, MenuItemProps>(
++ 
++     useEffect(() => {
++       if (IconElement && !context.state.hasIcons) {
++-        // @ts-expect-error - TODO: Should we be passing payload?
++         context.dispatch({ type: 'enableIcons' });
++       }
++     }, [IconElement, context.state.hasIcons, context]);
++@@ -445,7 +444,6 @@ export const MenuItemSelectable = forwardRef<
++ 
++   useEffect(() => {
++     if (!context.state.hasSelectableItems) {
++-      // @ts-expect-error - TODO: Should we be passing payload?
++       context.dispatch({ type: 'enableSelectableItems' });
++     }
++   }, [context.state.hasSelectableItems, context]);
++@@ -608,7 +606,6 @@ export const MenuItemRadioGroup = forwardRef(function MenuItemRadioGroup<Item>(
++ 
++   useEffect(() => {
++     if (!context.state.hasSelectableItems) {
++-      // @ts-expect-error - TODO: Should we be passing payload?
++       context.dispatch({ type: 'enableSelectableItems' });
++     }
++   }, [context.state.hasSelectableItems, context]);
