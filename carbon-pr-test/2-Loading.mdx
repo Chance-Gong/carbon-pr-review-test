@@ -1,0 +1,22 @@
+// Sample from Carbon PR 22196
+// Original file: packages/react/src/components/Loading/Loading.mdx
+// Status: modified
+// Changes: +10/-0
+
+@@ -35,6 +35,16 @@ import { stackblitzPrefillConfig } from '../../../previewer/codePreviewer';
+   ]}
+ />
+ 
++<Canvas
++  of={LoadingStories.UXExample}
++  additionalActions={[
++    {
++      title: 'Open in Stackblitz',
++      onClick: () => stackblitzPrefillConfig(LoadingStories.UXExample),
++    },
++  ]}
++/>
++
+ ## Component API
+ 
+ <ArgTypes />
