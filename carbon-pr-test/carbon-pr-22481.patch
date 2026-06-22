@@ -1,0 +1,87 @@
+diff --git a/packages/react/src/components/MultiSelect/FilterableMultiSelect.tsx b/packages/react/src/components/MultiSelect/FilterableMultiSelect.tsx
+index cd8f6a8984b7..a8086b7c2ed3 100644
+--- a/packages/react/src/components/MultiSelect/FilterableMultiSelect.tsx
++++ b/packages/react/src/components/MultiSelect/FilterableMultiSelect.tsx
+@@ -713,6 +713,10 @@ export const FilterableMultiSelect = forwardRef(function FilterableMultiSelect<
+         setHighlightedIndex(changes.selectedItem);
+         return changes;
+       case InputBlur:
++        setInputValue('');
++        setInputFocused(false);
++        setIsOpen(false);
++        return changes;
+       case InputKeyDownEscape:
+         setIsOpen(false);
+         return changes;
+@@ -826,6 +830,17 @@ export const FilterableMultiSelect = forwardRef(function FilterableMultiSelect<
+       setInputValue(value ?? '');
+     }
+ 
++    // Only trigger callback for mouse events (clear button clicks)
++    // Keyboard events will trigger InputChange naturally through Downshift
++    if (onInputValueChange && event && !('key' in event)) {
++      setInputValue('');
++      onInputValueChange({
++        inputValue: '',
++        type: InputChange,
++      });
++      setIsOpen(false);
++    }
++
+     if (textInput.current) {
+       textInput.current.focus();
+     }
+@@ -938,10 +953,6 @@ export const FilterableMultiSelect = forwardRef(function FilterableMultiSelect<
+         }
+       },
+       onFocus: () => setInputFocused(true),
+-      onBlur: () => {
+-        setInputFocused(false);
+-        setInputValue('');
+-      },
+     })
+   );
+ 
+diff --git a/packages/react/src/components/MultiSelect/__tests__/FilterableMultiSelect-test.js b/packages/react/src/components/MultiSelect/__tests__/FilterableMultiSelect-test.js
+index 98fa77a355c9..0674a71a20df 100644
+--- a/packages/react/src/components/MultiSelect/__tests__/FilterableMultiSelect-test.js
++++ b/packages/react/src/components/MultiSelect/__tests__/FilterableMultiSelect-test.js
+@@ -327,6 +327,38 @@ describe('FilterableMultiSelect', () => {
+ 
+     expect(screen.getByPlaceholderText('test')).toHaveDisplayValue('');
+   });
++  it('should trigger onInputValueChange when clicking clear button', async () => {
++    const onInputValueChange = jest.fn();
++    render(
++      <FilterableMultiSelect
++        {...mockProps}
++        placeholder="test"
++        onInputValueChange={onInputValueChange}
++      />
++    );
++    await openMenu();
++
++    // Type some text
++    await userEvent.type(screen.getByPlaceholderText('test'), '3');
++
++    // Clear the callback mock to ignore typing events
++    onInputValueChange.mockClear();
++
++    // Click the clear button
++    const clearButton = screen.getByRole('button', {
++      name: 'Clear selected item',
++    });
++    await userEvent.click(clearButton);
++
++    // Verify the input is cleared
++    expect(screen.getByPlaceholderText('test')).toHaveDisplayValue('');
++
++    // Verify onInputValueChange was called with empty string
++    expect(onInputValueChange).toHaveBeenCalledTimes(1);
++    expect(onInputValueChange).toHaveBeenCalledWith(
++      expect.objectContaining({ inputValue: '' })
++    );
++  });
+ 
+   it('should respect slug prop', async () => {
+     const spy = jest.spyOn(console, 'warn').mockImplementation(() => {});
