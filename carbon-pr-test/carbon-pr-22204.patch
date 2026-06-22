@@ -1,0 +1,263 @@
+diff --git a/packages/react/src/components/ComboBox/ComboBox.tsx b/packages/react/src/components/ComboBox/ComboBox.tsx
+index 57a9faff9158..0c566caa2e74 100644
+--- a/packages/react/src/components/ComboBox/ComboBox.tsx
++++ b/packages/react/src/components/ComboBox/ComboBox.tsx
+@@ -53,7 +53,11 @@ import { autoUpdate, flip, hide, useFloating } from '@floating-ui/react';
+ import type { TranslateWithId } from '../../types/common';
+ import { useFeatureFlag } from '../FeatureFlags';
+ import { AILabel } from '../AILabel';
+-import { defaultItemToString, isComponentElement } from '../../internal';
++import {
++  defaultItemToString,
++  isComponentElement,
++  isItemDisabled,
++} from '../../internal';
+ 
+ const {
+   InputBlur,
+@@ -70,12 +74,6 @@ const {
+ 
+ const defaultShouldFilterItem = () => true;
+ 
+-const isDisabledItem = (item: unknown) =>
+-  item !== null &&
+-  typeof item === 'object' &&
+-  'disabled' in item &&
+-  Boolean(item.disabled);
+-
+ const autocompleteCustomFilter = ({
+   item,
+   inputValue,
+@@ -139,7 +137,7 @@ const findHighlightedIndex = <ItemType,>(
+ 
+   for (let i = 0; i < items.length; i++) {
+     const item = itemToString(items[i]).toLowerCase();
+-    if (!isDisabledItem(items[i]) && item.indexOf(searchValue) !== -1) {
++    if (!isItemDisabled(items[i]) && item.indexOf(searchValue) !== -1) {
+       return i;
+     }
+   }
+@@ -476,7 +474,7 @@ const ComboBox = forwardRef(
+           if (inputValue) {
+             const filteredItems = items.filter(
+               (item) =>
+-                !isDisabledItem(item) &&
++                !isItemDisabled(item) &&
+                 autocompleteCustomFilter({
+                   item: itemToString(item),
+                   inputValue: inputValue,
+@@ -692,7 +690,7 @@ const ComboBox = forwardRef(
+                 );
+                 const highlightedItem = filteredList[state.highlightedIndex];
+ 
+-                if (highlightedItem && !isDisabledItem(highlightedItem)) {
++                if (highlightedItem && !isItemDisabled(highlightedItem)) {
+                   return {
+                     ...changes,
+                     selectedItem: highlightedItem,
+@@ -704,7 +702,7 @@ const ComboBox = forwardRef(
+                 if (autoIndex !== -1) {
+                   const matchingItem = items[autoIndex];
+ 
+-                  if (matchingItem && !isDisabledItem(matchingItem)) {
++                  if (matchingItem && !isItemDisabled(matchingItem)) {
+                     return {
+                       ...changes,
+                       selectedItem: matchingItem,
+@@ -894,7 +892,7 @@ const ComboBox = forwardRef(
+       initialSelectedItem: initialSelectedItem,
+       inputId: id,
+       stateReducer,
+-      isItemDisabled: isDisabledItem,
++      isItemDisabled,
+       ...downshiftProps,
+       onStateChange: ({ type, selectedItem: newSelectedItem }) => {
+         if (
+@@ -1195,7 +1193,7 @@ const ComboBox = forwardRef(
+                     //  event.preventDefault();
+                     const matchingItem = items.find(
+                       (item) =>
+-                        !isDisabledItem(item) &&
++                        !isItemDisabled(item) &&
+                         itemToString(item)
+                           .toLowerCase()
+                           .startsWith(inputValue.toLowerCase())
+diff --git a/packages/react/src/components/Dropdown/Dropdown.tsx b/packages/react/src/components/Dropdown/Dropdown.tsx
+index 47219344dc55..25d89dbb31bb 100644
+--- a/packages/react/src/components/Dropdown/Dropdown.tsx
++++ b/packages/react/src/components/Dropdown/Dropdown.tsx
+@@ -58,7 +58,11 @@ import {
+ } from '@floating-ui/react';
+ import { useFeatureFlag } from '../FeatureFlags';
+ import { AILabel } from '../AILabel';
+-import { defaultItemToString, isComponentElement } from '../../internal';
++import {
++  defaultItemToString,
++  isComponentElement,
++  isItemDisabled,
++} from '../../internal';
+ 
+ const { ItemMouseMove, MenuMouseLeave, ToggleButtonBlur, FunctionCloseMenu } =
+   useSelect.stateChangeTypes as UseSelectInterface['stateChangeTypes'] & {
+@@ -381,11 +385,6 @@ const Dropdown = React.forwardRef(
+       [onChange]
+     );
+ 
+-    const isItemDisabled = useCallback((item) => {
+-      const isObject = item !== null && typeof item === 'object';
+-      return isObject && 'disabled' in item && item.disabled === true;
+-    }, []);
+-
+     const onHighlightedIndexChange = useCallback(
+       (changes: UseSelectStateChange<ItemType>) => {
+         const { highlightedIndex } = changes;
+@@ -425,7 +424,6 @@ const Dropdown = React.forwardRef(
+         initialSelectedItem,
+         onSelectedItemChange,
+         stateReducer,
+-        isItemDisabled,
+         onHighlightedIndexChange,
+         downshiftProps,
+       ]
+diff --git a/packages/react/src/components/MultiSelect/FilterableMultiSelect.tsx b/packages/react/src/components/MultiSelect/FilterableMultiSelect.tsx
+index cd8f6a8984b7..3c56cf34e2f6 100644
+--- a/packages/react/src/components/MultiSelect/FilterableMultiSelect.tsx
++++ b/packages/react/src/components/MultiSelect/FilterableMultiSelect.tsx
+@@ -66,7 +66,11 @@ import {
+ } from '@floating-ui/react';
+ import type { TranslateWithId } from '../../types/common';
+ import { AILabel } from '../AILabel';
+-import { defaultItemToString, isComponentElement } from '../../internal';
++import {
++  defaultItemToString,
++  isComponentElement,
++  isItemDisabled,
++} from '../../internal';
+ import { hasHelperText } from '../../internal/hasHelperText';
+ import { useNormalizedInputProps } from '../../internal/useNormalizedInputProps';
+ import useIsomorphicEffect from '../../internal/useIsomorphicEffect';
+@@ -407,8 +411,7 @@ export const FilterableMultiSelect = forwardRef(function FilterableMultiSelect<
+ 
+   const selectAllStatus = useMemo(() => {
+     const selectable = nonSelectAllItems.filter(
+-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/carbon-design-system/carbon/issues/20452
+-      (item) => !(item as any).disabled
++      (item) => !isItemDisabled(item)
+     );
+ 
+     const nonSelectedCount = selectable.filter(
+@@ -423,8 +426,9 @@ export const FilterableMultiSelect = forwardRef(function FilterableMultiSelect<
+   }, [controlledSelectedItems, nonSelectAllItems]);
+ 
+   const handleSelectAllClick = useCallback(() => {
+-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/carbon-design-system/carbon/issues/20452
+-    const selectable = nonSelectAllItems.filter((i) => !(i as any).disabled);
++    const selectable = nonSelectAllItems.filter(
++      (item) => !isItemDisabled(item)
++    );
+     const { checked, indeterminate } = selectAllStatus;
+ 
+     // clear all options if select-all state is checked or indeterminate
+@@ -500,8 +504,7 @@ export const FilterableMultiSelect = forwardRef(function FilterableMultiSelect<
+     const selectAllItem = items.find(isSelectAllItem);
+ 
+     const selectableRealItems = nonSelectAllItems.filter(
+-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/carbon-design-system/carbon/issues/20452
+-      (item) => !(item as any).disabled
++      (item) => !isItemDisabled(item)
+     );
+ 
+     // Sort only non-select-all items, select-all item must stay at the top
+@@ -677,10 +680,7 @@ export const FilterableMultiSelect = forwardRef(function FilterableMultiSelect<
+     inputId,
+     inputValue,
+     stateReducer,
+-    isItemDisabled(item) {
+-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/carbon-design-system/carbon/issues/20452
+-      return (item as any)?.disabled;
+-    },
++    isItemDisabled,
+   });
+   function stateReducer(state, actionAndChanges) {
+     const { type, props, changes } = actionAndChanges;
+@@ -694,7 +694,7 @@ export const FilterableMultiSelect = forwardRef(function FilterableMultiSelect<
+         if (sortedItems.length === 0) {
+           return changes;
+         }
+-        if (changes.selectedItem && changes.selectedItem.disabled !== true) {
++        if (changes.selectedItem && !isItemDisabled(changes.selectedItem)) {
+           if (isSelectAllItem(changes.selectedItem)) {
+             handleSelectAllClick();
+           } else {
+diff --git a/packages/react/src/components/MultiSelect/MultiSelect.tsx b/packages/react/src/components/MultiSelect/MultiSelect.tsx
+index 20664f774e15..97e9386fba13 100644
+--- a/packages/react/src/components/MultiSelect/MultiSelect.tsx
++++ b/packages/react/src/components/MultiSelect/MultiSelect.tsx
+@@ -61,7 +61,11 @@ import {
+ } from '@floating-ui/react';
+ import { useFeatureFlag } from '../FeatureFlags';
+ import { AILabel } from '../AILabel';
+-import { defaultItemToString, isComponentElement } from '../../internal';
++import {
++  defaultItemToString,
++  isComponentElement,
++  isItemDisabled,
++} from '../../internal';
+ import { useNormalizedInputProps } from '../../internal/useNormalizedInputProps';
+ import useIsomorphicEffect from '../../internal/useIsomorphicEffect';
+ 
+@@ -445,10 +449,7 @@ export const MultiSelect = React.forwardRef(
+       },
+       selectedItem: controlledSelectedItems as ItemType,
+       items: filteredItems,
+-      isItemDisabled(item) {
+-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/carbon-design-system/carbon/issues/20452
+-        return (item as any)?.disabled;
+-      },
++      isItemDisabled,
+       ...downshiftProps,
+     };
+ 
+@@ -740,7 +741,7 @@ export const MultiSelect = React.forwardRef(
+         ).length;
+ 
+         const totalSelectableCount = filteredItems.filter(
+-          (item) => !isSelectAllItem(item) && !item.disabled
++          (item) => !isSelectAllItem(item) && !isItemDisabled(item)
+         ).length;
+ 
+         return {
+diff --git a/packages/react/src/internal/index.ts b/packages/react/src/internal/index.ts
+index 6120dc64a983..fc8e74597c43 100644
+--- a/packages/react/src/internal/index.ts
++++ b/packages/react/src/internal/index.ts
+@@ -1,9 +1,10 @@
+ /**
+- * Copyright IBM Corp. 2025
++ * Copyright IBM Corp. 2025, 2026
+  *
+  * This source code is licensed under the Apache-2.0 license found in the
+  * LICENSE file in the root directory of this source tree.
+  */
+ 
+ export * from './defaultItemToString';
++export * from './isItemDisabled';
+ export * from './utils';
+diff --git a/packages/react/src/internal/isItemDisabled.ts b/packages/react/src/internal/isItemDisabled.ts
+new file mode 100644
+index 000000000000..7165c2524508
+--- /dev/null
++++ b/packages/react/src/internal/isItemDisabled.ts
+@@ -0,0 +1,12 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++export const isItemDisabled = (item: unknown) =>
++  item !== null &&
++  typeof item === 'object' &&
++  'disabled' in item &&
++  item.disabled === true;
