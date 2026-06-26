@@ -1,0 +1,393 @@
+diff --git a/packages/styles/scss/components/__tests__/accordion-test.js b/packages/styles/scss/components/__tests__/accordion-test.js
+index 5467d35358ff..92769dbcf0d2 100644
+--- a/packages/styles/scss/components/__tests__/accordion-test.js
++++ b/packages/styles/scss/components/__tests__/accordion-test.js
+@@ -1,5 +1,5 @@
+ /**
+- * Copyright IBM Corp. 2018, 2023
++ * Copyright IBM Corp. 2018, 2026
+  *
+  * This source code is licensed under the Apache-2.0 license found in the
+  * LICENSE file in the root directory of this source tree.
+@@ -10,6 +10,7 @@
+ 'use strict';
+ 
+ const { SassRenderer } = require('@carbon/test-utils/scss');
++const css = require('css');
+ 
+ const { render } = SassRenderer.create(__dirname);
+ 
+@@ -44,4 +45,83 @@ describe('scss/components/accordion', () => {
+     `);
+     expect(unwrap('direction')).toBe('row');
+   });
++
++  test('hover styles are only applied on devices that support hover', async () => {
++    const { result } = await render(`
++      @use '../accordion';
++    `);
++    const { stylesheet } = css.parse(
++      removeAtRule(result.css.toString(), '@starting-style')
++    );
++
++    function getAccordionHoverSelectors(rules, media = []) {
++      return rules.flatMap((rule) => {
++        if (rule.type === 'media') {
++          return getAccordionHoverSelectors(rule.rules, [...media, rule.media]);
++        }
++
++        if (rule.type !== 'rule') {
++          return [];
++        }
++
++        return rule.selectors
++          .filter((selector) => {
++            return (
++              selector.includes('.cds--accordion') &&
++              selector.includes(':hover')
++            );
++          })
++          .map((selector) => {
++            return { media, selector };
++          });
++      });
++    }
++
++    const hoverSelectors = getAccordionHoverSelectors(stylesheet.rules);
++
++    expect(hoverSelectors).toEqual(
++      expect.arrayContaining([
++        expect.objectContaining({
++          media: expect.arrayContaining([
++            expect.stringContaining('(any-hover: hover)'),
++          ]),
++          selector: expect.stringContaining('.cds--accordion__heading:hover'),
++        }),
++      ])
++    );
++    expect(
++      hoverSelectors.every(({ media }) => {
++        return media.some((query) => query.includes('(any-hover: hover)'));
++      })
++    ).toBe(true);
++  });
+ });
++
++function removeAtRule(cssText, atRule) {
++  const start = cssText.indexOf(atRule);
++
++  if (start === -1) {
++    return cssText;
++  }
++
++  const blockStart = cssText.indexOf('{', start);
++  let blockEnd = blockStart;
++  let depth = 0;
++
++  for (let i = blockStart; i < cssText.length; i++) {
++    if (cssText[i] === '{') {
++      depth++;
++    }
++
++    if (cssText[i] === '}') {
++      depth--;
++    }
++
++    if (depth === 0) {
++      blockEnd = i + 1;
++      break;
++    }
++  }
++
++  return `${cssText.slice(0, start)}${cssText.slice(blockEnd)}`;
++}
+diff --git a/packages/styles/scss/components/accordion/_accordion.scss b/packages/styles/scss/components/accordion/_accordion.scss
+index 93b9ec1cdc12..4bd0d47015d3 100644
+--- a/packages/styles/scss/components/accordion/_accordion.scss
++++ b/packages/styles/scss/components/accordion/_accordion.scss
+@@ -1,5 +1,5 @@
+ //
+-// Copyright IBM Corp. 2018, 2023
++// Copyright IBM Corp. 2018, 2026
+ //
+ // This source code is licensed under the Apache-2.0 license found in the
+ // LICENSE file in the root directory of this source tree.
+@@ -68,16 +68,19 @@ $content-padding: 0 0 0 $spacing-05 !default;
+   }
+ 
+   .#{$prefix}--accordion__item:not(.#{$prefix}--accordion__item--active) {
+-    // Blend border on hover
+-    &:hover,
+-    // Blend top border of the next component on hover
+-    &:hover + .#{$prefix}--accordion__item {
+-      border-block-start-color: $layer-hover;
+-    }
++    // Apply hover styles only on devices that support hover
++    @media (any-hover: hover) {
++      // Blend border on hover
++      &:hover,
++      // Blend top border of the next component on hover
++      &:hover + .#{$prefix}--accordion__item {
++        border-block-start-color: $layer-hover;
++      }
+ 
+-    // Blend bottom border of last item on hover
+-    &:last-child:hover {
+-      border-block-end-color: $layer-hover;
++      // Blend bottom border of last item on hover
++      &:last-child:hover {
++        border-block-end-color: $layer-hover;
++      }
+     }
+   }
+ 
+@@ -99,9 +102,12 @@ $content-padding: 0 0 0 $spacing-05 !default;
+       padding-inline-end: layout.density('padding-inline');
+     }
+ 
+-    &:hover {
+-      background-color: $layer-hover;
+-      outline: none;
++    // Apply hover styles only on devices that support hover
++    @media (any-hover: hover) {
++      &:hover {
++        background-color: $layer-hover;
++        outline: none;
++      }
+     }
+ 
+     &:focus {
+@@ -137,8 +143,11 @@ $content-padding: 0 0 0 $spacing-05 !default;
+     fill: $icon-disabled;
+   }
+ 
+-  .#{$prefix}--accordion__heading[disabled]:hover::before {
+-    background-color: transparent;
++  // Apply hover styles only on devices that support hover
++  @media (any-hover: hover) {
++    .#{$prefix}--accordion__heading[disabled]:hover::before {
++      background-color: transparent;
++    }
+   }
+ 
+   .#{$prefix}--accordion__item--disabled,
+@@ -276,10 +285,7 @@ $content-padding: 0 0 0 $spacing-05 !default;
+     position: relative;
+     border-color: transparent;
+ 
+-    &:last-child,
+-    &:hover,
+-    &:last-child:hover,
+-    &:hover + .#{$prefix}--accordion__item {
++    &:last-child {
+       border-color: transparent;
+     }
+ 
+@@ -309,38 +315,52 @@ $content-padding: 0 0 0 $spacing-05 !default;
+     }
+   }
+ 
+-  .#{$prefix}--accordion--flush .#{$prefix}--accordion__heading:hover {
+-    position: relative;
+-    z-index: 1;
++  // Apply hover styles only on devices that support hover
++  @media (any-hover: hover) {
++    .#{$prefix}--accordion--flush .#{$prefix}--accordion__item:hover,
++    .#{$prefix}--accordion--flush .#{$prefix}--accordion__item:last-child:hover,
++    .#{$prefix}--accordion--flush
++      .#{$prefix}--accordion__item:hover
++      + .#{$prefix}--accordion__item {
++      border-color: transparent;
++    }
++  }
+ 
+-    // blend top/bottom border into heading hover state
+-    &::before,
+-    &::after {
+-      position: absolute;
+-      display: block;
+-      background: $layer-hover;
+-      block-size: 1px;
+-      content: '';
+-      inline-size: 100%;
+-      inset-inline-start: 0;
+-      transition: background motion(standard, productive) $duration-fast-02;
++  // Apply hover styles only on devices that support hover
++  @media (any-hover: hover) {
++    .#{$prefix}--accordion--flush .#{$prefix}--accordion__heading:hover {
++      position: relative;
++      z-index: 1;
+ 
+-      @media screen and (prefers-reduced-motion: reduce) {
+-        transition: none;
++      // blend top/bottom border into heading hover state
++      &::before,
++      &::after {
++        position: absolute;
++        display: block;
++        background: $layer-hover;
++        block-size: 1px;
++        content: '';
++        inline-size: 100%;
++        inset-inline-start: 0;
++        transition: background motion(standard, productive) $duration-fast-02;
++
++        @media screen and (prefers-reduced-motion: reduce) {
++          transition: none;
++        }
+       }
+-    }
+ 
+-    &::before {
+-      inset-block-start: -1px;
+-    }
++      &::before {
++        inset-block-start: -1px;
++      }
+ 
+-    &::after {
+-      inset-block-end: -1px;
+-    }
++      &::after {
++        inset-block-end: -1px;
++      }
+ 
+-    &:focus::after,
+-    &:focus::before {
+-      background: none;
++      &:focus::after,
++      &:focus::before {
++        background: none;
++      }
+     }
+   }
+ 
+@@ -355,7 +375,6 @@ $content-padding: 0 0 0 $spacing-05 !default;
+     fill: $icon-primary;
+     pointer-events: none;
+ 
+-    &:hover,
+     &:focus,
+     &:active {
+       border: none;
+@@ -364,11 +383,24 @@ $content-padding: 0 0 0 $spacing-05 !default;
+     }
+   }
+ 
+-  .#{$prefix}--accordion.#{$prefix}--skeleton
+-    .#{$prefix}--accordion__heading:hover::before,
+-  .#{$prefix}--accordion.#{$prefix}--skeleton
+-    .#{$prefix}--accordion__heading:hover {
+-    background-color: transparent;
++  // Apply hover styles only on devices that support hover
++  @media (any-hover: hover) {
++    .#{$prefix}--accordion.#{$prefix}--skeleton
++      .#{$prefix}--accordion__arrow:hover {
++      border: none;
++      cursor: default;
++      outline: none;
++    }
++  }
++
++  // Apply hover styles only on devices that support hover
++  @media (any-hover: hover) {
++    .#{$prefix}--accordion.#{$prefix}--skeleton
++      .#{$prefix}--accordion__heading:hover::before,
++    .#{$prefix}--accordion.#{$prefix}--skeleton
++      .#{$prefix}--accordion__heading:hover {
++      background-color: transparent;
++    }
+   }
+ 
+   .#{$prefix}--accordion--end.#{$prefix}--skeleton
+diff --git a/packages/web-components/src/components/accordion/accordion.scss b/packages/web-components/src/components/accordion/accordion.scss
+index 8b23611fc6a9..d44738284362 100644
+--- a/packages/web-components/src/components/accordion/accordion.scss
++++ b/packages/web-components/src/components/accordion/accordion.scss
+@@ -1,5 +1,5 @@
+ //
+-// Copyright IBM Corp. 2019, 2025
++// Copyright IBM Corp. 2019, 2026
+ //
+ // This source code is licensed under the Apache-2.0 license found in the
+ // LICENSE file in the root directory of this source tree.
+@@ -106,37 +106,40 @@ $css--plex: true !default;
+   }
+ }
+ 
+-:host([isFlush]) .#{$prefix}--accordion__heading:hover {
+-  position: relative;
+-  z-index: 1;
++// Apply hover styles only on devices that support hover
++@media (any-hover: hover) {
++  :host([isFlush]) .#{$prefix}--accordion__heading:hover {
++    position: relative;
++    z-index: 1;
+ 
+-  &::before,
+-  &::after {
+-    position: absolute;
+-    display: block;
+-    background: $layer-hover;
+-    block-size: 1px;
+-    content: '';
+-    inline-size: 100%;
+-    inset-inline-start: 0;
+-    transition: background $duration-fast-02 motion(standard, productive);
++    &::before,
++    &::after {
++      position: absolute;
++      display: block;
++      background: $layer-hover;
++      block-size: 1px;
++      content: '';
++      inline-size: 100%;
++      inset-inline-start: 0;
++      transition: background $duration-fast-02 motion(standard, productive);
+ 
+-    @media screen and (prefers-reduced-motion: reduce) {
+-      transition: none;
++      @media screen and (prefers-reduced-motion: reduce) {
++        transition: none;
++      }
+     }
+-  }
+ 
+-  &::before {
+-    inset-block-start: -1px;
+-  }
++    &::before {
++      inset-block-start: -1px;
++    }
+ 
+-  &::after {
+-    inset-block-end: -1px;
+-  }
++    &::after {
++      inset-block-end: -1px;
++    }
+ 
+-  &:focus::before,
+-  &:focus::after {
+-    background: none;
++    &:focus::before,
++    &:focus::after {
++      background: none;
++    }
+   }
+ }
+ 
+@@ -170,8 +173,11 @@ $css--plex: true !default;
+     cursor: default;
+     pointer-events: none;
+ 
+-    &:hover::before {
+-      background: transparent;
++    // Apply hover styles only on devices that support hover
++    @media (any-hover: hover) {
++      &:hover::before {
++        background: transparent;
++      }
+     }
+   }
+ }
