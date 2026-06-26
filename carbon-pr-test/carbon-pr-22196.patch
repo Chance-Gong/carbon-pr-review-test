@@ -1,0 +1,336 @@
+diff --git a/packages/react/src/components/Loading/Loading-test.js b/packages/react/src/components/Loading/Loading-test.js
+index 944ee842c1e6..0e798410e185 100644
+--- a/packages/react/src/components/Loading/Loading-test.js
++++ b/packages/react/src/components/Loading/Loading-test.js
+@@ -1,5 +1,5 @@
+ /**
+- * Copyright IBM Corp. 2016, 2023
++ * Copyright IBM Corp. 2016, 2026
+  *
+  * This source code is licensed under the Apache-2.0 license found in the
+  * LICENSE file in the root directory of this source tree.
+@@ -7,23 +7,24 @@
+ 
+ import React from 'react';
+ import Loading from './Loading';
+-import { render, screen } from '@testing-library/react';
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ describe('Loading', () => {
+   describe('renders as expected - Component API', () => {
+     it('should change classes based on active', () => {
+       const { container, rerender } = render(<Loading active />);
++      // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
++      const overlay = container.firstChild;
+ 
+-      expect(container.firstChild).not.toHaveClass(
+-        'cds--loading-overlay--stop'
+-      );
++      expect(overlay).not.toHaveClass('cds--loading-overlay--stop');
+ 
+       rerender(<Loading active={false} />);
+ 
+-      expect(container.firstChild).toHaveClass('cds--loading-overlay--stop');
++      expect(overlay).toHaveClass('cds--loading-overlay--stop');
+     });
+ 
+-    it('should support a custom `className` prop on the outermost element', () => {
++    it('should support a custom `className` prop on the loading element', () => {
+       const { container } = render(
+         <Loading className="custom-class" withOverlay={false} />
+       );
+@@ -31,7 +32,7 @@ describe('Loading', () => {
+       expect(container.firstChild).toHaveClass('custom-class');
+     });
+ 
+-    it('should spread extra props on the outermost element', () => {
++    it('should spread extra props on the loading element when withOverlay is false', () => {
+       const { container } = render(
+         <Loading withOverlay={false} data-testid="test" />
+       );
+@@ -60,29 +61,114 @@ describe('Loading', () => {
+ 
+       expect(container.firstChild).not.toHaveClass('cds--loading-overlay');
+     });
++
++    it('should render presentation wrapper and dialog when withOverlay is true', () => {
++      const { container } = render(<Loading withOverlay />);
++      // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
++      const overlay = container.firstChild;
++      expect(overlay).toHaveAttribute('role', 'presentation');
++      // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
++      const dialog = overlay.firstChild;
++      expect(dialog).toHaveAttribute('role', 'dialog');
++      expect(dialog).toHaveAttribute('aria-modal', 'true');
++    });
++
++    it('should not render overlay wrapper when withOverlay is false', () => {
++      const { container } = render(<Loading withOverlay={false} />);
++
++      expect(container.firstChild).toHaveClass('cds--loading');
++      expect(container.firstChild).not.toHaveAttribute('role', 'presentation');
++    });
+   });
+ 
+   describe('with a screenreader', () => {
+     // https://www.w3.org/TR/WCAG21/#headings-and-labels
+-    it('should have a label on the live region', () => {
++    it('should have a live region on the loading element', () => {
+       const { container } = render(<Loading />);
+       // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+       const liveRegion = container.querySelector('[aria-live]');
+       expect(liveRegion).toBeInstanceOf(HTMLElement);
++      expect(liveRegion).toHaveClass('cds--loading');
+     });
+ 
+     // https://www.w3.org/TR/WCAG21/#status-messages
+-    it('should announce a loading status', () => {
+-      const { container } = render(<Loading />);
++    it('should announce a loading status when active', () => {
++      const { container } = render(<Loading active />);
+       // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+       const liveRegion = container.querySelector('[aria-live]');
+       expect(liveRegion).toBeInstanceOf(HTMLElement);
+ 
+-      const atomicBoolean = liveRegion.getAttribute('aria-atomic');
+-      expect(atomicBoolean).toBe('true');
++      expect(liveRegion).toHaveAttribute('aria-atomic', 'true');
++      expect(liveRegion).toHaveAttribute('aria-live', 'assertive');
++    });
++
++    it('should set aria-live to off when not active', () => {
++      const { container } = render(<Loading active={false} />);
++      // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
++      const liveRegion = container.querySelector('[aria-live]');
++
++      expect(liveRegion).toHaveAttribute('aria-live', 'off');
++    });
++
++    it('should set aria-label on dialog when withOverlay is true', () => {
++      render(<Loading withOverlay description="Loading content" />);
++
++      const dialog = screen.getByRole('dialog');
++      expect(dialog).toHaveAttribute('aria-label', 'Loading content');
++    });
++  });
++
++  describe('focus trap', () => {
++    it('should prevent Tab from moving focus outside overlay', async () => {
++      const user = userEvent.setup();
++
++      render(
++        <div>
++          <button data-testid="before">Before</button>
++          <Loading withOverlay active />
++          <button data-testid="after">After</button>
++        </div>
++      );
++
++      const dialog = screen.getByRole('dialog');
++
++      await waitFor(() => {
++        expect(document.activeElement).toBe(dialog);
++      });
++
++      await user.tab();
++      expect(document.activeElement).toBe(dialog);
++
++      await user.tab({ shift: true });
++      expect(document.activeElement).toBe(dialog);
++    });
++
++    it('should restore focus when overlay deactivates', () => {
++      const { rerender } = render(
++        <div>
++          <button data-testid="trigger">Trigger</button>
++          <Loading withOverlay active={false} />
++        </div>
++      );
++
++      const trigger = screen.getByTestId('trigger');
++      trigger.focus();
++
++      rerender(
++        <div>
++          <button data-testid="trigger">Trigger</button>
++          <Loading withOverlay active />
++        </div>
++      );
++
++      rerender(
++        <div>
++          <button data-testid="trigger">Trigger</button>
++          <Loading withOverlay active={false} />
++        </div>
++      );
+ 
+-      const ariaLiveValue = liveRegion.getAttribute('aria-live');
+-      expect(ariaLiveValue).toEqual('assertive');
++      expect(document.activeElement).toBe(trigger);
+     });
+   });
+ });
+diff --git a/packages/react/src/components/Loading/Loading.mdx b/packages/react/src/components/Loading/Loading.mdx
+index a1b00dda4e49..f58243ea9ffa 100644
+--- a/packages/react/src/components/Loading/Loading.mdx
++++ b/packages/react/src/components/Loading/Loading.mdx
+@@ -35,6 +35,16 @@ import { stackblitzPrefillConfig } from '../../../previewer/codePreviewer';
+   ]}
+ />
+ 
++<Canvas
++  of={LoadingStories.UXExample}
++  additionalActions={[
++    {
++      title: 'Open in Stackblitz',
++      onClick: () => stackblitzPrefillConfig(LoadingStories.UXExample),
++    },
++  ]}
++/>
++
+ ## Component API
+ 
+ <ArgTypes />
+diff --git a/packages/react/src/components/Loading/Loading.stories.js b/packages/react/src/components/Loading/Loading.stories.js
+index 2ca9bf2d50ef..837af5c8fe29 100644
+--- a/packages/react/src/components/Loading/Loading.stories.js
++++ b/packages/react/src/components/Loading/Loading.stories.js
+@@ -1,13 +1,14 @@
+ /**
+- * Copyright IBM Corp. 2016, 2023
++ * Copyright IBM Corp. 2016, 2026
+  *
+  * This source code is licensed under the Apache-2.0 license found in the
+  * LICENSE file in the root directory of this source tree.
+  */
+ 
+-import React from 'react';
++import React, { useState } from 'react';
+ import Loading from '.';
+ import mdx from './Loading.mdx';
++import Button from '../Button';
+ 
+ export default {
+   title: 'Components/Loading',
+@@ -34,7 +35,7 @@ Default.args = {
+   description: 'Loading',
+ };
+ 
+-Default.argTypes = {
++const sharedArgTypes = {
+   active: {
+     control: {
+       type: 'boolean',
+@@ -56,3 +57,24 @@ Default.argTypes = {
+     },
+   },
+ };
++
++Default.argTypes = { ...sharedArgTypes };
++
++export const UXExample = () => {
++  const [isActive, setIsActive] = useState(false);
++
++  const startLoading = () => setIsActive(true);
++  const stopLoading = () => setIsActive(false);
++
++  return (
++    <main>
++      <Button onClick={startLoading}>Start</Button>
++      <Button onClick={stopLoading}>Stop</Button>
++      <Loading active={isActive} withOverlay />
++    </main>
++  );
++};
++
++UXExample.storyName = 'UX Example';
++
++UXExample.argTypes = { ...sharedArgTypes };
+diff --git a/packages/react/src/components/Loading/Loading.tsx b/packages/react/src/components/Loading/Loading.tsx
+index 4873d586b06b..fef3f2afb946 100644
+--- a/packages/react/src/components/Loading/Loading.tsx
++++ b/packages/react/src/components/Loading/Loading.tsx
+@@ -7,7 +7,7 @@
+ 
+ import cx from 'classnames';
+ import PropTypes from 'prop-types';
+-import React, { type HTMLAttributes } from 'react';
++import React, { type HTMLAttributes, useEffect, useRef } from 'react';
+ import { usePrefix } from '../../internal/usePrefix';
+ import { deprecate } from '../../prop-types/deprecate';
+ 
+@@ -52,6 +52,43 @@ function Loading({
+   ...rest
+ }: LoadingProps) {
+   const prefix = usePrefix();
++  const overlayRef = useRef<HTMLDivElement>(null);
++  const savedFocusRef = useRef<Element | null>(null);
++
++  const trapActive = !!(withOverlay && active);
++
++  useEffect(() => {
++    if (!trapActive) return;
++
++    savedFocusRef.current = document.activeElement;
++    overlayRef.current?.focus();
++
++    return () => {
++      if (
++        savedFocusRef.current &&
++        typeof (savedFocusRef.current as HTMLElement).focus === 'function'
++      ) {
++        (savedFocusRef.current as HTMLElement).focus();
++      }
++      savedFocusRef.current = null;
++    };
++  }, [trapActive]);
++
++  useEffect(() => {
++    if (!trapActive) return;
++
++    function handleKeyDown(e: KeyboardEvent) {
++      if (e.key !== 'Tab') return;
++      // Dialog has no tabbable children; keep focus on the dialog itself.
++      e.preventDefault();
++    }
++
++    document.addEventListener('keydown', handleKeyDown, true);
++    return () => {
++      document.removeEventListener('keydown', handleKeyDown, true);
++    };
++  }, [trapActive]);
++
+   const loadingClassName = cx(customClassName, {
+     [`${prefix}--loading`]: true,
+     [`${prefix}--loading--small`]: small,
+@@ -93,7 +130,16 @@ function Loading({
+   );
+ 
+   return withOverlay ? (
+-    <div className={overlayClassName}>{loading}</div>
++    <div className={overlayClassName} role="presentation">
++      <div
++        ref={overlayRef}
++        role="dialog"
++        aria-modal="true"
++        aria-label={description}
++        tabIndex={-1}>
++        {loading}
++      </div>
++    </div>
+   ) : (
+     loading
+   );
+diff --git a/packages/styles/scss/components/loading/_loading.scss b/packages/styles/scss/components/loading/_loading.scss
+index e5a26145a2e7..d9b2b1e856ed 100644
+--- a/packages/styles/scss/components/loading/_loading.scss
++++ b/packages/styles/scss/components/loading/_loading.scss
+@@ -96,6 +96,7 @@
+     inset-block-start: 0;
+     inset-inline-start: 0;
+     transition: background-color $duration-slow-02 motion(standard, expressive);
++    user-select: none;
+   }
+ 
+   .#{$prefix}--loading-overlay--stop {
