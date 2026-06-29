@@ -1,0 +1,246 @@
+diff --git a/packages/web-components/src/components/search/__tests__/search-test.js b/packages/web-components/src/components/search/__tests__/search-test.js
+index 2a9600aefab1..858cfd35cabd 100644
+--- a/packages/web-components/src/components/search/__tests__/search-test.js
++++ b/packages/web-components/src/components/search/__tests__/search-test.js
+@@ -163,4 +163,179 @@ describe('cds-search', () => {
+       expect(input).to.have.property('value', 'test-value');
+     });
+   });
++
++  describe('@query decorator functionality', () => {
++    it('should focus input element when clear button is clicked', async () => {
++      const el = await fixture(html`
++        <cds-search label-text="test-search" value="test-value"></cds-search>
++      `);
++
++      await el.updateComplete;
++
++      const input = el.shadowRoot?.querySelector('input');
++      const closeButton = el.shadowRoot?.querySelector(
++        'button.cds--search-close'
++      );
++
++      expect(input).to.exist;
++      expect(closeButton).to.exist;
++
++      closeButton?.click();
++      await el.updateComplete;
++
++      expect(el.shadowRoot?.activeElement).to.equal(input);
++      expect(el.value).to.equal('');
++    });
++
++    it('should cache input element reference via @query decorator', async () => {
++      const el = await fixture(html`
++        <cds-search label-text="test-search" value="initial"></cds-search>
++      `);
++
++      await el.updateComplete;
++
++      const inputElement = el._inputElement;
++      expect(inputElement).to.exist;
++      expect(inputElement?.tagName).to.equal('INPUT');
++      expect(inputElement?.value).to.equal('initial');
++    });
++
++    it('should cache magnifier element reference via @query decorator', async () => {
++      const el = await fixture(html`
++        <cds-search label-text="test-search" expandable></cds-search>
++      `);
++
++      await el.updateComplete;
++
++      const magnifierElement = el._magnifierElement;
++      expect(magnifierElement).to.exist;
++      expect(magnifierElement?.classList.contains('cds--search-magnifier')).to
++        .be.true;
++    });
++
++    it('should focus magnifier when Escape is pressed with empty input in expandable mode', async () => {
++      const el = await fixture(html`
++        <cds-search label-text="test-search" expandable expanded></cds-search>
++      `);
++
++      await el.updateComplete;
++
++      const input = el.shadowRoot?.querySelector('input');
++      const magnifier = el.shadowRoot?.querySelector('.cds--search-magnifier');
++
++      expect(input).to.exist;
++      expect(magnifier).to.exist;
++
++      input?.focus();
++      await el.updateComplete;
++
++      const escapeEvent = new KeyboardEvent('keydown', {
++        key: 'Escape',
++        bubbles: true,
++      });
++      el.dispatchEvent(escapeEvent);
++      await el.updateComplete;
++
++      expect(el.shadowRoot?.activeElement).to.equal(magnifier);
++    });
++
++    it('should clear value but keep focus when Escape is pressed with non-empty input', async () => {
++      const el = await fixture(html`
++        <cds-search
++          label-text="test-search"
++          value="test-value"
++          expandable
++          expanded></cds-search>
++      `);
++
++      await el.updateComplete;
++
++      const input = el.shadowRoot?.querySelector('input');
++      expect(input).to.exist;
++
++      input?.focus();
++      await el.updateComplete;
++
++      const escapeEvent = new KeyboardEvent('keydown', {
++        key: 'Escape',
++        bubbles: true,
++      });
++      el.dispatchEvent(escapeEvent);
++      await el.updateComplete;
++
++      expect(el.value).to.equal('');
++      expect(el.shadowRoot?.activeElement).to.equal(input);
++    });
++
++    it('should expand and focus input when magnifier is clicked in expandable mode', async () => {
++      const el = await fixture(html`
++        <cds-search label-text="test-search" expandable></cds-search>
++      `);
++
++      await el.updateComplete;
++
++      expect(el.expanded).to.be.false;
++
++      const magnifier = el.shadowRoot?.querySelector('.cds--search-magnifier');
++      const input = el.shadowRoot?.querySelector('input');
++
++      expect(magnifier).to.exist;
++      expect(input).to.exist;
++
++      magnifier?.click();
++      await el.updateComplete;
++
++      expect(el.expanded).to.be.true;
++      expect(el.shadowRoot?.activeElement).to.equal(input);
++    });
++
++    it('should handle multiple clear operations correctly', async () => {
++      const el = await fixture(html`
++        <cds-search label-text="test-search" value="test1"></cds-search>
++      `);
++
++      await el.updateComplete;
++
++      const input = el.shadowRoot?.querySelector('input');
++      const closeButton = el.shadowRoot?.querySelector(
++        'button.cds--search-close'
++      );
++
++      closeButton?.click();
++      await el.updateComplete;
++      expect(el.value).to.equal('');
++      expect(el.shadowRoot?.activeElement).to.equal(input);
++
++      el.value = 'test2';
++      await el.updateComplete;
++
++      closeButton?.click();
++      await el.updateComplete;
++      expect(el.value).to.equal('');
++      expect(el.shadowRoot?.activeElement).to.equal(input);
++    });
++
++    it('should maintain focus management with @query decorator after updates', async () => {
++      const el = await fixture(html`
++        <cds-search label-text="test-search" expandable></cds-search>
++      `);
++
++      await el.updateComplete;
++
++      el.placeholder = 'New placeholder';
++      await el.updateComplete;
++
++      el.size = 'sm';
++      await el.updateComplete;
++
++      const magnifier = el.shadowRoot?.querySelector('.cds--search-magnifier');
++      const input = el.shadowRoot?.querySelector('input');
++
++      magnifier?.click();
++      await el.updateComplete;
++
++      expect(el.expanded).to.be.true;
++      expect(el.shadowRoot?.activeElement).to.equal(input);
++    });
++  });
+ });
+diff --git a/packages/web-components/src/components/search/search.ts b/packages/web-components/src/components/search/search.ts
+index 18e78d6363fe..ff938dd1e71e 100644
+--- a/packages/web-components/src/components/search/search.ts
++++ b/packages/web-components/src/components/search/search.ts
+@@ -7,7 +7,7 @@
+ 
+ import { classMap } from 'lit/directives/class-map.js';
+ import { LitElement, html } from 'lit';
+-import { property } from 'lit/decorators.js';
++import { property, query } from 'lit/decorators.js';
+ import { prefix } from '../../globals/settings';
+ import Search16 from '@carbon/icons/es/search/16.js';
+ import Close16 from '@carbon/icons/es/close/16.js';
+@@ -36,6 +36,18 @@ export { SEARCH_SIZE };
+  */
+ @customElement(`${prefix}-search`)
+ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
++  /**
++   * The input element
++   */
++  @query('input')
++  private _inputElement?: HTMLInputElement;
++
++  /**
++   * The search magnifier element
++   */
++  @query(`.${prefix}--search-magnifier`)
++  private _magnifierElement?: HTMLElement;
++
+   /**
+    * Handles `input` event on the `<input>` in the shadow DOM.
+    */
+@@ -73,9 +85,7 @@ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
+       this.value = '';
+ 
+       // set focus on back to input once search is cleared
+-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- https://github.com/carbon-design-system/carbon/issues/20452
+-      const input = this.shadowRoot!.querySelector('input');
+-      (input as HTMLElement).focus();
++      this._inputElement?.focus();
+     }
+   }
+ 
+@@ -195,14 +205,11 @@ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
+    * Adds tabindex="-1" if it is not focusable yet.
+    */
+   private _focusMagnifier() {
+-    const magnifier = this.shadowRoot?.querySelector<HTMLElement>(
+-      `.${prefix}--search-magnifier`
+-    );
+-    if (magnifier) {
+-      if (!magnifier.hasAttribute('tabindex')) {
+-        magnifier.tabIndex = -1;
++    if (this._magnifierElement) {
++      if (!this._magnifierElement.hasAttribute('tabindex')) {
++        this._magnifierElement.tabIndex = -1;
+       }
+-      magnifier.focus();
++      this._magnifierElement.focus();
+     }
+   }
+ 
