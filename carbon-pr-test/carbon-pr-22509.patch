@@ -1,0 +1,771 @@
+diff --git a/packages/react/src/components/DataTable/__tests__/__snapshots__/DataTable-test.js.snap b/packages/react/src/components/DataTable/__tests__/__snapshots__/DataTable-test.js.snap
+index d1d9dc85cfbe..70369134e4cf 100644
+--- a/packages/react/src/components/DataTable/__tests__/__snapshots__/DataTable-test.js.snap
++++ b/packages/react/src/components/DataTable/__tests__/__snapshots__/DataTable-test.js.snap
+@@ -612,7 +612,7 @@ exports[`DataTable behaves as expected selection should render and match snapsho
+                 aria-expanded="false"
+                 aria-haspopup="true"
+                 aria-labelledby="tooltip-_r_3d_"
+-                class="cds--toolbar-action cds--overflow-menu cds--overflow-menu cds--overflow-menu--md cds--btn cds--btn--md cds--layout--size-md cds--btn--ghost cds--btn--icon-only"
++                class="cds--toolbar-action cds--overflow-menu cds--overflow-menu cds--btn cds--btn--ghost cds--btn--icon-only"
+                 type="button"
+               >
+                 <svg
+@@ -1062,7 +1062,7 @@ exports[`DataTable renders as expected - Component API should render and match s
+                 aria-expanded="false"
+                 aria-haspopup="true"
+                 aria-labelledby="tooltip-_r_m_"
+-                class="cds--toolbar-action cds--overflow-menu cds--overflow-menu cds--overflow-menu--md cds--btn cds--btn--md cds--layout--size-md cds--btn--ghost cds--btn--icon-only"
++                class="cds--toolbar-action cds--overflow-menu cds--overflow-menu cds--btn cds--btn--ghost cds--btn--icon-only"
+                 type="button"
+               >
+                 <svg
+diff --git a/packages/react/src/components/DataTable/__tests__/__snapshots__/TableToolbarMenu-test.js.snap b/packages/react/src/components/DataTable/__tests__/__snapshots__/TableToolbarMenu-test.js.snap
+index 5ebda7b7514d..94f25322c702 100644
+--- a/packages/react/src/components/DataTable/__tests__/__snapshots__/TableToolbarMenu-test.js.snap
++++ b/packages/react/src/components/DataTable/__tests__/__snapshots__/TableToolbarMenu-test.js.snap
+@@ -15,7 +15,7 @@ exports[`TableToolbarMenu renders as expected - Component API should render 1`]
+           aria-expanded="false"
+           aria-haspopup="true"
+           aria-labelledby="tooltip-_r_1_"
+-          class="custom-class cds--toolbar-action cds--overflow-menu cds--overflow-menu cds--overflow-menu--md cds--btn cds--btn--md cds--layout--size-md cds--btn--ghost cds--btn--icon-only"
++          class="custom-class cds--toolbar-action cds--overflow-menu cds--overflow-menu cds--btn cds--btn--ghost cds--btn--icon-only"
+           type="button"
+         >
+           <svg
+diff --git a/packages/react/src/components/OverflowMenu/OverflowMenu-test.js b/packages/react/src/components/OverflowMenu/OverflowMenu-test.js
+index c3dc24954ae4..7400745e60f1 100644
+--- a/packages/react/src/components/OverflowMenu/OverflowMenu-test.js
++++ b/packages/react/src/components/OverflowMenu/OverflowMenu-test.js
+@@ -1,5 +1,5 @@
+ /**
+- * Copyright IBM Corp. 2016, 2023
++ * Copyright IBM Corp. 2016, 2026
+  *
+  * This source code is licensed under the Apache-2.0 license found in the
+  * LICENSE file in the root directory of this source tree.
+@@ -204,7 +204,8 @@ describe('OverflowMenu', () => {
+           );
+ 
+           expect(screen.getByRole('button')).toHaveClass(
+-            `cds--overflow-menu--${size}`
++            `cds--overflow-menu--${size}`, // TODO: V12 - Remove this check
++            `cds--layout--size-${size}`
+           );
+         });
+       });
+diff --git a/packages/react/src/components/OverflowMenu/OverflowMenu.stories.js b/packages/react/src/components/OverflowMenu/OverflowMenu.stories.js
+index c1b4538acb2d..83fcf8649a79 100644
+--- a/packages/react/src/components/OverflowMenu/OverflowMenu.stories.js
++++ b/packages/react/src/components/OverflowMenu/OverflowMenu.stories.js
+@@ -10,7 +10,7 @@ import { OverflowMenu } from './OverflowMenu';
+ import { default as OverflowMenuItem } from '../OverflowMenuItem';
+ import { Filter } from '@carbon/icons-react';
+ import mdx from './OverflowMenu.mdx';
+-
++import { Layout } from '../Layout'; // remove before merging
+ export default {
+   title: 'Components/OverflowMenu',
+   component: OverflowMenu,
+@@ -93,6 +93,55 @@ Default.argTypes = {
+   },
+ };
+ 
++// remove before merging
++export const SizeTest = (args) => {
++  return (
++    <>
++      <h4>The menu on the right is using layout tokens (no size prop)</h4>
++      <br />
++      <div style={{ display: 'flex', gap: '6rem' }}>
++        <OverflowMenu aria-label="overflow-menu" {...args}>
++          <OverflowMenuItem itemText="Stop app" />
++          <OverflowMenuItem itemText="Restart app" />
++          <OverflowMenuItem itemText="Rename app" />
++          <OverflowMenuItem
++            itemText="Clone and move app"
++            disabled
++            requireTitle
++          />
++          <OverflowMenuItem itemText="Edit routes and access" requireTitle />
++          <OverflowMenuItem hasDivider isDelete itemText="Delete app" />
++        </OverflowMenu>
++
++        <Layout {...args}>
++          <OverflowMenu aria-label="overflow-menu">
++            <OverflowMenuItem itemText="Stop app" />
++            <OverflowMenuItem itemText="Restart app" />
++            <OverflowMenuItem itemText="Rename app" />
++            <OverflowMenuItem
++              itemText="Clone and move app"
++              disabled
++              requireTitle
++            />
++            <OverflowMenuItem itemText="Edit routes and access" requireTitle />
++            <OverflowMenuItem hasDivider isDelete itemText="Delete app" />
++          </OverflowMenu>
++        </Layout>
++      </div>
++    </>
++  );
++};
++
++SizeTest.args = {
++  size: 'lg',
++};
++SizeTest.parameters = {
++  controls: {
++    include: ['size'],
++  },
++};
++//
++
+ Default.parameters = {
+   controls: {
+     exclude: [
+diff --git a/packages/react/src/components/OverflowMenu/OverflowMenu.tsx b/packages/react/src/components/OverflowMenu/OverflowMenu.tsx
+index dec0633dd19f..cd09978bbc17 100644
+--- a/packages/react/src/components/OverflowMenu/OverflowMenu.tsx
++++ b/packages/react/src/components/OverflowMenu/OverflowMenu.tsx
+@@ -14,6 +14,7 @@ import React, {
+   useCallback,
+   useContext,
+   useEffect,
++  useReducer,
+   useRef,
+   useState,
+   type ElementType,
+@@ -280,7 +281,7 @@ export const OverflowMenu = forwardRef<HTMLButtonElement, OverflowMenuProps>(
+       open: openProp,
+       renderIcon: IconElement = OverflowMenuVertical,
+       selectorPrimaryFocus = '[data-floating-menu-primary-focus]',
+-      size = 'md',
++      size,
+       innerRef,
+       ...other
+     },
+@@ -300,6 +301,8 @@ export const OverflowMenu = forwardRef<HTMLButtonElement, OverflowMenuProps>(
+     /** The element ref of the tooltip's trigger button. */
+     const triggerRef = useRef<HTMLButtonElement | null>(null);
+     const wrapperRef = useRef<HTMLSpanElement | null>(null);
++    const [, forceUpdate] = useReducer((x) => x + 1, 0);
++    const resizeObserverRef = useRef<ResizeObserver | null>(null);
+ 
+     // Sync open prop changes.
+     useEffect(() => {
+@@ -316,6 +319,36 @@ export const OverflowMenu = forwardRef<HTMLButtonElement, OverflowMenuProps>(
+       }
+     }, []);
+ 
++    /**
++     * When `size` is brought in from a contextual layout token, FloatingMenu can't detect size changes
++     * while the menu is open since there is no state/prop update. This ResizeObserver watches
++     * the trigger button when the menu is open and calls `forceUpdate()` on resize to force a re-render if its
++     * size changes while the menu is open
++     */
++
++    useEffect(() => {
++      resizeObserverRef.current = new ResizeObserver(() => {
++        forceUpdate();
++      });
++
++      return () => {
++        resizeObserverRef.current?.disconnect();
++        resizeObserverRef.current = null;
++      };
++    }, []);
++
++    useEffect(() => {
++      if (!triggerRef.current || !resizeObserverRef.current) {
++        return;
++      }
++
++      if (open) {
++        resizeObserverRef.current.observe(triggerRef.current);
++      } else {
++        resizeObserverRef.current.disconnect();
++      }
++    }, [open]);
++
+     useEffect(() => {
+       if (open && !prevOpenState.current) {
+         onOpen();
+@@ -496,7 +529,9 @@ export const OverflowMenu = forwardRef<HTMLButtonElement, OverflowMenuProps>(
+       const triggerEl = triggerRef.current;
+       if (triggerEl instanceof Element) {
+         return (
+-          triggerEl.closest('[data-floating-menu-container]') || document.body
++          triggerEl.closest('[data-floating-menu-container]') ||
++          triggerEl.closest(`.${prefix}--layout`) ||
++          document.body
+         );
+       }
+       return document.body;
+@@ -510,7 +545,8 @@ export const OverflowMenu = forwardRef<HTMLButtonElement, OverflowMenuProps>(
+       {
+         [`${prefix}--overflow-menu--open`]: open,
+         [`${prefix}--overflow-menu--light`]: light,
+-        [`${prefix}--overflow-menu--${size}`]: size,
++        [`${prefix}--overflow-menu--${size}`]: size, // TODO: V12 - Remove this class
++        [`${prefix}--layout--size-${size}`]: size,
+       }
+     );
+ 
+@@ -521,7 +557,8 @@ export const OverflowMenu = forwardRef<HTMLButtonElement, OverflowMenuProps>(
+         [`${prefix}--overflow-menu--flip`]: flipped,
+         [`${prefix}--overflow-menu-options--open`]: open,
+         [`${prefix}--overflow-menu-options--light`]: light,
+-        [`${prefix}--overflow-menu-options--${size}`]: size,
++        [`${prefix}--overflow-menu-options--${size}`]: size, // TODO: V12 - Remove this class
++        [`${prefix}--layout--size-${size}`]: size,
+       }
+     );
+ 
+@@ -530,6 +567,10 @@ export const OverflowMenu = forwardRef<HTMLButtonElement, OverflowMenuProps>(
+       iconClass
+     );
+ 
++    const overflowMenuWrapperClasses = classNames(
++      `${prefix}--overflow-menu__wrapper`
++    );
++
+     const childrenWithProps = Children.toArray(children).map((child, index) => {
+       if (isValidElement(child)) {
+         const childElement = child as ReactElement<OverflowMenuItemProps>;
+@@ -580,7 +621,7 @@ export const OverflowMenu = forwardRef<HTMLButtonElement, OverflowMenuProps>(
+     return (
+       <>
+         <span
+-          className={`${prefix}--overflow-menu__wrapper`}
++          className={overflowMenuWrapperClasses}
+           aria-owns={open ? menuBodyId : undefined}
+           ref={wrapperRef}>
+           <IconButton
+diff --git a/packages/react/src/components/OverflowMenu/next/index.tsx b/packages/react/src/components/OverflowMenu/next/index.tsx
+index e61750c667ba..facb1d4fee36 100644
+--- a/packages/react/src/components/OverflowMenu/next/index.tsx
++++ b/packages/react/src/components/OverflowMenu/next/index.tsx
+@@ -1,5 +1,5 @@
+ /**
+- * Copyright IBM Corp. 2020, 2025
++ * Copyright IBM Corp. 2020, 2026
+  *
+  * This source code is licensed under the Apache-2.0 license found in the
+  * LICENSE file in the root directory of this source tree.
+@@ -180,7 +180,8 @@ const OverflowMenu = React.forwardRef<HTMLDivElement, OverflowMenuProps>(
+       {
+         [`${prefix}--overflow-menu--open`]: open,
+       },
+-      size !== defaultSize && `${prefix}--overflow-menu--${size}`
++      size !== defaultSize && `${prefix}--overflow-menu--${size}`, // TODO: V12 - Remove this class
++      size !== defaultSize && `${prefix}--layout--size-${size}`
+     );
+ 
+     const floatingRef = mergeRefs(triggerRef, refs.setReference);
+diff --git a/packages/styles/scss/components/overflow-menu/_overflow-menu.scss b/packages/styles/scss/components/overflow-menu/_overflow-menu.scss
+index 771c295129da..57ab423d4c37 100644
+--- a/packages/styles/scss/components/overflow-menu/_overflow-menu.scss
++++ b/packages/styles/scss/components/overflow-menu/_overflow-menu.scss
+@@ -1,5 +1,5 @@
+ //
+-// Copyright IBM Corp. 2016, 2023
++// Copyright IBM Corp. 2016, 2026
+ //
+ // This source code is licensed under the Apache-2.0 license found in the
+ // LICENSE file in the root directory of this source tree.
+@@ -21,6 +21,7 @@
+ @use '../../utilities/convert';
+ @use '../../utilities/z-index' as *;
+ @use '../../utilities/custom-property';
++@use '../../utilities/layout';
+ 
+ /// Overflow menu styles
+ /// @access public
+@@ -28,6 +29,7 @@
+ @mixin overflow-menu {
+   .#{$prefix}--overflow-menu,
+   .#{$prefix}--overflow-menu__trigger {
++    @include layout.use('size', $default: 'md', $min: 'xs', $max: 'lg');
+     @include button-reset.reset;
+     @include component-reset.reset;
+     @include focus-outline('reset');
+@@ -36,10 +38,10 @@
+     display: flex;
+     align-items: center;
+     justify-content: center;
+-    block-size: $spacing-08;
++    block-size: layout.size('height');
+     cursor: pointer;
+-    inline-size: $spacing-08;
+-    min-block-size: $spacing-08;
++    inline-size: layout.size('height');
++    min-block-size: layout.size('height');
+     transition:
+       outline $duration-fast-02 motion(entrance, productive),
+       background-color $duration-fast-02 motion(entrance, productive);
+@@ -57,23 +59,6 @@
+     margin-block-start: 0;
+   }
+ 
+-  .#{$prefix}--overflow-menu--xs {
+-    block-size: $spacing-06;
+-    inline-size: $spacing-06;
+-    min-block-size: $spacing-06;
+-  }
+-
+-  .#{$prefix}--overflow-menu--sm {
+-    block-size: $spacing-07;
+-    inline-size: $spacing-07;
+-    min-block-size: $spacing-07;
+-  }
+-
+-  .#{$prefix}--overflow-menu--lg {
+-    block-size: $spacing-09;
+-    inline-size: $spacing-09;
+-  }
+-
+   // Overwrite Icon Tooltip focus styles
+   .#{$prefix}--overflow-menu__trigger.#{$prefix}--tooltip--a11y.#{$prefix}--tooltip__trigger:focus {
+     @include focus-outline('outline');
+@@ -109,6 +94,7 @@
+   }
+ 
+   .#{$prefix}--overflow-menu-options {
++    @include layout.use('size', $default: 'md', $min: 'xs', $max: 'lg');
+     @include component-reset.reset;
+     @include box-shadow;
+ 
+@@ -157,68 +143,32 @@
+       .#{$prefix}--breadcrumb-menu-options
+     )::after {
+     block-size: convert.to-rem(3px);
+-    inline-size: $spacing-08;
++    inline-size: layout.size('height');
+     inset-block-start: convert.to-rem(-3px);
+     inset-inline-start: 0;
+   }
+ 
+   .#{$prefix}--overflow-menu-options[data-floating-menu-direction='top']::after {
+     block-size: $spacing-03;
+-    inline-size: $spacing-08;
++    inline-size: layout.size('height');
+     inset-block-end: -$spacing-03;
+     inset-inline-start: 0;
+   }
+ 
+   .#{$prefix}--overflow-menu-options[data-floating-menu-direction='left']::after {
+-    block-size: $spacing-08;
++    block-size: layout.size('height');
+     inline-size: convert.to-rem(6px);
+     inset-block-start: 0;
+     inset-inline-end: convert.to-rem(-6px);
+   }
+ 
+   .#{$prefix}--overflow-menu-options[data-floating-menu-direction='right']::after {
+-    block-size: $spacing-08;
++    block-size: layout.size('height');
+     inline-size: convert.to-rem(6px);
+     inset-block-start: 0;
+     inset-inline-start: convert.to-rem(-6px);
+   }
+ 
+-  .#{$prefix}--overflow-menu-options--xs.#{$prefix}--overflow-menu-options {
+-    &[data-floating-menu-direction='bottom']::after,
+-    &[data-floating-menu-direction='top']::after {
+-      inline-size: $spacing-06;
+-    }
+-
+-    &[data-floating-menu-direction='left']::after,
+-    &[data-floating-menu-direction='right']::after {
+-      block-size: $spacing-06;
+-    }
+-  }
+-
+-  .#{$prefix}--overflow-menu-options--sm.#{$prefix}--overflow-menu-options {
+-    &[data-floating-menu-direction='bottom']::after,
+-    &[data-floating-menu-direction='top']::after {
+-      inline-size: $spacing-07;
+-    }
+-
+-    &[data-floating-menu-direction='left']::after,
+-    &[data-floating-menu-direction='right']::after {
+-      block-size: $spacing-07;
+-    }
+-  }
+-
+-  .#{$prefix}--overflow-menu-options--lg.#{$prefix}--overflow-menu-options {
+-    &[data-floating-menu-direction='bottom']::after,
+-    &[data-floating-menu-direction='top']::after {
+-      inline-size: $spacing-09;
+-    }
+-
+-    &[data-floating-menu-direction='left']::after,
+-    &[data-floating-menu-direction='right']::after {
+-      block-size: $spacing-09;
+-    }
+-  }
+-
+   .#{$prefix}--overflow-menu--flip.#{$prefix}--overflow-menu-options[data-floating-menu-direction='top']::after,
+   .#{$prefix}--overflow-menu--flip.#{$prefix}--overflow-menu-options[data-floating-menu-direction='bottom']::after {
+     inset-inline: auto 0;
+@@ -244,26 +194,11 @@
+     align-items: center;
+     padding: 0;
+     background-color: transparent;
+-    block-size: $spacing-08;
++    block-size: layout.size('height');
+     inline-size: 100%;
+     transition: background-color $duration-fast-02 motion(entrance, productive);
+   }
+ 
+-  .#{$prefix}--overflow-menu-options--xs
+-    .#{$prefix}--overflow-menu-options__option {
+-    block-size: $spacing-06;
+-  }
+-
+-  .#{$prefix}--overflow-menu-options--sm
+-    .#{$prefix}--overflow-menu-options__option {
+-    block-size: $spacing-07;
+-  }
+-
+-  .#{$prefix}--overflow-menu-options--lg
+-    .#{$prefix}--overflow-menu-options__option {
+-    block-size: $spacing-09;
+-  }
+-
+   .#{$prefix}--overflow-menu--divider {
+     border-block-start: 1px solid $border-subtle;
+   }
+diff --git a/packages/web-components/src/components/button/button.ts b/packages/web-components/src/components/button/button.ts
+index 42547d28917e..5b2039b5d8d5 100644
+--- a/packages/web-components/src/components/button/button.ts
++++ b/packages/web-components/src/components/button/button.ts
+@@ -223,7 +223,7 @@ class CDSButton extends HostListenerMixin(FocusMixin(LitElement)) {
+    * Specify the size of the button, from the following list of sizes: `xs`, `sm`, `md`, `lg`, `xl`, `2xl`
+    */
+   @property({ type: String, reflect: true })
+-  size = 'lg';
++  size?: BUTTON_SIZE | string = 'lg';
+ 
+   /**
+    * Optional prop to specify the tabIndex of the Button
+@@ -300,8 +300,8 @@ class CDSButton extends HostListenerMixin(FocusMixin(LitElement)) {
+       [`${prefix}--btn--danger--ghost`]: kind === BUTTON_KIND.DANGER_GHOST,
+       [`${prefix}--btn--disabled`]: disabled,
+       [`${prefix}--btn--icon-only`]: hasIcon && !hasMainContent,
+-      [`${prefix}--btn--${size}`]: size,
+-      [`${prefix}--layout--size-${size}`]: size,
++      [`${prefix}--btn--${size}`]: !!size,
++      [`${prefix}--layout--size-${size}`]: !!size,
+       [`${prefix}-ce--btn--has-icon`]: hasIcon,
+       [`${prefix}--btn--expressive`]: isExpressive,
+       [`${prefix}--btn--selected`]: isSelected && kind === 'ghost',
+diff --git a/packages/web-components/src/components/floating-menu/floating-menu.ts b/packages/web-components/src/components/floating-menu/floating-menu.ts
+index a7cbc6afd1a7..9d789f273d81 100644
+--- a/packages/web-components/src/components/floating-menu/floating-menu.ts
++++ b/packages/web-components/src/components/floating-menu/floating-menu.ts
+@@ -410,7 +410,7 @@ abstract class CDSFloatingMenu extends HostListenerMixin(
+    * The CSS selector to find the element to put this floating menu in.
+    */
+   static get selectorContainer() {
+-    return `[data-floating-menu-container],${prefix}-modal`;
++    return `[data-floating-menu-container],${prefix}-layout,${prefix}-modal`;
+   }
+   static shadowRootOptions = {
+     ...LitElement.shadowRootOptions,
+diff --git a/packages/web-components/src/components/icon-button/icon-button.ts b/packages/web-components/src/components/icon-button/icon-button.ts
+index 86d2dc7fe111..68f9a7bf440f 100644
+--- a/packages/web-components/src/components/icon-button/icon-button.ts
++++ b/packages/web-components/src/components/icon-button/icon-button.ts
+@@ -70,7 +70,7 @@ class CDSIconButton extends CDSButton {
+    * Specify the size of the Button. Defaults to `md`.
+    */
+   @property({ reflect: true })
+-  size = 'md';
++  size?: ICON_BUTTON_SIZE | string = 'md';
+ 
+   connectedCallback() {
+     super.connectedCallback();
+diff --git a/packages/web-components/src/components/overflow-menu/__tests__/overflow-menu-test.js b/packages/web-components/src/components/overflow-menu/__tests__/overflow-menu-test.js
+index 08952b0f4125..e2c16f67cac4 100644
+--- a/packages/web-components/src/components/overflow-menu/__tests__/overflow-menu-test.js
++++ b/packages/web-components/src/components/overflow-menu/__tests__/overflow-menu-test.js
+@@ -54,7 +54,8 @@ describe('cds-overflow-menu', () => {
+ 
+         const button = el.shadowRoot?.querySelector('button');
+ 
+-        expect(button).to.have.class(`cds--overflow-menu--${size}`);
++        expect(button).to.have.class(`cds--overflow-menu--${size}`); // TODO: V12 - Remove this check
++        expect(button).to.have.class(`cds--layout--size-${size}`);
+       });
+     });
+   });
+diff --git a/packages/web-components/src/components/overflow-menu/overflow-menu-body.ts b/packages/web-components/src/components/overflow-menu/overflow-menu-body.ts
+index 29987dd6638a..55e2f3d2bf7c 100644
+--- a/packages/web-components/src/components/overflow-menu/overflow-menu-body.ts
++++ b/packages/web-components/src/components/overflow-menu/overflow-menu-body.ts
+@@ -69,7 +69,7 @@ class CDSOverflowMenuBody extends CDSFloatingMenu {
+    * The overflow menu size.
+    */
+   @property({ reflect: true })
+-  size = OVERFLOW_MENU_SIZE.MEDIUM;
++  size?: OVERFLOW_MENU_SIZE;
+ 
+   /**
+    * The adjustment in position applied to the floating menu.
+@@ -223,7 +223,7 @@ class CDSOverflowMenuBody extends CDSFloatingMenu {
+         .constructor as typeof CDSOverflowMenuBody;
+       const menuItems = this.querySelectorAll(selectorMenuItem);
+       menuItems.forEach((item) => {
+-        item.setAttribute('size', this.size);
++        if (this.size) item.setAttribute('size', this.size);
+       });
+     }
+ 
+diff --git a/packages/web-components/src/components/overflow-menu/overflow-menu.scss b/packages/web-components/src/components/overflow-menu/overflow-menu.scss
+index 5738dc2be9d1..2a07597d816b 100644
+--- a/packages/web-components/src/components/overflow-menu/overflow-menu.scss
++++ b/packages/web-components/src/components/overflow-menu/overflow-menu.scss
+@@ -10,6 +10,7 @@
+ @use '@carbon/styles/scss/spacing' as *;
+ @use '@carbon/styles/scss/motion' as *;
+ @use '@carbon/styles/scss/utilities/convert';
++@use '@carbon/styles/scss/layout' as *;
+ @use '@carbon/styles/scss/components/overflow-menu/overflow-menu' as *;
+ 
+ // https://github.com/carbon-design-system/carbon/issues/11408
+@@ -17,6 +18,7 @@
+ 
+ :host(#{$prefix}-overflow-menu),
+ :host(#{$prefix}-breadcrumb-overflow-menu) {
++  @include emit-layout-tokens();
+   @extend .#{$prefix}--overflow-menu;
+ 
+   ::slotted(.#{$prefix}--overflow-menu__icon) {
+@@ -24,21 +26,6 @@
+   }
+ }
+ 
+-:host(#{$prefix}-overflow-menu[size='xs']),
+-:host(#{$prefix}-breadcrumb-overflow-menu[size='xs']) {
+-  @extend .#{$prefix}--overflow-menu--xs;
+-}
+-
+-:host(#{$prefix}-overflow-menu[size='sm']),
+-:host(#{$prefix}-breadcrumb-overflow-menu[size='sm']) {
+-  @extend .#{$prefix}--overflow-menu--sm;
+-}
+-
+-:host(#{$prefix}-overflow-menu[size='lg']),
+-:host(#{$prefix}-breadcrumb-overflow-menu[size='lg']) {
+-  @extend .#{$prefix}--overflow-menu--lg;
+-}
+-
+ :host(#{$prefix}-overflow-menu[disabled]),
+ :host(#{$prefix}-breadcrumb-overflow-menu[disabled]) {
+   cursor: not-allowed;
+@@ -66,6 +53,7 @@
+ }
+ 
+ :host(#{$prefix}-overflow-menu-body) {
++  @include emit-layout-tokens();
+   @extend .#{$prefix}--overflow-menu-options;
+ 
+   &::after {
+@@ -89,18 +77,6 @@
+   @extend .#{$prefix}--overflow-menu-options--open;
+ }
+ 
+-:host(#{$prefix}-overflow-menu-body[size='xs']) {
+-  @extend .#{$prefix}--overflow-menu-options--xs;
+-}
+-
+-:host(#{$prefix}-overflow-menu-body[size='sm']) {
+-  @extend .#{$prefix}--overflow-menu-options--sm;
+-}
+-
+-:host(#{$prefix}-overflow-menu-body[size='lg']) {
+-  @extend .#{$prefix}--overflow-menu-options--lg;
+-}
+-
+ :host(#{$prefix}-overflow-menu-item) {
+   @extend .#{$prefix}--overflow-menu-options__option;
+ 
+@@ -115,18 +91,6 @@
+   }
+ }
+ 
+-:host(#{$prefix}-overflow-menu-item[size='xs']) {
+-  block-size: $spacing-06;
+-}
+-
+-:host(#{$prefix}-overflow-menu-item[size='sm']) {
+-  block-size: $spacing-07;
+-}
+-
+-:host(#{$prefix}-overflow-menu-item[size='lg']) {
+-  block-size: $spacing-09;
+-}
+-
+ :host(#{$prefix}-overflow-menu-item[danger]) {
+   @extend .#{$prefix}--overflow-menu-options__option--danger;
+ }
+@@ -245,3 +209,6 @@ $caret-size: convert.to-rem(7px);
+     direction: ltr;
+   }
+ }
++@include emit-layout-tokens-to-shadow-host(#{$prefix}-overflow-menu-body);
++@include emit-layout-tokens-to-shadow-host(#{$prefix}-overflow-menu);
++@include emit-layout-tokens-to-shadow-host(#{$prefix}-breadcrumb-overflow-menu);
+diff --git a/packages/web-components/src/components/overflow-menu/overflow-menu.stories.ts b/packages/web-components/src/components/overflow-menu/overflow-menu.stories.ts
+index 497d1d4ae81e..93466559df4f 100644
+--- a/packages/web-components/src/components/overflow-menu/overflow-menu.stories.ts
++++ b/packages/web-components/src/components/overflow-menu/overflow-menu.stories.ts
+@@ -1,12 +1,11 @@
+ /**
+- * Copyright IBM Corp. 2019, 2025
++ * Copyright IBM Corp. 2019, 2026
+  *
+  * This source code is licensed under the Apache-2.0 license found in the
+  * LICENSE file in the root directory of this source tree.
+  */
+ 
+ import { html } from 'lit';
+-import { ifDefined } from 'lit/directives/if-defined.js';
+ import { OVERFLOW_MENU_SIZE } from './overflow-menu';
+ import './overflow-menu-body';
+ import './overflow-menu-item';
+@@ -14,6 +13,7 @@ import { prefix } from '../../globals/settings';
+ import OverflowMenuVertical16 from '@carbon/icons/es/overflow-menu--vertical/16.js';
+ import Filter16 from '@carbon/icons/es/filter/16.js';
+ import { iconLoader } from '../../globals/internal/icon-loader';
++import '../layout/index'; // remove before merging
+ 
+ const sizes = {
+   [`Extra small size (${OVERFLOW_MENU_SIZE.EXTRA_SMALL})`]:
+@@ -69,7 +69,7 @@ export const Default = {
+           slot: 'icon',
+         })}
+         <span slot="tooltip-content"> ${iconDescription} </span>
+-        <cds-overflow-menu-body ?flipped="${ifDefined(flipped)}">
++        <cds-overflow-menu-body ?flipped="${flipped}">
+           <cds-overflow-menu-item>Stop app</cds-overflow-menu-item>
+           <cds-overflow-menu-item>Restart app</cds-overflow-menu-item>
+           <cds-overflow-menu-item>Rename app</cds-overflow-menu-item>
+@@ -87,6 +87,59 @@ export const Default = {
+     `;
+   },
+ };
++
++// remove before merging
++const renderMenuItems = () => html`
++  <cds-overflow-menu-item>Stop app</cds-overflow-menu-item>
++  <cds-overflow-menu-item>Restart app</cds-overflow-menu-item>
++  <cds-overflow-menu-item>Rename app</cds-overflow-menu-item>
++  <cds-overflow-menu-item disabled>Clone and move app</cds-overflow-menu-item>
++  <cds-overflow-menu-item>Edit routes and access</cds-overflow-menu-item>
++  <cds-overflow-menu-item divider danger>Delete app</cds-overflow-menu-item>
++`;
++
++export const SizeTest = {
++  args,
++  argTypes,
++  parameters: {
++    controls: {
++      include: ['size'],
++    },
++  },
++  render: (args) => {
++    const { flipped, iconDescription, open, index, size } = args ?? {};
++    const icon = iconLoader(OverflowMenuVertical16, {
++      class: `${prefix}--overflow-menu__icon`,
++      slot: 'icon',
++    });
++    return html`
++      <h4>The menu on the right is using layout tokens (no size attribute)</h4>
++      <br />
++
++      <div style="display: flex; gap: 6rem;">
++        <cds-overflow-menu ?open="${open}" size="${size}" index=${index}>
++          ${icon}
++          <span slot="tooltip-content"> ${iconDescription} </span>
++          <cds-overflow-menu-body ?flipped="${flipped}">
++            ${renderMenuItems()}
++          </cds-overflow-menu-body>
++        </cds-overflow-menu>
++
++        <cds-layout size="${size}">
++          <cds-overflow-menu ?open="${open}" index=${index}>
++            ${icon}
++            <span slot="tooltip-content"> ${iconDescription} </span>
++            <cds-overflow-menu-body ?flipped="${flipped}">
++              ${renderMenuItems()}
++            </cds-overflow-menu-body>
++          </cds-overflow-menu>
++        </cds-layout>
++      </div>
++    `;
++  },
++};
++//
++
+ export const RenderCustomIcon = {
+   render: () => {
+     return html`
+diff --git a/packages/web-components/src/components/overflow-menu/overflow-menu.ts b/packages/web-components/src/components/overflow-menu/overflow-menu.ts
+index 297216275c55..e5e3a566d228 100644
+--- a/packages/web-components/src/components/overflow-menu/overflow-menu.ts
++++ b/packages/web-components/src/components/overflow-menu/overflow-menu.ts
+@@ -248,7 +248,7 @@ class CDSOverflowMenu
+    * Overflow menu size.
+    */
+   @property({ reflect: true })
+-  size = OVERFLOW_MENU_SIZE.MEDIUM;
++  size?: OVERFLOW_MENU_SIZE | string = undefined;
+ 
+   /**
+    * `true` if this menu is a toolbar action
+@@ -343,7 +343,7 @@ class CDSOverflowMenu
+           menuBody.id ||= this._menuId;
+           menuBody.setAttribute('breadcrumb', String(this.breadcrumb));
+           menuBody.open = open;
+-          menuBody.size = size;
++          if (this.size) menuBody.size = size as OVERFLOW_MENU_SIZE;
+         }
+       }
+     }
+@@ -367,10 +367,21 @@ class CDSOverflowMenu
+           button?.classList.remove(item);
+         }
+       });
+-      button?.classList.add(`${prefix}--overflow-menu--${this.size}`);
++      this.classList.forEach((item) => {
++        if (item.startsWith(`${prefix}--layout--size-`)) {
++          this.classList.remove(item);
++        }
++      });
++
++      if (this.size) {
++        button?.classList.add(`${prefix}--overflow-menu--${this.size}`); // TODO: V12 - Remove this class
++        this.classList.add(`${prefix}--layout--size-${this.size}`);
++      }
+ 
+       const tooltip = this.shadowRoot?.querySelector(`${prefix}-tooltip`);
+-      tooltip?.setAttribute('size', this.size);
++      if (this.size) {
++        tooltip?.setAttribute('size', this.size);
++      }
+     }
+ 
+     if (changedProperties.has('toolbarAction') && this.toolbarAction) {
+@@ -603,7 +614,9 @@ class CDSOverflowMenu
+     menu.y = [top, bottom];
+   }
+ 
+-  private _toMenuSize(size: OVERFLOW_MENU_SIZE | string): CDSMenu['size'] {
++  private _toMenuSize(
++    size: OVERFLOW_MENU_SIZE | string | undefined
++  ): CDSMenu['size'] {
+     switch (size) {
+       case OVERFLOW_MENU_SIZE.EXTRA_SMALL:
+         return MENU_SIZE.EXTRA_SMALL;
