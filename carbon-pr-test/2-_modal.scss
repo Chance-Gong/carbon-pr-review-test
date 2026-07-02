@@ -1,0 +1,18 @@
+// Sample from Carbon PR 22613
+// Original file: packages/styles/scss/components/modal/_modal.scss
+// Status: modified
+// Changes: +4/-2
+
+@@ -363,8 +363,10 @@
+     inline-size: 3rem;
+     transition: background-color $duration-fast-02 motion(standard, productive);
+ 
+-    &:hover {
+-      background-color: $layer-hover;
++    @media (any-hover: hover) {
++      &:hover {
++        background-color: $layer-hover;
++      }
+     }
+ 
+     &:focus {
