@@ -1,0 +1,597 @@
+diff --git a/packages/web-components/src/components/notification/__tests__/actionable-notification-test.js b/packages/web-components/src/components/notification/__tests__/actionable-notification-test.js
+--- a/packages/web-components/src/components/notification/__tests__/actionable-notification-test.js
++++ b/packages/web-components/src/components/notification/__tests__/actionable-notification-test.js
+@@ -6,27 +6,144 @@
+  */
+ 
+ import CDSActionableNotification from '@carbon/web-components/es/components/notification/actionable-notification.js';
+-import { expect } from '@open-wc/testing';
++import '@carbon/web-components/es/components/notification/actionable-notification-button.js';
++import { expect, fixture } from '@open-wc/testing';
++
++const prefix = 'cds';
++
++async function createActionable(properties = {}, content = '') {
++  const el = new CDSActionableNotification();
++  el.hasFocus = false;
++  Object.assign(el, properties);
++  el.innerHTML = content;
++  return fixture(el);
++}
+ 
+ describe('cds-actionable-notification', () => {
+-  it('uses the status icon description as its accessible label', async () => {
++  it('renders with an alertdialog role', async () => {
++    const el = await createActionable();
++
++    expect(el).to.have.attribute('role', 'alertdialog');
++  });
++
++  it('preserves a custom role', async () => {
+     const el = new CDSActionableNotification();
+     el.hasFocus = false;
+-    el.statusIconDescription = 'notification';
+-    document.body.append(el);
+-
+-    try {
+-      await el.updateComplete;
+-
+-      const statusIcon = el.shadowRoot?.querySelector(
+-        '.cds--toast-notification__icon'
+-      );
+-
+-      expect(statusIcon).to.exist;
+-      expect(statusIcon).to.have.attribute('aria-label', 'notification');
+-      expect(statusIcon).to.not.have.attribute('aria-hidden');
+-    } finally {
+-      el.remove();
+-    }
++    el.setAttribute('role', 'status');
++    await fixture(el);
++
++    expect(el).to.have.attribute('role', 'status');
++  });
++
++  it('uses the status icon description as its accessible label', async () => {
++    const el = await createActionable({
++      statusIconDescription: 'notification',
++    });
++    const statusIcon = el.shadowRoot?.querySelector(
++      `.${prefix}--toast-notification__icon`
++    );
++
++    expect(statusIcon).to.exist;
++    expect(statusIcon).to.have.attribute('aria-label', 'notification');
++    expect(statusIcon).to.not.have.attribute('aria-hidden');
++  });
++
++  it('renders title, subtitle, and caption properties', async () => {
++    const el = await createActionable({
++      title: 'A title',
++      subtitle: 'A subtitle',
++      caption: '00:00:00 AM',
++    });
++
++    expect(
++      el.shadowRoot
++        ?.querySelector(`.${prefix}--actionable-notification__title`)
++        ?.textContent.trim()
++    ).to.equal('A title');
++    expect(
++      el.shadowRoot
++        ?.querySelector(`.${prefix}--actionable-notification__subtitle`)
++        ?.textContent.trim()
++    ).to.equal('A subtitle');
++    expect(
++      el.shadowRoot
++        ?.querySelector(`.${prefix}--actionable-notification__caption`)
++        ?.textContent.trim()
++    ).to.equal('00:00:00 AM');
++  });
++
++  it('renders additional content in the default slot', async () => {
++    const el = await createActionable({}, '<a href="#">Additional content</a>');
++
++    expect(el.querySelector('a')?.textContent).to.equal('Additional content');
++  });
++
++  it('closes when Escape is pressed', async () => {
++    const el = await createActionable();
++
++    el.dispatchEvent(
++      new KeyboardEvent('keydown', {
++        key: 'Escape',
++        bubbles: true,
++        composed: true,
++      })
++    );
++    await el.updateComplete;
++
++    expect(el.open).to.be.false;
++  });
++
++  it('remains open on Escape when close-on-escape is false', async () => {
++    const el = await createActionable({ closeOnEscape: false });
++
++    el.dispatchEvent(
++      new KeyboardEvent('keydown', {
++        key: 'Escape',
++        bubbles: true,
++        composed: true,
++      })
++    );
++    await el.updateComplete;
++
++    expect(el.open).to.be.true;
++  });
++
++  it('uses inline notification styling when inline', async () => {
++    const el = await createActionable({ inline: true });
++
++    expect(
++      el.shadowRoot?.querySelector(`.${prefix}--inline-notification__icon`)
++    ).to.exist;
++  });
++
++  it('configures its action button from notification state', async () => {
++    const el = await createActionable(
++      { inline: true, lowContrast: true, hideCloseButton: true },
++      `<${prefix}-actionable-notification-button slot="action">
++        Action
++      </${prefix}-actionable-notification-button>`
++    );
++    const actionButton = el.querySelector(
++      `${prefix}-actionable-notification-button`
++    );
++
++    expect(actionButton).to.have.attribute('kind', 'ghost');
++    expect(actionButton).to.have.attribute('low-contrast', 'true');
++    expect(actionButton).to.have.attribute('hide-close-button', 'true');
++    expect(actionButton).to.have.attribute('size', 'sm');
++  });
++
++  it('sets the action button kind to tertiary in toast mode', async () => {
++    const el = await createActionable(
++      {},
++      `<${prefix}-actionable-notification-button slot="action">
++        Action
++      </${prefix}-actionable-notification-button>`
++    );
++    const actionButton = el.querySelector(
++      `${prefix}-actionable-notification-button`
++    );
++
++    expect(actionButton).to.have.attribute('kind', 'tertiary');
+   });
+ });
+
+diff --git a/packages/web-components/src/components/notification/__tests__/callout-notification-test.js b/packages/web-components/src/components/notification/__tests__/callout-notification-test.js
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/src/components/notification/__tests__/callout-notification-test.js
+@@ -0,0 +1,126 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import CDSCalloutNotification from '@carbon/web-components/es/components/notification/callout-notification.js';
++import '@carbon/web-components/es/components/notification/actionable-notification-button.js';
++import { expect, fixture } from '@open-wc/testing';
++
++const prefix = 'cds';
++
++async function createCallout(properties = {}, content = '') {
++  const el = new CDSCalloutNotification();
++  el.hasFocus = false;
++  Object.assign(el, properties);
++  el.innerHTML = content;
++  return fixture(el);
++}
++
++describe('cds-callout-notification', () => {
++  it('does not use a live-region role', async () => {
++    const el = await createCallout();
++
++    expect(el).to.not.have.attribute('role');
++  });
++
++  it('defaults to the info kind', async () => {
++    const el = await createCallout();
++
++    expect(el).to.have.attribute('kind', 'info');
++  });
++
++  it('renders title, subtitle, title ID, and additional content', async () => {
++    const el = await createCallout(
++      {
++        title: 'A title',
++        subtitle: 'A subtitle',
++        titleId: 'callout-title',
++      },
++      '<p>Additional content</p>'
++    );
++    const title = el.shadowRoot?.querySelector(
++      `.${prefix}--actionable-notification__title`
++    );
++
++    expect(title).to.have.attribute('id', 'callout-title');
++    expect(title?.textContent.trim()).to.equal('A title');
++    expect(
++      el.shadowRoot
++        ?.querySelector(`.${prefix}--actionable-notification__subtitle`)
++        ?.textContent.trim()
++    ).to.equal('A subtitle');
++    expect(el.querySelector('p')?.textContent).to.equal('Additional content');
++  });
++
++  it('does not render empty title and subtitle containers', async () => {
++    const el = await createCallout();
++
++    expect(
++      el.shadowRoot?.querySelector(`.${prefix}--actionable-notification__title`)
++    ).to.not.exist;
++    expect(
++      el.shadowRoot?.querySelector(
++        `.${prefix}--actionable-notification__subtitle`
++      )
++    ).to.not.exist;
++  });
++
++  it('does not render a close button', async () => {
++    const el = await createCallout();
++
++    expect(
++      el.shadowRoot?.querySelector(
++        `.${prefix}--actionable-notification__close-button`
++      )
++    ).to.not.exist;
++  });
++
++  it('uses the status icon description as its accessible label', async () => {
++    const el = await createCallout({
++      statusIconDescription: 'notification',
++    });
++    const statusIcon = el.shadowRoot?.querySelector(
++      `.${prefix}--inline-notification__icon`
++    );
++
++    expect(statusIcon).to.have.attribute('aria-label', 'notification');
++    expect(statusIcon).to.not.have.attribute('aria-hidden');
++  });
++
++  it('configures its action button for callout context', async () => {
++    const el = await createCallout(
++      { title: 'A title', titleId: 'callout-title', lowContrast: true },
++      `<${prefix}-actionable-notification-button slot="action">
++        Action
++      </${prefix}-actionable-notification-button>`
++    );
++    const actionButton = el.querySelector(
++      `${prefix}-actionable-notification-button`
++    );
++
++    expect(actionButton).to.have.attribute('kind', 'ghost');
++    expect(actionButton).to.have.attribute('aria-describedby', 'callout-title');
++    expect(actionButton).to.have.attribute('low-contrast', 'true');
++  });
++
++  it('reflects changes to kind and low contrast from their defaults', async () => {
++    const el = await createCallout();
++
++    expect(el.kind).to.equal('info');
++    expect(el.lowContrast).to.be.false;
++    expect(el).to.have.attribute('kind', 'info');
++    expect(el).to.not.have.attribute('low-contrast');
++
++    el.kind = 'warning';
++    el.lowContrast = true;
++    await el.updateComplete;
++
++    expect(el.kind).to.equal('warning');
++    expect(el.lowContrast).to.be.true;
++    expect(el).to.have.attribute('kind', 'warning');
++    expect(el).to.have.attribute('low-contrast');
++  });
++});
+
+diff --git a/packages/web-components/src/components/notification/__tests__/inline-notification-test.js b/packages/web-components/src/components/notification/__tests__/inline-notification-test.js
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/src/components/notification/__tests__/inline-notification-test.js
+@@ -0,0 +1,144 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import '@carbon/web-components/es/components/notification/index.js';
++import { expect, fixture, html, oneEvent } from '@open-wc/testing';
++
++const prefix = 'cds';
++
++describe('cds-inline-notification', () => {
++  it('renders its content and default role', async () => {
++    const el = await fixture(html`
++      <cds-inline-notification title="A title" subtitle="A subtitle">
++        <span>Additional content</span>
++      </cds-inline-notification>
++    `);
++
++    expect(el).to.have.attribute('role', 'status');
++    expect(
++      el.shadowRoot
++        ?.querySelector(`.${prefix}--inline-notification__title`)
++        ?.textContent.trim()
++    ).to.equal('A title');
++    expect(
++      el.shadowRoot
++        ?.querySelector(`.${prefix}--inline-notification__subtitle`)
++        ?.textContent.trim()
++    ).to.equal('A subtitle');
++    expect(el.querySelector('span')?.textContent).to.equal(
++      'Additional content'
++    );
++  });
++
++  it('preserves a custom role', async () => {
++    const el = await fixture(html`
++      <cds-inline-notification role="log"></cds-inline-notification>
++    `);
++
++    expect(el).to.have.attribute('role', 'log');
++  });
++
++  ['error', 'info', 'info-square', 'success', 'warning', 'warning-alt'].forEach(
++    (kind) => {
++      it(`supports kind="${kind}"`, async () => {
++        const el = await fixture(html`
++          <cds-inline-notification kind=${kind}></cds-inline-notification>
++        `);
++
++        expect(el).to.have.attribute('kind', kind);
++        expect(
++          el.shadowRoot?.querySelector(`.${prefix}--inline-notification__icon`)
++        ).to.exist;
++      });
++    }
++  );
++
++  it('uses the status icon description as its accessible label', async () => {
++    const el = await fixture(html`
++      <cds-inline-notification status-icon-description="notification">
++      </cds-inline-notification>
++    `);
++    const statusIcon = el.shadowRoot?.querySelector(
++      `.${prefix}--inline-notification__icon`
++    );
++
++    expect(statusIcon).to.have.attribute('aria-label', 'notification');
++    expect(statusIcon).to.not.have.attribute('aria-hidden');
++  });
++
++  it('uses the provided accessible label for the close button', async () => {
++    const el = await fixture(html`
++      <cds-inline-notification aria-label="Close notification">
++      </cds-inline-notification>
++    `);
++    const closeButton = el.shadowRoot?.querySelector(
++      `.${prefix}--inline-notification__close-button`
++    );
++
++    expect(closeButton).to.have.attribute('aria-label', 'Close notification');
++    expect(closeButton).to.have.attribute('title', 'Close notification');
++  });
++
++  it('hides the close button when requested', async () => {
++    const el = await fixture(html`
++      <cds-inline-notification hide-close-button></cds-inline-notification>
++    `);
++    const closeButton = el.shadowRoot?.querySelector(
++      `.${prefix}--inline-notification__close-button`
++    );
++
++    expect(closeButton.getClientRects()).to.have.lengthOf(0);
++    closeButton.focus();
++    expect(el.shadowRoot?.activeElement).to.not.equal(closeButton);
++  });
++
++  it('closes and reports the triggering element', async () => {
++    const el = await fixture(html`
++      <cds-inline-notification></cds-inline-notification>
++    `);
++    const closeButton = el.shadowRoot?.querySelector(
++      `.${prefix}--inline-notification__close-button`
++    );
++    const closed = oneEvent(el, `${prefix}-notification-closed`);
++
++    closeButton.click();
++    const event = await closed;
++    await el.updateComplete;
++
++    expect(el.open).to.be.false;
++    expect(event.detail.triggeredBy).to.equal(closeButton);
++  });
++
++  it('allows closing to be prevented', async () => {
++    const el = await fixture(html`
++      <cds-inline-notification></cds-inline-notification>
++    `);
++    const closeButton = el.shadowRoot?.querySelector(
++      `.${prefix}--inline-notification__close-button`
++    );
++    el.addEventListener(`${prefix}-notification-beingclosed`, (event) => {
++      event.preventDefault();
++    });
++
++    closeButton.click();
++    await el.updateComplete;
++
++    expect(el.open).to.be.true;
++  });
++
++  it('closes after the configured timeout', async () => {
++    const el = await fixture(html`
++      <cds-inline-notification></cds-inline-notification>
++    `);
++    const closed = oneEvent(el, `${prefix}-notification-closed`);
++
++    el.timeout = 10;
++    await closed;
++
++    expect(el.open).to.be.false;
++  });
++});
+
+diff --git a/packages/web-components/src/components/notification/__tests__/toast-notification-test.js b/packages/web-components/src/components/notification/__tests__/toast-notification-test.js
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/src/components/notification/__tests__/toast-notification-test.js
+@@ -0,0 +1,130 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import '@carbon/web-components/es/components/notification/index.js';
++import { expect, fixture, html, oneEvent } from '@open-wc/testing';
++
++const prefix = 'cds';
++
++describe('cds-toast-notification', () => {
++  it('renders its title, subtitle, caption, and default role', async () => {
++    const el = await fixture(html`
++      <cds-toast-notification
++        title="A title"
++        subtitle="A subtitle"
++        caption="00:00:00 AM">
++      </cds-toast-notification>
++    `);
++
++    expect(el).to.have.attribute('role', 'status');
++    expect(
++      el.shadowRoot
++        ?.querySelector(`.${prefix}--toast-notification__title`)
++        ?.textContent.trim()
++    ).to.equal('A title');
++    expect(
++      el.shadowRoot
++        ?.querySelector(`.${prefix}--toast-notification__subtitle`)
++        ?.textContent.trim()
++    ).to.equal('A subtitle');
++    expect(
++      el.shadowRoot
++        ?.querySelector(`.${prefix}--toast-notification__caption`)
++        ?.textContent.trim()
++    ).to.equal('00:00:00 AM');
++  });
++
++  it('renders a slotted caption', async () => {
++    const el = await fixture(html`
++      <cds-toast-notification>
++        <span slot="caption">Slotted caption</span>
++      </cds-toast-notification>
++    `);
++
++    expect(
++      el.shadowRoot?.querySelector(`.${prefix}--toast-notification__caption`)
++    ).to.exist;
++    expect(el.querySelector('[slot="caption"]')?.textContent).to.equal(
++      'Slotted caption'
++    );
++  });
++
++  it('does not render an empty caption container', async () => {
++    const el = await fixture(html`
++      <cds-toast-notification></cds-toast-notification>
++    `);
++
++    expect(
++      el.shadowRoot?.querySelector(`.${prefix}--toast-notification__caption`)
++    ).to.not.exist;
++  });
++
++  it('uses toast-specific classes for its controls and icon', async () => {
++    const el = await fixture(html`
++      <cds-toast-notification></cds-toast-notification>
++    `);
++
++    expect(el.shadowRoot?.querySelector(`.${prefix}--toast-notification__icon`))
++      .to.exist;
++    expect(
++      el.shadowRoot?.querySelector(
++        `.${prefix}--toast-notification__close-button`
++      )
++    ).to.exist;
++  });
++
++  it('uses the status icon description as its accessible label', async () => {
++    const el = await fixture(html`
++      <cds-toast-notification status-icon-description="notification">
++      </cds-toast-notification>
++    `);
++    const statusIcon = el.shadowRoot?.querySelector(
++      `.${prefix}--toast-notification__icon`
++    );
++
++    expect(statusIcon).to.have.attribute('aria-label', 'notification');
++    expect(statusIcon).to.not.have.attribute('aria-hidden');
++  });
++
++  it('reflects kind and low contrast state', async () => {
++    const el = await fixture(html`
++      <cds-toast-notification kind="warning" low-contrast>
++      </cds-toast-notification>
++    `);
++
++    expect(el).to.have.attribute('kind', 'warning');
++    expect(el).to.have.attribute('low-contrast');
++  });
++
++  it('hides the close button when requested', async () => {
++    const el = await fixture(html`
++      <cds-toast-notification hide-close-button></cds-toast-notification>
++    `);
++    const closeButton = el.shadowRoot?.querySelector(
++      `.${prefix}--toast-notification__close-button`
++    );
++
++    expect(closeButton.getClientRects()).to.have.lengthOf(0);
++    closeButton.focus();
++    expect(el.shadowRoot?.activeElement).to.not.equal(closeButton);
++  });
++
++  it('fires the close event when the close button is clicked', async () => {
++    const el = await fixture(html`
++      <cds-toast-notification></cds-toast-notification>
++    `);
++    const closeButton = el.shadowRoot?.querySelector(
++      `.${prefix}--toast-notification__close-button`
++    );
++    const closed = oneEvent(el, `${prefix}-notification-closed`);
++
++    closeButton.click();
++    await closed;
++
++    expect(el.open).to.be.false;
++  });
++});
+
+diff --git a/packages/web-components/src/components/notification/inline-notification.ts b/packages/web-components/src/components/notification/inline-notification.ts
+--- a/packages/web-components/src/components/notification/inline-notification.ts
++++ b/packages/web-components/src/components/notification/inline-notification.ts
+@@ -239,7 +239,7 @@ class CDSInlineNotification extends FocusMixin(LitElement) {
+ 
+   connectedCallback() {
+     if (!this.hasAttribute('role')) {
+-      this.setAttribute('role', 'alert');
++      this.setAttribute('role', 'status');
+     }
+     super.connectedCallback();
+   }
