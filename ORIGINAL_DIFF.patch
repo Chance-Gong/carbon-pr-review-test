@@ -1,0 +1,11 @@
+diff --git a/packages/utilities/src/index.ts b/packages/utilities/src/index.ts
+--- a/packages/utilities/src/index.ts
++++ b/packages/utilities/src/index.ts
+@@ -6,7 +6,6 @@
+  */
+ 
+ export * from '@internationalized/number';
+-export type * from '@internationalized/number';
+ export * from './carousel';
+ export * from './datePartsOrder';
+ export * from './dateTimeFormat';
