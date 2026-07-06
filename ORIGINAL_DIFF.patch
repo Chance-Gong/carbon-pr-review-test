@@ -1,0 +1,2802 @@
+diff --git a/packages/web-components/code-connect/checkbox/checkbox-group.figma.ts b/packages/web-components/code-connect/checkbox/checkbox-group.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/checkbox/checkbox-group.figma.ts
+@@ -0,0 +1,45 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=17422-270657&t=Qm7ndWAwgu7d5Uxc-4',
++  {
++    props: {
++      children: figma.children(['Checkbox']),
++      helperText: figma.boolean('Helper message', {
++        true: figma.string('Helper text'),
++      }),
++      readonly: figma.enum('State', {
++        'Read-only': true,
++      }),
++      invalid: figma.enum('State', {
++        Invalid: true,
++      }),
++      invalidText: figma.string('Error text'),
++      warn: figma.enum('State', {
++        Warning: true,
++      }),
++      warnText: figma.string('Warning text'),
++    },
++    example: (props) =>
++      html`<cds-checkbox-group
++        helper-text=${props.helperText}
++        invalid=${props.invalid}
++        invalid-text=${props.invalidText}
++        legend-text="Checkbox group label"
++        readonly=${props.readonly}
++        warn=${props.warn}
++        warn-text=${props.warnText}>
++        ${props.children}
++      </cds-checkbox-group>`,
++    imports: [
++      "import '@carbon/web-components/es/components/checkbox/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/checkbox/checkbox.figma.ts b/packages/web-components/code-connect/checkbox/checkbox.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/checkbox/checkbox.figma.ts
+@@ -0,0 +1,72 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/file/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?type=design&node-id=3193-29303&mode=design&t=QVE44xARq96HRr11-4',
++  {
++    props: {
++      hideLabel: figma.boolean('Value', {
++        true: false,
++        false: true,
++      }),
++      labelText: figma.string('Value text'),
++      indeterminate: figma.enum('Selection', {
++        Indeterminate: true,
++      }),
++      checked: figma.enum('Selection', {
++        Checked: true,
++      }),
++      helperText: figma.boolean('Helper message', {
++        true: figma.string('Helper text'),
++      }),
++      invalid: figma.enum('State', {
++        Invalid: true,
++      }),
++      invalidText: figma.string('Error text'),
++      warn: figma.enum('State', {
++        Warning: true,
++      }),
++      warnText: figma.string('Warning text'),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      readonly: figma.enum('State', {
++        'Read-only': true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-checkbox
++        checked=${props.checked}
++        disabled=${props.disabled}
++        helper-text=${props.helperText}
++        hide-label=${props.hideLabel}
++        indeterminate=${props.indeterminate}
++        invalid=${props.invalid}
++        invalid-text=${props.invalidText}
++        readonly=${props.readonly}
++        warn=${props.warn}
++        warn-text=${props.warnText}>
++        ${props.labelText}
++      </cds-checkbox>`,
++    imports: [
++      "import '@carbon/web-components/es/components/checkbox/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/file/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?type=design&node-id=3193-29303&mode=design&t=QVE44xARq96HRr11-4',
++  {
++    variant: { State: 'Skeleton' },
++    example: () => html`<cds-checkbox-skeleton></cds-checkbox-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/checkbox/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/code-snippet/code-snippet.figma.ts b/packages/web-components/code-connect/code-snippet/code-snippet.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/code-snippet/code-snippet.figma.ts
+@@ -0,0 +1,128 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=4266-104904&t=cMvnFTYLPEhzhIpj-4',
++  {
++    variant: { Tooltip: 'True' },
++    props: {
++      codeSnippet: figma.nestedProps('Code snippet', {
++        text: figma.textContent('node -v'),
++      }),
++      tooltip: figma.nestedProps('Tooltip content', {
++        text: figma.textContent('Tooltip text'),
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-code-snippet
++        disabled=${props.disabled}
++        feedback=${props.tooltip.text}
++        tooltip-content="Copy to clipboard"
++        type="inline">
++        ${props.codeSnippet.text}
++      </cds-code-snippet>`,
++    imports: [
++      "import '@carbon/web-components/es/components/code-snippet/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=4266-104904&t=cMvnFTYLPEhzhIpj-4',
++  {
++    variant: { Tooltip: 'False' },
++    props: {
++      codeSnippet: figma.nestedProps('Code snippet', {
++        text: figma.textContent('node -v'),
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-code-snippet
++        disabled=${props.disabled}
++        feedback="Copied to clipboard"
++        tooltip-content="Copy to clipboard"
++        type="inline">
++        ${props.codeSnippet.text}
++      </cds-code-snippet>`,
++    imports: [
++      "import '@carbon/web-components/es/components/code-snippet/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=4266-103999&t=cMvnFTYLPEhzhIpj-4',
++  {
++    props: {
++      children: figma.textContent('$ npm install --save carbon-components'),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-code-snippet
++        disabled=${props.disabled}
++        feedback="Copied to clipboard"
++        tooltip-content="Copy to clipboard"
++        type="single">
++        ${props.children}
++      </cds-code-snippet>`,
++    imports: [
++      "import '@carbon/web-components/es/components/code-snippet/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=4257-168802&t=cMvnFTYLPEhzhIpj-4',
++  {
++    props: {
++      hideCopyButton: figma.boolean('Copy', {
++        true: false,
++        false: true,
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-code-snippet
++        disabled=${props.disabled}
++        feedback="Copied to clipboard"
++        hide-copy-button=${props.hideCopyButton}
++        show-less-text="Show less"
++        show-more-text="Show more"
++        tooltip-content="Copy to clipboard"
++        type="multi">
++        Code sample here
++      </cds-code-snippet>`,
++    imports: [
++      "import '@carbon/web-components/es/components/code-snippet/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=4257-168802&t=cMvnFTYLPEhzhIpj-4',
++  {
++    variant: { State: 'Skeleton' },
++    example: () =>
++      html`<cds-code-snippet-skeleton
++        type="multi"></cds-code-snippet-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/code-snippet/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/combo-box/combo-box.figma.ts b/packages/web-components/code-connect/combo-box/combo-box.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/combo-box/combo-box.figma.ts
+@@ -0,0 +1,78 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=14032-290976&t=5acDGCinwyrs5Bbc-4',
++  {
++    props: {
++      label: figma.string('Filter text'),
++      helperText: figma.boolean('Show helper', {
++        true: figma.string('Helper text'),
++      }),
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++      titleText: figma.string('Label text'),
++      readOnly: figma.enum('State', {
++        'Read-only': true,
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      invalid: figma.enum('State', {
++        Error: true,
++      }),
++      invalidText: figma.string('Error message'),
++      warn: figma.enum('State', {
++        Warning: true,
++      }),
++      warnText: figma.string('Warning message'),
++    },
++    example: (props) =>
++      html`<cds-combo-box
++        disabled=${props.disabled}
++        helper-text=${props.helperText}
++        invalid=${props.invalid}
++        invalid-text=${props.invalidText}
++        label=${props.label}
++        read-only=${props.readOnly}
++        size=${props.size}
++        title-text=${props.titleText}
++        warn=${props.warn}
++        warn-text=${props.warnText}>
++        <cds-combo-box-item value="option-0">Option 0</cds-combo-box-item>
++        <cds-combo-box-item value="option-1">Option 1</cds-combo-box-item>
++      </cds-combo-box>`,
++    imports: [
++      "import '@carbon/web-components/es/components/combo-box/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=14032-290976&t=5acDGCinwyrs5Bbc-4',
++  {
++    variant: { State: 'Skeleton' },
++    props: {
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++    },
++    example: (props) =>
++      html`<cds-dropdown-skeleton size=${props.size}></cds-dropdown-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/combo-box/index.js'",
++      "import '@carbon/web-components/es/components/dropdown/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/combo-button/combo-button.figma.ts b/packages/web-components/code-connect/combo-button/combo-button.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/combo-button/combo-button.figma.ts
+@@ -0,0 +1,60 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++const sharedComboButtonProps = {
++  size: figma.enum('Size', {
++    Large: 'lg',
++    Medium: 'md',
++    Small: 'sm',
++  }),
++  menuAlignment: figma.enum('Position', {
++    Bottom: 'bottom',
++    Top: 'top',
++  }),
++  menu: figma.nestedProps('Menu', {
++    menuItem: figma.children(['_Menu list item']),
++  }),
++};
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=31753-68447&t=aG4cJRjteQHcd71k-4',
++  {
++    props: sharedComboButtonProps,
++    example: (props) =>
++      html`<cds-combo-button
++        label="Primary action"
++        menu-alignment=${props.menuAlignment}
++        size=${props.size}>
++        <cds-menu>${props.menu.menuItem}</cds-menu>
++      </cds-combo-button>`,
++    imports: [
++      "import '@carbon/web-components/es/components/combo-button/index.js'",
++      "import '@carbon/web-components/es/components/menu/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=31753-68447&t=aG4cJRjteQHcd71k-4',
++  {
++    variant: { Open: 'True' },
++    props: sharedComboButtonProps,
++    example: (props) =>
++      html`<cds-combo-button
++        label="Primary action"
++        menu-alignment=${props.menuAlignment}
++        size=${props.size}>
++        <cds-menu>${props.menu.menuItem}</cds-menu>
++      </cds-combo-button>`,
++    imports: [
++      "import '@carbon/web-components/es/components/combo-button/index.js'",
++      "import '@carbon/web-components/es/components/menu/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/content-switcher/content-switcher-item.figma.ts b/packages/web-components/code-connect/content-switcher/content-switcher-item.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/content-switcher/content-switcher-item.figma.ts
+@@ -0,0 +1,52 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=10151-402337&t=Y6lD1uj5Q0yszbgL-4',
++  {
++    props: {
++      text: figma.string('Label text'),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-content-switcher-item
++        disabled=${props.disabled}
++        value="switch-value">
++        ${props.text}
++      </cds-content-switcher-item>`,
++    imports: [
++      "import '@carbon/web-components/es/components/content-switcher/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=21988-280553&t=Y6lD1uj5Q0yszbgL-4',
++  {
++    props: {
++      children: figma.children('*'),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-content-switcher-item
++        disabled=${props.disabled}
++        icon
++        value="icon-switch-value">
++        ${props.children}
++        <span slot="tooltip-content">Content switcher item</span>
++      </cds-content-switcher-item>`,
++    imports: [
++      "import '@carbon/web-components/es/components/content-switcher/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/content-switcher/content-switcher.figma.ts b/packages/web-components/code-connect/content-switcher/content-switcher.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/content-switcher/content-switcher.figma.ts
+@@ -0,0 +1,59 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=10151-402486&t=LoXqbMLZkoMgbrAS-4',
++  {
++    props: {
++      children: figma.children(['_Content switcher text item']),
++      lowContrast: figma.boolean('Low contrast'),
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++    },
++    example: (props) =>
++      html`<cds-content-switcher
++        low-contrast=${props.lowContrast}
++        selected-index="0"
++        size=${props.size}>
++        ${props.children}
++      </cds-content-switcher>`,
++    imports: [
++      "import '@carbon/web-components/es/components/content-switcher/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=10151-402486&t=LoXqbMLZkoMgbrAS-4',
++  {
++    variant: { Type: 'Icon only' },
++    props: {
++      children: figma.children(['_Content switcher icon item']),
++      lowContrast: figma.boolean('Low contrast'),
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++    },
++    example: (props) =>
++      html`<cds-content-switcher
++        low-contrast=${props.lowContrast}
++        selected-index="0"
++        size=${props.size}>
++        ${props.children}
++      </cds-content-switcher>`,
++    imports: [
++      "import '@carbon/web-components/es/components/content-switcher/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/date-picker/date-picker.figma.ts b/packages/web-components/code-connect/date-picker/date-picker.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/date-picker/date-picker.figma.ts
+@@ -0,0 +1,183 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++const sharedDateInputProps = {
++  placeholder: figma.string('Date unselected'),
++  labelText: figma.string('Label text'),
++  disabled: figma.enum('State', {
++    Disabled: true,
++  }),
++  invalid: figma.enum('State', {
++    Error: true,
++  }),
++  warn: figma.enum('State', {
++    Warning: true,
++  }),
++  warnText: figma.string('Warning text'),
++  // Intentionally omit helperText: WC date picker uses a slot, and the HTML parser
++  // cannot conditionally omit that slot here without changing snippet behavior.
++  invalidText: figma.string('Error text'),
++  size: figma.enum('Size', {
++    Large: 'lg',
++    Medium: 'md',
++    Small: 'sm',
++  }),
++  readOnly: figma.enum('State', {
++    'Read-only': true,
++  }),
++};
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=17544-266985&t=hgJuU7m9Y6EM076g-4',
++  {
++    props: {
++      ...sharedDateInputProps,
++      hideLabel: figma.boolean('Show label', {
++        true: false,
++        false: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-date-picker readonly=${props.readOnly}>
++        <cds-date-picker-input
++          disabled=${props.disabled}
++          hide-label=${props.hideLabel}
++          invalid=${props.invalid}
++          invalid-text=${props.invalidText}
++          kind="simple"
++          label-text=${props.labelText}
++          placeholder=${props.placeholder}
++          size=${props.size}
++          warn=${props.warn}
++          warn-text=${props.warnText}></cds-date-picker-input>
++      </cds-date-picker>`,
++    imports: [
++      "import '@carbon/web-components/es/components/date-picker/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=17544-266985&t=hgJuU7m9Y6EM076g-4',
++  {
++    variant: { State: 'Skeleton' },
++    example: () =>
++      html`<cds-date-picker-input-skeleton></cds-date-picker-input-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/date-picker/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=17544-267504&t=hgJuU7m9Y6EM076g-4',
++  {
++    props: sharedDateInputProps,
++    example: (props) =>
++      html`<cds-date-picker readonly=${props.readOnly}>
++        <cds-date-picker-input
++          disabled=${props.disabled}
++          invalid=${props.invalid}
++          invalid-text=${props.invalidText}
++          kind="single"
++          label-text=${props.labelText}
++          placeholder=${props.placeholder}
++          size=${props.size}
++          warn=${props.warn}
++          warn-text=${props.warnText}></cds-date-picker-input>
++      </cds-date-picker>`,
++    imports: [
++      "import '@carbon/web-components/es/components/date-picker/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=17544-267504&t=hgJuU7m9Y6EM076g-4',
++  {
++    variant: { State: 'Skeleton' },
++    example: () =>
++      html`<cds-date-picker-input-skeleton></cds-date-picker-input-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/date-picker/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=17544-268170&t=hgJuU7m9Y6EM076g-4',
++  {
++    props: {
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++      readOnly: figma.enum('State', {
++        'Read-only': true,
++      }),
++      datePickerInput: figma.nestedProps(
++        'Date picker - Single calendar - Default',
++        {
++          placeholder: figma.string('Date unselected'),
++          disabled: figma.enum('State', {
++            Disabled: true,
++          }),
++          invalid: figma.enum('State', {
++            Error: true,
++          }),
++          warn: figma.enum('State', {
++            Warning: true,
++          }),
++          warnText: figma.string('Warning text'),
++          invalidText: figma.string('Error text'),
++        }
++      ),
++    },
++    example: (props) =>
++      html`<cds-date-picker readonly=${props.readOnly}>
++        <cds-date-picker-input
++          disabled=${props.datePickerInput.disabled}
++          invalid=${props.datePickerInput.invalid}
++          invalid-text=${props.datePickerInput.invalidText}
++          kind="from"
++          label-text="Start date"
++          placeholder=${props.datePickerInput.placeholder}
++          size=${props.size}
++          warn=${props.datePickerInput.warn}
++          warn-text=${props.datePickerInput.warnText}></cds-date-picker-input>
++        <cds-date-picker-input
++          disabled=${props.datePickerInput.disabled}
++          invalid=${props.datePickerInput.invalid}
++          invalid-text=${props.datePickerInput.invalidText}
++          kind="to"
++          label-text="End date"
++          placeholder=${props.datePickerInput.placeholder}
++          size=${props.size}
++          warn=${props.datePickerInput.warn}
++          warn-text=${props.datePickerInput.warnText}></cds-date-picker-input>
++      </cds-date-picker>`,
++    imports: [
++      "import '@carbon/web-components/es/components/date-picker/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=17544-268170&t=hgJuU7m9Y6EM076g-4',
++  {
++    variant: { State: 'Skeleton' },
++    example: () =>
++      html`<cds-date-picker-input-skeleton
++        range></cds-date-picker-input-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/date-picker/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/dropdown/dropdown.figma.ts b/packages/web-components/code-connect/dropdown/dropdown.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/dropdown/dropdown.figma.ts
+@@ -0,0 +1,82 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/file/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?type=design&node-id=14032-290635&mode=dev',
++  {
++    props: {
++      helperText: figma.boolean('Show helper', {
++        true: figma.string('Helper text'),
++      }),
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++      titleText: figma.string('Label'),
++      label: figma.string('Prompt text'),
++      readOnly: figma.enum('State', {
++        'Read-only': true,
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      invalid: figma.enum('State', {
++        Error: true,
++      }),
++      invalidText: figma.string('Error message'),
++      warn: figma.enum('State', {
++        Warning: true,
++      }),
++      warnText: figma.string('Warning message'),
++      type: figma.enum('Style', {
++        Inline: 'inline',
++      }),
++    },
++    example: (props) =>
++      html`<cds-dropdown
++        disabled=${props.disabled}
++        helper-text=${props.helperText}
++        invalid=${props.invalid}
++        invalid-text=${props.invalidText}
++        label=${props.label}
++        read-only=${props.readOnly}
++        size=${props.size}
++        title-text=${props.titleText}
++        type=${props.type}
++        warn=${props.warn}
++        warn-text=${props.warnText}
++        value="option-0">
++        <cds-dropdown-item value="option-0">Option 0</cds-dropdown-item>
++        <cds-dropdown-item value="option-1">Option 1</cds-dropdown-item>
++      </cds-dropdown>`,
++    imports: [
++      "import '@carbon/web-components/es/components/dropdown/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/file/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?type=design&node-id=14032-290635&mode=dev',
++  {
++    variant: { State: 'Skeleton' },
++    props: {
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++    },
++    example: (props) =>
++      html`<cds-dropdown-skeleton size=${props.size}></cds-dropdown-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/dropdown/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/form/form.figma.ts b/packages/web-components/code-connect/form/form.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/form/form.figma.ts
+@@ -0,0 +1,20 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=3897-51336&t=SbIuH3RAJeFPjXmN-4',
++  {
++    props: {
++      children: figma.children('*'),
++    },
++    example: (props) =>
++      html`<cds-form aria-label="sample form"> ${props.children} </cds-form>`,
++    imports: ["import '@carbon/web-components/es/components/form/index.js'"],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/loading/loading.figma.ts b/packages/web-components/code-connect/loading/loading.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/loading/loading.figma.ts
+@@ -0,0 +1,25 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=3238-28455&t=Y6lD1uj5Q0yszbgL-4',
++  {
++    props: {
++      small: figma.enum('Size', {
++        Small: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-loading
++        active
++        description="Loading"
++        small=${props.small}></cds-loading>`,
++    imports: ["import '@carbon/web-components/es/components/loading/index.js'"],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/menu-button/menu-button.figma.ts b/packages/web-components/code-connect/menu-button/menu-button.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/menu-button/menu-button.figma.ts
+@@ -0,0 +1,74 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++const sharedMenuButtonProps = {
++  size: figma.enum('Size', {
++    Large: 'lg',
++    Medium: 'md',
++    Small: 'sm',
++  }),
++  menuAlignment: figma.enum('Position', {
++    Bottom: 'bottom',
++    Top: 'top',
++  }),
++  menu: figma.nestedProps('Menu', {
++    menuItem: figma.children(['_Menu list item']),
++  }),
++  button: figma.nestedProps('Button', {
++    kind: figma.enum('Style', {
++      Primary: 'primary',
++      Tertiary: 'tertiary',
++      Ghost: 'ghost',
++    }),
++    disabled: figma.enum('State', {
++      Disabled: true,
++    }),
++  }),
++};
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=31420-317548&t=KXgYpEhuz2XzSITV-4',
++  {
++    props: sharedMenuButtonProps,
++    example: (props) =>
++      html`<cds-menu-button
++        disabled=${props.button.disabled}
++        kind=${props.button.kind}
++        label="Actions"
++        menu-alignment=${props.menuAlignment}
++        size=${props.size}>
++        <cds-menu>${props.menu.menuItem}</cds-menu>
++      </cds-menu-button>`,
++    imports: [
++      "import '@carbon/web-components/es/components/menu-button/index.js'",
++      "import '@carbon/web-components/es/components/menu/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=31420-317548&t=KXgYpEhuz2XzSITV-4',
++  {
++    variant: { Open: 'True' },
++    props: sharedMenuButtonProps,
++    example: (props) =>
++      html`<cds-menu-button
++        disabled=${props.button.disabled}
++        kind=${props.button.kind}
++        label="Actions"
++        menu-alignment=${props.menuAlignment}
++        size=${props.size}>
++        <cds-menu>${props.menu.menuItem}</cds-menu>
++      </cds-menu-button>`,
++    imports: [
++      "import '@carbon/web-components/es/components/menu-button/index.js'",
++      "import '@carbon/web-components/es/components/menu/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/menu/menu-item.figma.ts b/packages/web-components/code-connect/menu/menu-item.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/menu/menu-item.figma.ts
+@@ -0,0 +1,109 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++const sharedMenuItemProps = {
++  kind: figma.enum('State', {
++    'Danger hover': 'danger',
++    'Danger hover + Focus': 'danger',
++  }),
++  label: figma.string('Option text'),
++  disabled: figma.enum('State', {
++    Disabled: true,
++  }),
++};
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=36234-38344&t=OdgMrt4NDVwZpNSx-4',
++  {
++    props: sharedMenuItemProps,
++    example: (props) =>
++      html`<cds-menu-item
++        disabled=${props.disabled}
++        kind=${props.kind}
++        label=${props.label}></cds-menu-item>`,
++    imports: ["import '@carbon/web-components/es/components/menu/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=36234-38344&t=OdgMrt4NDVwZpNSx-4',
++  {
++    variant: { Divider: 'True' },
++    props: sharedMenuItemProps,
++    example: (props) =>
++      html`<cds-menu-item-divider></cds-menu-item-divider>
++        <cds-menu-item
++          disabled=${props.disabled}
++          kind=${props.kind}
++          label=${props.label}></cds-menu-item>`,
++    imports: ["import '@carbon/web-components/es/components/menu/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=36234-38344&t=OdgMrt4NDVwZpNSx-4',
++  {
++    variant: { 'Shortcuts or Trigger ': 'True' },
++    props: sharedMenuItemProps,
++    example: (props) =>
++      html`<cds-menu-item
++        disabled=${props.disabled}
++        kind=${props.kind}
++        label=${props.label}
++        shortcut="⌘X"></cds-menu-item>`,
++    imports: ["import '@carbon/web-components/es/components/menu/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=36234-38344&t=OdgMrt4NDVwZpNSx-4',
++  {
++    variant: { 'Shortcuts or Trigger ': 'True', Divider: 'True' },
++    props: sharedMenuItemProps,
++    example: (props) =>
++      html`<cds-menu-item-divider></cds-menu-item-divider>
++        <cds-menu-item
++          disabled=${props.disabled}
++          kind=${props.kind}
++          label=${props.label}
++          shortcut="⌘X"></cds-menu-item>`,
++    imports: ["import '@carbon/web-components/es/components/menu/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=36234-38344&t=OdgMrt4NDVwZpNSx-4',
++  {
++    variant: { Selected: 'True' },
++    props: sharedMenuItemProps,
++    example: (props) =>
++      html`<cds-menu-item-selectable
++        disabled=${props.disabled}
++        kind=${props.kind}
++        label=${props.label}
++        selected></cds-menu-item-selectable>`,
++    imports: ["import '@carbon/web-components/es/components/menu/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=36234-38344&t=OdgMrt4NDVwZpNSx-4',
++  {
++    variant: { Selected: 'True', Divider: 'True' },
++    props: sharedMenuItemProps,
++    example: (props) =>
++      html`<cds-menu-item-divider></cds-menu-item-divider>
++        <cds-menu-item-selectable
++          disabled=${props.disabled}
++          kind=${props.kind}
++          label=${props.label}
++          selected></cds-menu-item-selectable>`,
++    imports: ["import '@carbon/web-components/es/components/menu/index.js'"],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/menu/menu.figma.ts b/packages/web-components/code-connect/menu/menu.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/menu/menu.figma.ts
+@@ -0,0 +1,28 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=31131-96397&t=OdgMrt4NDVwZpNSx-4',
++  {
++    props: {
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++        'Extra small': 'xs',
++      }),
++      children: figma.children(['_Menu list item']),
++    },
++    example: (props) =>
++      html`<cds-menu menu-alignment="bottom" open size=${props.size}>
++        ${props.children}
++      </cds-menu>`,
++    imports: ["import '@carbon/web-components/es/components/menu/index.js'"],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/multi-select/multi-select.figma.ts b/packages/web-components/code-connect/multi-select/multi-select.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/multi-select/multi-select.figma.ts
+@@ -0,0 +1,85 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=14032-291311&t=aG4cJRjteQHcd71k-4',
++  {
++    props: {
++      type: figma.enum('Style', {
++        Inline: 'inline',
++      }),
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++      titleText: figma.string('Label text'),
++      label: figma.string('Prompt text'),
++      helperText: figma.boolean('Show helper', {
++        true: figma.string('Helper text'),
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      invalid: figma.enum('State', {
++        Error: true,
++      }),
++      invalidText: figma.string('Error message'),
++      warn: figma.enum('State', {
++        Warning: true,
++      }),
++      warnText: figma.string('Warning message'),
++      readOnly: figma.enum('State', {
++        'Read-only': true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-multi-select
++        disabled=${props.disabled}
++        helper-text=${props.helperText}
++        invalid=${props.invalid}
++        invalid-text=${props.invalidText}
++        label=${props.label}
++        read-only=${props.readOnly}
++        selection-feedback="top-after-reopen"
++        size=${props.size}
++        title-text=${props.titleText}
++        type=${props.type}
++        warn=${props.warn}
++        warn-text=${props.warnText}>
++        <cds-multi-select-item selected value="option-0"
++          >Option 0</cds-multi-select-item
++        >
++        <cds-multi-select-item value="option-1">Option 1</cds-multi-select-item>
++      </cds-multi-select>`,
++    imports: [
++      "import '@carbon/web-components/es/components/multi-select/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=14032-291311&t=aG4cJRjteQHcd71k-4',
++  {
++    variant: { State: 'Skeleton' },
++    props: {
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++    },
++    example: (props) =>
++      html`<cds-dropdown-skeleton size=${props.size}></cds-dropdown-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/multi-select/index.js'",
++      "import '@carbon/web-components/es/components/dropdown/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/notification/notification.figma.ts b/packages/web-components/code-connect/notification/notification.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/notification/notification.figma.ts
+@@ -0,0 +1,142 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++const sharedNotificationProps = {
++  title: figma.string('Title text'),
++  subtitle: figma.string('Message text'),
++  kind: figma.enum('Status', {
++    Info: 'info',
++    Success: 'success',
++    Warning: 'warning',
++    Error: 'error',
++  }),
++  hideCloseButton: figma.boolean('Close', {
++    true: false,
++    false: true,
++  }),
++  lowContrast: figma.boolean('High contrast', {
++    true: false,
++    false: true,
++  }),
++};
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-Carbon-Design-System?node-id=4179-105911&t=nJ89fkK549fgCUuf-4',
++  {
++    variant: { Actionable: 'False' },
++    props: sharedNotificationProps,
++    example: (props) =>
++      html`<cds-inline-notification
++        hide-close-button=${props.hideCloseButton}
++        kind=${props.kind}
++        low-contrast=${props.lowContrast}
++        subtitle=${props.subtitle}
++        title=${props.title}></cds-inline-notification>`,
++    imports: [
++      "import '@carbon/web-components/es/components/notification/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-Carbon-Design-System?node-id=4179-105911&t=nJ89fkK549fgCUuf-4',
++  {
++    variant: { Actionable: 'True' },
++    props: sharedNotificationProps,
++    example: (props) =>
++      html`<cds-actionable-notification
++        hide-close-button=${props.hideCloseButton}
++        inline
++        kind=${props.kind}
++        low-contrast=${props.lowContrast}
++        subtitle=${props.subtitle}
++        title=${props.title}>
++        <cds-actionable-notification-button slot="action">
++          Action
++        </cds-actionable-notification-button>
++      </cds-actionable-notification>`,
++    imports: [
++      "import '@carbon/web-components/es/components/notification/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-Carbon-Design-System?node-id=84336-35011&t=nJ89fkK549fgCUuf-4',
++  {
++    variant: { Actionable: 'False' },
++    props: {
++      ...sharedNotificationProps,
++      caption: figma.string('Time text'),
++    },
++    example: (props) =>
++      html`<cds-toast-notification
++        caption=${props.caption}
++        hide-close-button=${props.hideCloseButton}
++        kind=${props.kind}
++        low-contrast=${props.lowContrast}
++        subtitle=${props.subtitle}
++        title=${props.title}></cds-toast-notification>`,
++    imports: [
++      "import '@carbon/web-components/es/components/notification/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-Carbon-Design-System?node-id=84336-35011&t=nJ89fkK549fgCUuf-4',
++  {
++    variant: { Actionable: 'True' },
++    props: sharedNotificationProps,
++    example: (props) =>
++      html`<cds-actionable-notification
++        hide-close-button=${props.hideCloseButton}
++        kind=${props.kind}
++        low-contrast=${props.lowContrast}
++        subtitle=${props.subtitle}
++        title=${props.title}>
++        <cds-actionable-notification-button slot="action">
++          Action
++        </cds-actionable-notification-button>
++      </cds-actionable-notification>`,
++    imports: [
++      "import '@carbon/web-components/es/components/notification/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-Carbon-Design-System?node-id=84336-36580&t=nJ89fkK549fgCUuf-4',
++  {
++    props: {
++      title: figma.boolean('Title', {
++        true: figma.string('Title text'),
++        false: '',
++      }),
++      subtitle: figma.string('Message text'),
++      kind: figma.enum('Status', {
++        Info: 'info',
++        Warning: 'warning',
++      }),
++      lowContrast: figma.boolean('High contrast', {
++        true: false,
++        false: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-callout-notification
++        kind=${props.kind}
++        low-contrast=${props.lowContrast}
++        subtitle=${props.subtitle}
++        title=${props.title}></cds-callout-notification>`,
++    imports: [
++      "import '@carbon/web-components/es/components/notification/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/number-input/number-input.figma.ts b/packages/web-components/code-connect/number-input/number-input.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/number-input/number-input.figma.ts
+@@ -0,0 +1,81 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=19893-290998&m=dev',
++  {
++    props: {
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      helperText: figma.boolean('Show helper', {
++        true: figma.string('Helper text'),
++      }),
++      hideLabel: figma.boolean('Show label', {
++        true: false,
++        false: true,
++      }),
++      invalid: figma.enum('State', {
++        Error: true,
++      }),
++      invalidText: figma.string('Error text'),
++      label: figma.string('Label text'),
++      readOnly: figma.enum('State', {
++        'Read-only': true,
++      }),
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++      warn: figma.enum('State', {
++        Warning: true,
++      }),
++      warnText: figma.string('Warning text'),
++      numberInputBase: figma.nestedProps('_Number input base', {
++        value: figma.textContent('Text'),
++      }),
++    },
++    example: (props) =>
++      html`<cds-number-input
++        disabled=${props.disabled}
++        helper-text=${props.helperText}
++        hide-label=${props.hideLabel}
++        invalid=${props.invalid}
++        invalid-text=${props.invalidText}
++        label=${props.label}
++        readonly=${props.readOnly}
++        size=${props.size}
++        value=${props.numberInputBase.value}
++        warn=${props.warn}
++        warn-text=${props.warnText}></cds-number-input>`,
++    imports: [
++      "import '@carbon/web-components/es/components/number-input/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=19893-290998&m=dev',
++  {
++    variant: { State: 'Skeleton' },
++    props: {
++      hideLabel: figma.boolean('Show label', {
++        true: false,
++        false: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-number-input-skeleton
++        hide-label=${props.hideLabel}></cds-number-input-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/number-input/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/overflow-menu/overflow-menu.figma.ts b/packages/web-components/code-connect/overflow-menu/overflow-menu.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/overflow-menu/overflow-menu.figma.ts
+@@ -0,0 +1,57 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=3717-45725&t=aG4cJRjteQHcd71k-4',
++  {
++    props: {
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++      direction: figma.enum('Position', {
++        Top: 'top',
++      }),
++      flipped: figma.enum('Alignment', {
++        End: true,
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      open: figma.boolean('Open'),
++      button: figma.nestedProps('Button', {
++        renderIcon: figma.instance('Swap icon'),
++      }),
++    },
++    example: (props) =>
++      html`<cds-overflow-menu
++        disabled=${props.disabled}
++        menu-alignment=${props.direction}
++        open=${props.open}
++        size=${props.size}>
++        <span slot="icon">${props.button.renderIcon}</span>
++        <span slot="tooltip-content">Options</span>
++        <cds-overflow-menu-body flipped=${props.flipped}>
++          <cds-overflow-menu-item>Stop app</cds-overflow-menu-item>
++          <cds-overflow-menu-item>Restart app</cds-overflow-menu-item>
++          <cds-overflow-menu-item>Rename app</cds-overflow-menu-item>
++          <cds-overflow-menu-item disabled>
++            Clone and move app
++          </cds-overflow-menu-item>
++          <cds-overflow-menu-item divider danger>
++            Delete app
++          </cds-overflow-menu-item>
++        </cds-overflow-menu-body>
++      </cds-overflow-menu>`,
++    imports: [
++      "import '@carbon/web-components/es/components/overflow-menu/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/pagination/pagination.figma.ts b/packages/web-components/code-connect/pagination/pagination.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/pagination/pagination.figma.ts
+@@ -0,0 +1,39 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=3889-50204&t=gkzO9FaEPqewqYn6-4',
++  {
++    props: {
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++    },
++    example: (props) =>
++      html`<cds-pagination
++        backward-text="Previous page"
++        forward-text="Next page"
++        items-per-page-text="Items per page:"
++        page="1"
++        page-size="10"
++        size=${props.size}
++        total-items="103">
++        <cds-select-item value="10">10</cds-select-item>
++        <cds-select-item value="20">20</cds-select-item>
++        <cds-select-item value="30">30</cds-select-item>
++        <cds-select-item value="40">40</cds-select-item>
++        <cds-select-item value="50">50</cds-select-item>
++      </cds-pagination>`,
++    imports: [
++      "import '@carbon/web-components/es/components/pagination/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/password-input/password-input.figma.ts b/packages/web-components/code-connect/password-input/password-input.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/password-input/password-input.figma.ts
+@@ -0,0 +1,61 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=5621-280380&t=BNxiN6zuoeazJ8tv-4',
++  {
++    props: {
++      label: figma.string('Label text'),
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      invalid: figma.enum('State', {
++        Error: true,
++      }),
++      invalidText: figma.string('Error text'),
++      warn: figma.enum('State', {
++        Warning: true,
++      }),
++      warnText: figma.string('Warning text'),
++      helperText: figma.boolean('Show helper', {
++        true: figma.string('Helper text'),
++      }),
++    },
++    example: (props) =>
++      html`<cds-password-input
++        disabled=${props.disabled}
++        helper-text=${props.helperText}
++        invalid=${props.invalid}
++        invalid-text=${props.invalidText}
++        label=${props.label}
++        size=${props.size}
++        warn=${props.warn}
++        warn-text=${props.warnText}></cds-password-input>`,
++    imports: [
++      "import '@carbon/web-components/es/components/password-input/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=5621-280380&t=BNxiN6zuoeazJ8tv-4',
++  {
++    variant: { State: 'Skeleton' },
++    example: () =>
++      html`<cds-password-input-skeleton></cds-password-input-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/password-input/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/popover/popover.figma.ts b/packages/web-components/code-connect/popover/popover.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/popover/popover.figma.ts
+@@ -0,0 +1,73 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=9125-400576&t=SbIuH3RAJeFPjXmN-4',
++  {
++    props: {
++      align: figma.enum('Position', {
++        Top: figma.enum('Alignment', {
++          Start: 'top-start',
++          Center: 'top',
++          End: 'top-end',
++        }),
++        Bottom: figma.enum('Alignment', {
++          Start: 'bottom-start',
++          Center: 'bottom',
++          End: 'bottom-end',
++        }),
++        Left: 'left',
++        Right: 'right',
++      }),
++      open: figma.boolean('Visible'),
++      popoverItem: figma.nestedProps('Popover item', {
++        caret: figma.boolean('Caret tip'),
++        children: figma.instance('Swap slot'),
++        dropShadow: figma.boolean('Shadow'),
++      }),
++    },
++    example: (props) =>
++      html`<cds-popover
++        align=${props.align}
++        caret=${props.popoverItem.caret}
++        dropshadow=${props.popoverItem.dropShadow}
++        open=${props.open}>
++        <button type="button">Open popover</button>
++        <cds-popover-content>${props.popoverItem.children}</cds-popover-content>
++      </cds-popover>`,
++    imports: ["import '@carbon/web-components/es/components/popover/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=9826-402965&t=SbIuH3RAJeFPjXmN-4',
++  {
++    props: {
++      align: figma.enum('Alignment', {
++        Start: 'bottom-start',
++        End: 'bottom-end',
++      }),
++      open: figma.boolean('Open'),
++      dropShadow: figma.boolean('Shadow'),
++      popoverItem: figma.nestedProps('Popover item', {
++        children: figma.instance('Swap slot'),
++      }),
++    },
++    example: (props) =>
++      html`<cds-popover
++        align=${props.align}
++        dropshadow=${props.dropShadow}
++        open=${props.open}
++        tabtip>
++        <button type="button">Open tab tip</button>
++        <cds-popover-content>${props.popoverItem.children}</cds-popover-content>
++      </cds-popover>`,
++    imports: ["import '@carbon/web-components/es/components/popover/index.js'"],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/progress-bar/progress-bar.figma.ts b/packages/web-components/code-connect/progress-bar/progress-bar.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/progress-bar/progress-bar.figma.ts
+@@ -0,0 +1,91 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++const sharedProgressBarProps = {
++  label: figma.string('Label text'),
++  value: figma.enum('Progress', {
++    '0%': 0,
++    '25%': 25,
++    '50%': 50,
++    '75%': 75,
++  }),
++  type: figma.enum('Alignment', {
++    Inline: 'inline',
++    Indent: 'indented',
++  }),
++  status: figma.enum('Status', {
++    Active: 'active',
++    Success: 'finished',
++    Error: 'error',
++  }),
++  size: figma.enum('Size', {
++    Big: 'big',
++    Small: 'small',
++  }),
++  helperText: figma.string('Helper text'),
++  helperTextError: figma.string('Error text'),
++  helperTextSuccess: figma.string('Success text'),
++};
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=9506-402924&t=j280IIQF1o3iLkV2-4',
++  {
++    variant: { Status: 'Active' },
++    props: sharedProgressBarProps,
++    example: (props) =>
++      html`<cds-progress-bar
++        helper-text=${props.helperText}
++        label=${props.label}
++        size=${props.size}
++        status=${props.status}
++        type=${props.type}
++        value=${props.value}></cds-progress-bar>`,
++    imports: [
++      "import '@carbon/web-components/es/components/progress-bar/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=9506-402924&t=j280IIQF1o3iLkV2-4',
++  {
++    variant: { Status: 'Error' },
++    props: sharedProgressBarProps,
++    example: (props) =>
++      html`<cds-progress-bar
++        helper-text=${props.helperTextError}
++        label=${props.label}
++        size=${props.size}
++        status=${props.status}
++        type=${props.type}
++        value=${props.value}></cds-progress-bar>`,
++    imports: [
++      "import '@carbon/web-components/es/components/progress-bar/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=9506-402924&t=j280IIQF1o3iLkV2-4',
++  {
++    variant: { Status: 'Success' },
++    props: sharedProgressBarProps,
++    example: (props) =>
++      html`<cds-progress-bar
++        helper-text=${props.helperTextSuccess}
++        label=${props.label}
++        size=${props.size}
++        status=${props.status}
++        type=${props.type}
++        value=${props.value}></cds-progress-bar>`,
++    imports: [
++      "import '@carbon/web-components/es/components/progress-bar/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/progress-indicator/progress-indicator.figma.ts b/packages/web-components/code-connect/progress-indicator/progress-indicator.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/progress-indicator/progress-indicator.figma.ts
+@@ -0,0 +1,27 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=3925-58667&m=dev',
++  {
++    props: {
++      children: figma.children(['_Progress indicator item']),
++      vertical: figma.enum('Direction', {
++        Vertical: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-progress-indicator vertical=${props.vertical}>
++        ${props.children}
++      </cds-progress-indicator>`,
++    imports: [
++      "import '@carbon/web-components/es/components/progress-indicator/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/progress-indicator/progress-step.figma.ts b/packages/web-components/code-connect/progress-indicator/progress-step.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/progress-indicator/progress-step.figma.ts
+@@ -0,0 +1,43 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=3377-31707&m=dev',
++  {
++    props: {
++      complete: figma.enum('State', {
++        Completed: true,
++      }),
++      current: figma.enum('State', {
++        Current: true,
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      invalid: figma.enum('State', {
++        Error: true,
++      }),
++      secondaryLabel: figma.boolean('Optional label', {
++        true: figma.textContent('Optional label'),
++      }),
++      label: figma.string('Label text'),
++    },
++    example: (props) =>
++      html`<cds-progress-step
++        complete=${props.complete}
++        current=${props.current}
++        disabled=${props.disabled}
++        invalid=${props.invalid}
++        label=${props.label}
++        secondary-label=${props.secondaryLabel}></cds-progress-step>`,
++    imports: [
++      "import '@carbon/web-components/es/components/progress-indicator/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/radio-button/radio-button-group.figma.ts b/packages/web-components/code-connect/radio-button/radio-button-group.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/radio-button/radio-button-group.figma.ts
+@@ -0,0 +1,50 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=2927-28166&t=yFGI7EFVWv0vtqIk-4',
++  {
++    props: {
++      children: figma.children(['Radio button']),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      helperText: figma.boolean('Helper message', {
++        true: figma.string('Helper text'),
++      }),
++      warnText: figma.string('Warning text'),
++      warn: figma.enum('State', {
++        Warning: true,
++      }),
++      invalidText: figma.string('Error text'),
++      invalid: figma.enum('State', {
++        Invalid: true,
++      }),
++      legendText: figma.string('Label text'),
++      orientation: figma.boolean('Horizontal', {
++        false: 'vertical',
++      }),
++    },
++    example: (props) =>
++      html`<cds-radio-button-group
++        disabled=${props.disabled}
++        helper-text=${props.helperText}
++        invalid=${props.invalid}
++        invalid-text=${props.invalidText}
++        legend-text=${props.legendText}
++        orientation=${props.orientation}
++        warn=${props.warn}
++        warn-text=${props.warnText}>
++        ${props.children}
++      </cds-radio-button-group>`,
++    imports: [
++      "import '@carbon/web-components/es/components/radio-button/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/radio-button/radio-button.figma.ts b/packages/web-components/code-connect/radio-button/radio-button.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/radio-button/radio-button.figma.ts
+@@ -0,0 +1,51 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=2930-23442&t=yFGI7EFVWv0vtqIk-4',
++  {
++    props: {
++      labelText: figma.string('Value text'),
++      labelPosition: figma.enum('Position', {
++        Right: 'right',
++      }),
++      hideLabel: figma.boolean('Value', {
++        true: false,
++        false: true,
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      checked: figma.boolean('Selected'),
++    },
++    example: (props) =>
++      html`<cds-radio-button
++        checked=${props.checked}
++        disabled=${props.disabled}
++        hide-label=${props.hideLabel}
++        label-position=${props.labelPosition}
++        label-text=${props.labelText}
++        value="radio-button-value"></cds-radio-button>`,
++    imports: [
++      "import '@carbon/web-components/es/components/radio-button/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=2930-23442&t=yFGI7EFVWv0vtqIk-4',
++  {
++    variant: { State: 'Skeleton' },
++    example: () =>
++      html`<cds-radio-button-skeleton></cds-radio-button-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/radio-button/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/search/search.figma.ts b/packages/web-components/code-connect/search/search.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/search/search.figma.ts
+@@ -0,0 +1,58 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++const sharedSearchProps = {
++  size: figma.enum('Size', {
++    Large: 'lg',
++    Medium: 'md',
++    Small: 'sm',
++  }),
++  placeholder: figma.string('Placeholder text'),
++  disabled: figma.enum('State', {
++    Disabled: true,
++  }),
++};
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=2805-21056&t=6KMXKibN414b97hv-4',
++  {
++    variant: { Expandable: 'False' },
++    props: sharedSearchProps,
++    example: (props) =>
++      html`<cds-search
++        disabled=${props.disabled}
++        placeholder=${props.placeholder}
++        size=${props.size}></cds-search>`,
++    imports: ["import '@carbon/web-components/es/components/search/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=2805-21056&t=6KMXKibN414b97hv-4',
++  {
++    variant: { Expandable: 'True' },
++    props: sharedSearchProps,
++    example: (props) =>
++      html`<cds-search
++        disabled=${props.disabled}
++        expandable
++        placeholder=${props.placeholder}
++        size=${props.size}></cds-search>`,
++    imports: ["import '@carbon/web-components/es/components/search/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=2805-21056&t=6KMXKibN414b97hv-4',
++  {
++    variant: { State: 'Skeleton' },
++    example: () => html`<cds-search-skeleton></cds-search-skeleton>`,
++    imports: ["import '@carbon/web-components/es/components/search/index.js'"],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/select/select.figma.ts b/packages/web-components/code-connect/select/select.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/select/select.figma.ts
+@@ -0,0 +1,83 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=17650-274860&t=LS77peWFGhwOdxIw-4',
++  {
++    props: {
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      hideLabel: figma.boolean('Show label', {
++        true: false,
++        false: true,
++      }),
++      inline: figma.enum('Style', {
++        Inline: true,
++      }),
++      readOnly: figma.enum('State', {
++        'Read-only': true,
++      }),
++      invalid: figma.enum('State', {
++        Error: true,
++      }),
++      invalidText: figma.string('Error text'),
++      warn: figma.enum('State', {
++        Warning: true,
++      }),
++      warnText: figma.string('Warning text'),
++      labelText: figma.string('Label text'),
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++      helperText: figma.boolean('Show helper', {
++        true: figma.string('Helper text'),
++      }),
++    },
++    example: (props) =>
++      html`<cds-select
++        disabled=${props.disabled}
++        helper-text=${props.helperText}
++        hide-label=${props.hideLabel}
++        inline=${props.inline}
++        invalid=${props.invalid}
++        invalid-text=${props.invalidText}
++        label-text=${props.labelText}
++        readonly=${props.readOnly}
++        size=${props.size}
++        warn=${props.warn}
++        warn-text=${props.warnText}>
++        <cds-select-item value=""></cds-select-item>
++        <cds-select-item value="option-1">Option 1</cds-select-item>
++        <cds-select-item value="option-2">Option 2</cds-select-item>
++        <cds-select-item value="option-3">Option 3</cds-select-item>
++        <cds-select-item value="option-4">Option 4</cds-select-item>
++      </cds-select>`,
++    imports: ["import '@carbon/web-components/es/components/select/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=17650-274860&t=LS77peWFGhwOdxIw-4',
++  {
++    variant: { State: 'Skeleton' },
++    props: {
++      hideLabel: figma.boolean('Show label', {
++        true: false,
++        false: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-select-skeleton
++        hide-label=${props.hideLabel}></cds-select-skeleton>`,
++    imports: ["import '@carbon/web-components/es/components/select/index.js'"],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/tag/tag.figma.ts b/packages/web-components/code-connect/tag/tag.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/tag/tag.figma.ts
+@@ -0,0 +1,162 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++const colorProps = {
++  type: figma.enum('Color', {
++    Blue: 'blue',
++    Cyan: 'cyan',
++    Teal: 'teal',
++    Green: 'green',
++    Purple: 'purple',
++    Magenta: 'magenta',
++    Red: 'red',
++    Gray: 'gray',
++    'Cool gray': 'cool-gray',
++    'Warm gray': 'warm-gray',
++    'High contrast': 'high-contrast',
++    Outline: 'outline',
++  }),
++};
++
++const sharedTagProps = {
++  renderIcon: figma.boolean('Icon', {
++    true: figma.instance('Swap icon'),
++  }),
++  text: figma.string('Tag text'),
++  size: figma.enum('Size', {
++    Large: 'lg',
++    Small: 'sm',
++  }),
++  disabled: figma.enum('State', {
++    Disabled: true,
++  }),
++};
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=16031-269750&t=RuAO38H8L12JZXpK-4',
++  {
++    props: {
++      ...sharedTagProps,
++      ...colorProps,
++    },
++    example: (props) =>
++      html`<cds-tag
++        disabled=${props.disabled}
++        size=${props.size}
++        type=${props.type}>
++        ${props.text}
++        <span slot="icon">${props.renderIcon}</span>
++      </cds-tag>`,
++    imports: ["import '@carbon/web-components/es/components/tag/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=16031-269750&t=RuAO38H8L12JZXpK-4',
++  {
++    variant: { Dismissible: 'True' },
++    props: {
++      ...sharedTagProps,
++      ...colorProps,
++    },
++    example: (props) =>
++      html`<cds-dismissible-tag
++        disabled=${props.disabled}
++        dismiss-tooltip-label="Dismiss"
++        size=${props.size}
++        text=${props.text}
++        type=${props.type}>
++        <span slot="icon">${props.renderIcon}</span>
++      </cds-dismissible-tag>`,
++    imports: ["import '@carbon/web-components/es/components/tag/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=46254-7550&t=RuAO38H8L12JZXpK-4',
++  {
++    props: {
++      ...sharedTagProps,
++      selected: figma.boolean('Selected'),
++    },
++    example: (props) =>
++      html`<cds-selectable-tag
++        disabled=${props.disabled}
++        selected=${props.selected}
++        size=${props.size}
++        text=${props.text}>
++        <span slot="icon">${props.renderIcon}</span>
++      </cds-selectable-tag>`,
++    imports: ["import '@carbon/web-components/es/components/tag/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=46254-10165&t=RuAO38H8L12JZXpK-4',
++  {
++    props: {
++      ...sharedTagProps,
++      ...colorProps,
++    },
++    example: (props) =>
++      html`<cds-operational-tag
++        disabled=${props.disabled}
++        size=${props.size}
++        text=${props.text}
++        type=${props.type}>
++        <span slot="icon">${props.renderIcon}</span>
++      </cds-operational-tag>`,
++    imports: ["import '@carbon/web-components/es/components/tag/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=16031-269750&t=RuAO38H8L12JZXpK-4',
++  {
++    variant: { State: 'Skeleton' },
++    props: {
++      size: figma.enum('Size', {
++        Small: 'sm',
++      }),
++    },
++    example: (props) =>
++      html`<cds-tag-skeleton size=${props.size}></cds-tag-skeleton>`,
++    imports: ["import '@carbon/web-components/es/components/tag/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=46254-7550&t=RuAO38H8L12JZXpK-4',
++  {
++    variant: { State: 'Skeleton' },
++    props: {
++      size: figma.enum('Size', {
++        Small: 'sm',
++      }),
++    },
++    example: (props) =>
++      html`<cds-tag-skeleton size=${props.size}></cds-tag-skeleton>`,
++    imports: ["import '@carbon/web-components/es/components/tag/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=46254-10165&t=RuAO38H8L12JZXpK-4',
++  {
++    variant: { State: 'Skeleton' },
++    props: {
++      size: figma.enum('Size', {
++        Small: 'sm',
++      }),
++    },
++    example: (props) =>
++      html`<cds-tag-skeleton size=${props.size}></cds-tag-skeleton>`,
++    imports: ["import '@carbon/web-components/es/components/tag/index.js'"],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/text-input/text-input.figma.ts b/packages/web-components/code-connect/text-input/text-input.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/text-input/text-input.figma.ts
+@@ -0,0 +1,72 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=15784-271032&m=dev',
++  {
++    props: {
++      label: figma.string('Label text'),
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      invalid: figma.enum('State', {
++        Error: true,
++      }),
++      invalidText: figma.string('Error text'),
++      warn: figma.enum('State', {
++        Warning: true,
++      }),
++      warnText: figma.string('Warning text'),
++      helperText: figma.boolean('Show helper', {
++        true: figma.string('Helper text'),
++      }),
++      placeholder: figma.string('Placeholder text'),
++      value: figma.boolean('Text filled', {
++        true: figma.string('Input text'),
++      }),
++      enableCounter: figma.boolean('Show count'),
++      readonly: figma.enum('State', {
++        'Read-only': true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-text-input
++        disabled=${props.disabled}
++        enable-counter=${props.enableCounter}
++        helper-text=${props.helperText}
++        invalid=${props.invalid}
++        invalid-text=${props.invalidText}
++        label=${props.label}
++        placeholder=${props.placeholder}
++        readonly=${props.readonly}
++        size=${props.size}
++        value=${props.value}
++        warn=${props.warn}
++        warn-text=${props.warnText}></cds-text-input>`,
++    imports: [
++      "import '@carbon/web-components/es/components/text-input/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=15784-271032&m=dev',
++  {
++    variant: { State: 'Skeleton' },
++    example: () => html`<cds-text-input-skeleton></cds-text-input-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/text-input/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/textarea/textarea.figma.ts b/packages/web-components/code-connect/textarea/textarea.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/textarea/textarea.figma.ts
+@@ -0,0 +1,81 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=14494-263111&t=4Ath5JqwaYJZxznq-4',
++  {
++    props: {
++      label: figma.string('Label text'),
++      hideLabel: figma.boolean('Show label', {
++        true: false,
++        false: true,
++      }),
++      value: figma.boolean('Text filled', {
++        true: figma.string('Body text'),
++      }),
++      helperText: figma.boolean('Show helper', {
++        true: figma.string('Helper text'),
++      }),
++      enableCounter: figma.boolean('Show count'),
++      placeholder: figma.string('Placeholder text'),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      invalid: figma.enum('State', {
++        Error: true,
++      }),
++      invalidText: figma.string('Error text'),
++      warn: figma.enum('State', {
++        Warning: true,
++      }),
++      warnText: figma.string('Warning text'),
++      readonly: figma.enum('State', {
++        'Read-only': true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-textarea
++        disabled=${props.disabled}
++        enable-counter=${props.enableCounter}
++        helper-text=${props.helperText}
++        hide-label=${props.hideLabel}
++        invalid=${props.invalid}
++        invalid-text=${props.invalidText}
++        label=${props.label}
++        placeholder=${props.placeholder}
++        readonly=${props.readonly}
++        value=${props.value}
++        warn=${props.warn}
++        warn-text=${props.warnText}>
++        ${props.value}
++      </cds-textarea>`,
++    imports: [
++      "import '@carbon/web-components/es/components/textarea/index.js'",
++    ],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=14494-263111&t=4Ath5JqwaYJZxznq-4',
++  {
++    variant: { State: 'Skeleton' },
++    props: {
++      hideLabel: figma.boolean('Show label', {
++        true: false,
++        false: true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-textarea-skeleton
++        hide-label=${props.hideLabel}></cds-textarea-skeleton>`,
++    imports: [
++      "import '@carbon/web-components/es/components/textarea/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/tile/tile.figma.ts b/packages/web-components/code-connect/tile/tile.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/tile/tile.figma.ts
+@@ -0,0 +1,19 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/-v11--Carbon-Design-System?node-id=20125-279432&m=dev',
++  {
++    props: {
++      swapSlot: figma.instance('Swap slot'),
++    },
++    example: (props) => html`<cds-tile>${props.swapSlot}</cds-tile>`,
++    imports: ["import '@carbon/web-components/es/components/tile/index.js'"],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/time-picker/time-picker.figma.ts b/packages/web-components/code-connect/time-picker/time-picker.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/time-picker/time-picker.figma.ts
+@@ -0,0 +1,53 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=17544-268301&t=qp8bdiovIuVIO7xb-4',
++  {
++    props: {
++      size: figma.enum('Size', {
++        Large: 'lg',
++        Medium: 'md',
++        Small: 'sm',
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      readOnly: figma.enum('State', {
++        'Read-only': true,
++      }),
++    },
++    example: (props) =>
++      html`<cds-time-picker
++        disabled=${props.disabled}
++        label-text="Choose a time"
++        placeholder="hh:mm"
++        readonly=${props.readOnly}
++        size=${props.size}>
++        <cds-time-picker-select
++          default-value="AM"
++          disabled=${props.disabled}
++          id="time-picker-select-1">
++          <cds-select-item value="AM">AM</cds-select-item>
++          <cds-select-item value="PM">PM</cds-select-item>
++        </cds-time-picker-select>
++        <cds-time-picker-select
++          default-value="Time zone 1"
++          disabled=${props.disabled}
++          id="time-picker-select-2">
++          <cds-select-item value="Time zone 1">Time zone 1</cds-select-item>
++          <cds-select-item value="Time zone 2">Time zone 2</cds-select-item>
++        </cds-time-picker-select>
++      </cds-time-picker>`,
++    imports: [
++      "import '@carbon/web-components/es/components/time-picker/index.js'",
++      "import '@carbon/web-components/es/components/select/index.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/toggle/toggle.figma.ts b/packages/web-components/code-connect/toggle/toggle.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/toggle/toggle.figma.ts
+@@ -0,0 +1,116 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=3038-25739&t=9zqAFF3e617gPBGE-4',
++  {
++    props: {
++      size: figma.enum('Size', {
++        Default: 'md',
++        Small: 'sm',
++      }),
++      readOnly: figma.enum('State', {
++        'Read-only': true,
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      hideLabel: figma.boolean('Show label', {
++        true: false,
++        false: true,
++      }),
++      labelText: figma.string('Label text'),
++      toggled: figma.boolean('Toggled'),
++    },
++    example: (props) =>
++      html`<cds-toggle
++        disabled=${props.disabled}
++        hideLabel=${props.hideLabel}
++        label-text=${props.labelText}
++        read-only=${props.readOnly}
++        size=${props.size}
++        toggled=${props.toggled}></cds-toggle>`,
++    imports: ["import '@carbon/web-components/es/components/toggle/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=3038-25739&t=9zqAFF3e617gPBGE-4',
++  {
++    variant: { 'Toggle only': 'True' },
++    props: {
++      size: figma.enum('Size', {
++        Default: 'md',
++        Small: 'sm',
++      }),
++      readOnly: figma.enum('State', {
++        'Read-only': true,
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      toggled: figma.boolean('Toggled'),
++    },
++    example: (props) =>
++      html`<cds-toggle
++        disabled=${props.disabled}
++        hideLabel
++        label-a=""
++        label-b=""
++        read-only=${props.readOnly}
++        size=${props.size}
++        toggled=${props.toggled}></cds-toggle>`,
++    imports: ["import '@carbon/web-components/es/components/toggle/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=3038-25739&t=9zqAFF3e617gPBGE-4',
++  {
++    variant: { 'Show value': 'False' },
++    props: {
++      size: figma.enum('Size', {
++        Default: 'md',
++        Small: 'sm',
++      }),
++      readOnly: figma.enum('State', {
++        'Read-only': true,
++      }),
++      disabled: figma.enum('State', {
++        Disabled: true,
++      }),
++      hideLabel: figma.boolean('Show label', {
++        true: false,
++        false: true,
++      }),
++      labelText: figma.string('Label text'),
++      toggled: figma.boolean('Toggled'),
++    },
++    example: (props) =>
++      html`<cds-toggle
++        disabled=${props.disabled}
++        hideLabel=${props.hideLabel}
++        label-a=""
++        label-b=""
++        label-text=${props.labelText}
++        read-only=${props.readOnly}
++        size=${props.size}
++        toggled=${props.toggled}></cds-toggle>`,
++    imports: ["import '@carbon/web-components/es/components/toggle/index.js'"],
++  }
++);
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=3038-25739&t=9zqAFF3e617gPBGE-4',
++  {
++    variant: { State: 'Skeleton' },
++    example: () => html`<cds-toggle-skeleton></cds-toggle-skeleton>`,
++    imports: ["import '@carbon/web-components/es/components/toggle/index.js'"],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/toggletip/toggletip.figma.ts b/packages/web-components/code-connect/toggletip/toggletip.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/toggletip/toggletip.figma.ts
+@@ -0,0 +1,45 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=9384-402406&t=DU9vCm0ie6tvQBsY-4',
++  {
++    props: {
++      alignment: figma.enum('Position', {
++        Top: figma.enum('Alignment', {
++          Start: 'top-start',
++          Center: 'top',
++          End: 'top-end',
++        }),
++        Bottom: figma.enum('Alignment', {
++          Start: 'bottom-start',
++          Center: 'bottom',
++          End: 'bottom-end',
++        }),
++        Left: 'left',
++        Right: 'right',
++      }),
++      toggletip: figma.nestedProps('Toggletip body', {
++        content: figma.textContent('Toggletip text'),
++      }),
++    },
++    example: (props) =>
++      html`<cds-toggletip alignment=${props.alignment}>
++        Toggletip label
++        <p slot="body-text">${props.toggletip.content}</p>
++        <cds-link href="#" slot="actions">Link action</cds-link>
++        <cds-button size="sm" slot="actions">Button</cds-button>
++      </cds-toggletip>`,
++    imports: [
++      "import '@carbon/web-components/es/components/toggle-tip/toggletip.js'",
++      "import '@carbon/web-components/es/components/button/button.js'",
++      "import '@carbon/web-components/es/components/link/link.js'",
++    ],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/tooltip/tooltip.figma.ts b/packages/web-components/code-connect/tooltip/tooltip.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/tooltip/tooltip.figma.ts
+@@ -0,0 +1,45 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=3684-40507&t=Z5rlxC6sD11qtIsk-4',
++  {
++    variant: { Type: 'Standard' },
++    props: {
++      trigger: figma.instance('Trigger'),
++      tooltip: figma.nestedProps('Tooltip content', {
++        label: figma.textContent('Tooltip text'),
++      }),
++      align: figma.enum('Position', {
++        Top: figma.enum('Alignment', {
++          Start: 'top-start',
++          Center: 'top',
++          End: 'top-end',
++        }),
++        Bottom: figma.enum('Alignment', {
++          Start: 'bottom-start',
++          Center: 'bottom',
++          End: 'bottom-end',
++        }),
++        Left: 'left',
++        Right: 'right',
++      }),
++    },
++    example: (props) =>
++      html`<cds-tooltip align=${props.align}>
++        <button type="button" aria-labelledby="content">
++          ${props.trigger}
++        </button>
++        <cds-tooltip-content id="content">
++          ${props.tooltip.label}
++        </cds-tooltip-content>
++      </cds-tooltip>`,
++    imports: ["import '@carbon/web-components/es/components/tooltip/index.js'"],
++  }
++);
+
+diff --git a/packages/web-components/code-connect/tree-view/tree-view.figma.ts b/packages/web-components/code-connect/tree-view/tree-view.figma.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/code-connect/tree-view/tree-view.figma.ts
+@@ -0,0 +1,32 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import figma, { html } from '@figma/code-connect/html';
++
++figma.connect(
++  'https://www.figma.com/design/YAnB1jKx0yCUL29j6uSLpg/(v11)-All-themes---Carbon-Design-System?node-id=11948-286738&t=aG4cJRjteQHcd71k-4',
++  {
++    props: {
++      treeNode: figma.nestedProps('Branch node item', {
++        size: figma.enum('Size', {
++          Small: 'sm',
++          'Extra small': 'xs',
++        }),
++      }),
++      children: figma.children(['Branch node item']),
++    },
++    // Figma component doesn't currently nest TreeNodes accurately,
++    // code sample below is incomplete.
++    example: (props) =>
++      html`<cds-tree-view label="Tree View" size=${props.treeNode.size}>
++        ${props.children}
++      </cds-tree-view>`,
++    imports: [
++      "import '@carbon/web-components/es/components/tree-view/index.js'",
++    ],
++  }
++);
