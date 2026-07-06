@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "4fbc69a593390d4f0bb41e57dbad2251e8daedeb",
+    "filename": "packages/styles/scss/components/data-table/_data-table.scss",
+    "status": "modified",
+    "additions": 12,
+    "deletions": 0,
+    "changes": 12,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/820565110afdba0ba16ce606f6d4c82accfb7794/packages%2Fstyles%2Fscss%2Fcomponents%2Fdata-table%2F_data-table.scss",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/820565110afdba0ba16ce606f6d4c82accfb7794/packages%2Fstyles%2Fscss%2Fcomponents%2Fdata-table%2F_data-table.scss",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fstyles%2Fscss%2Fcomponents%2Fdata-table%2F_data-table.scss?ref=820565110afdba0ba16ce606f6d4c82accfb7794",
+    "patch": "@@ -722,6 +722,18 @@\n     padding-block: convert.to-rem(3px) convert.to-rem(3px);\n   }\n \n+  //----------------------------------------------------------------------------\n+  // Large\n+  //----------------------------------------------------------------------------\n+  .#{$prefix}--data-table--lg .#{$prefix}--table-header-label {\n+    padding-block: $spacing-05 $spacing-05;\n+  }\n+\n+  .#{$prefix}--data-table--lg td,\n+  .#{$prefix}--data-table--lg tbody tr th {\n+    padding-block: $spacing-05 $spacing-05;\n+  }\n+\n   //----------------------------------------------------------------------------\n   // Extra Large\n   //----------------------------------------------------------------------------"
+  }
+]
