@@ -1,0 +1,110 @@
+[
+  {
+    "sha": "1043f773f59e7aa997ad2e539483ff1698c47ba9",
+    "filename": "packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 0,
+    "changes": 3,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2F__tests__%2F__snapshots__%2FPublicAPI-test.js.snap",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2F__tests__%2F__snapshots__%2FPublicAPI-test.js.snap",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2F__tests__%2F__snapshots__%2FPublicAPI-test.js.snap?ref=4eb426d3daf52c63ef7c611d32658e0be9f384c8",
+    "patch": "@@ -7925,6 +7925,9 @@ Map {\n       \"pagesUnknown\": {\n         \"type\": \"bool\",\n       },\n+      \"renderPageSelect\": {\n+        \"type\": \"func\",\n+      },\n       \"size\": {\n         \"args\": [\n           ["
+  },
+  {
+    "sha": "8f18fab015722b590012b6640cd050ca43a4bc8a",
+    "filename": "packages/react/src/components/Pagination/Pagination.stories.js",
+    "status": "modified",
+    "additions": 51,
+    "deletions": 0,
+    "changes": 51,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2FPagination.stories.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2FPagination.stories.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2FPagination.stories.js?ref=4eb426d3daf52c63ef7c611d32658e0be9f384c8",
+    "patch": "@@ -6,6 +6,7 @@\n  */\n \n import Pagination from './Pagination';\n+import { NumberInput } from '../NumberInput';\n import React from 'react';\n import { action } from 'storybook/actions';\n import mdx from './Pagination.mdx';\n@@ -239,3 +240,53 @@ PaginationUnknownPages.parameters = {\n     exclude: ['pageInputDisabled', 'pagesUnknown', 'totalItems'],\n   },\n };\n+\n+/**\n+ * `renderPageSelect` lets you replace the default page-select control with\n+ * any React node. The render function receives `{ currentPage, totalPages,\n+ * currentPageSize, onSetPage }`.\n+ *\n+ * This story uses Carbon's `NumberInput` with `hideSteppers` to replace the\n+ * default page-select `<Select>`, illustrating how any custom control can be\n+ * slotted in.\n+ * TODO: remove after initial review ?\n+ */\n+export const WithRenderPageSelect = (args) => (\n+  <Pagination\n+    {...props()}\n+    totalItems={350}\n+    pageSizes={[10, 20, 30]}\n+    {...args}\n+    renderPageSelect={({ currentPage, totalPages, onSetPage }) => (\n+      <NumberInput\n+        hideSteppers\n+        id=\"page-select-number-input\"\n+        label=\"Page number\"\n+        hideLabel\n+        size={args.size}\n+        style={{\n+          minInlineSize: 'unset',\n+          paddingInline: '1rem',\n+          inlineSize: `calc(${String(currentPage).length + 2}ch + 1rem)`,\n+          border: '0',\n+        }}\n+        min={1}\n+        max={totalPages}\n+        value={currentPage}\n+        onChange={(_e, { value }) => {\n+          const next = Number(value);\n+          if (next >= 1 && next <= totalPages) {\n+            onSetPage(next);\n+          }\n+        }}\n+      />\n+    )}\n+  />\n+);\n+\n+WithRenderPageSelect.storyName = 'With custom page select (renderPageSelect)';\n+WithRenderPageSelect.parameters = {\n+  controls: {\n+    exclude: ['renderPageSelect'],\n+  },\n+};"
+  },
+  {
+    "sha": "c2b08193c525a9aa9f2588a22f67316f02476833",
+    "filename": "packages/react/src/components/Pagination/Pagination.tsx",
+    "status": "modified",
+    "additions": 51,
+    "deletions": 13,
+    "changes": 64,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2FPagination.tsx",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2FPagination.tsx",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2FPagination.tsx?ref=4eb426d3daf52c63ef7c611d32658e0be9f384c8",
+    "patch": "@@ -116,6 +116,22 @@ export interface PaginationProps\n    */\n   pageSelectLabelText?: (total: number) => string;\n \n+  /**\n+   * Provide a custom render function for the page-selection control.\n+   * When provided, the default `<Select>` is replaced with the returned node.\n+   * Receives `{ currentPage, totalPages, currentPageSize, onSetPage }`.\n+   */\n+  renderPageSelect?: (props: {\n+    /** The currently active page. */\n+    currentPage: number;\n+    /** Total number of pages derived from `totalItems` and `pageSize`. */\n+    totalPages: number;\n+    /** Current page size. */\n+    currentPageSize: number;\n+    /** Call this to change the active page. */\n+    onSetPage: (page: number) => void;\n+  }) => React.ReactNode;\n+\n   /**\n    * The number dictating how many items a page contains.\n    */\n@@ -211,6 +227,7 @@ const Pagination = React.forwardRef(\n         `Page of ${total} ${total === 1 ? 'page' : 'pages'}`,\n       page: controlledPage = 1,\n       pageInputDisabled,\n+      renderPageSelect,\n       pageSize: controlledPageSize,\n       pageSizeInputDisabled,\n       pageSizes: controlledPageSizes,\n@@ -269,7 +286,7 @@ const Pagination = React.forwardRef(\n       [`${prefix}--pagination__button--forward`]: true,\n       [`${prefix}--pagination__button--no-index`]: forwardButtonDisabled,\n     });\n-    const selectItems = renderSelectItems(totalPages);\n+    const selectItems = renderPageSelect ? [] : renderSelectItems(totalPages);\n \n     const focusMap = {\n       backward: backBtnRef,\n@@ -501,18 +518,32 @@ const Pagination = React.forwardRef(\n             </span>\n           ) : (\n             <>\n-              <Select\n-                id={`${prefix}-pagination-select-${inputId}-right`}\n-                className={`${prefix}--select__page-number`}\n-                labelText={pageSelectLabelText(totalPages)}\n-                inline\n-                hideLabel\n-                onChange={handlePageInputChange}\n-                value={page}\n-                key={page}\n-                disabled={pageInputDisabled || disabled}>\n-                {selectItems}\n-              </Select>\n+              {renderPageSelect ? (\n+                renderPageSelect({\n+                  currentPage: page,\n+                  totalPages,\n+                  currentPageSize: pageSize,\n+                  onSetPage: (nextPage: number) => {\n+                    setPage(nextPage);\n+                    if (onChange) {\n+                      onChange({ page: nextPage, pageSize });\n+                    }\n+                  },\n+                })\n+              ) : (\n+                <Select\n+                  id={`${prefix}-pagination-select-${inputId}-right`}\n+                  className={`${prefix}--select__page-number`}\n+                  labelText={pageSelectLabelText(totalPages)}\n+                  inline\n+                  hideLabel\n+                  onChange={handlePageInputChange}\n+                  value={page}\n+                  key={page}\n+                  disabled={pageInputDisabled || disabled}>\n+                  {selectItems}\n+                </Select>\n+              )}\n               <span className={`${prefix}--pagination__text`}>\n                 {pageRangeText(page, totalPages)}\n               </span>\n@@ -643,6 +674,13 @@ Pagination.propTypes = {\n    */\n   pageSelectLabelText: PropTypes.func,\n \n+  /**\n+   * Provide a custom render function for the page-selection control.\n+   * When provided, the default `<Select>` is replaced with the returned node.\n+   * Receives `{ currentPage, totalPages, currentPageSize, onSetPage }`.\n+   */\n+  renderPageSelect: PropTypes.func,\n+\n   /**\n    * The number dictating how many items a page contains.\n    */"
+  },
+  {
+    "sha": "6605f6080355c4847eb11f4564f328e1258a646d",
+    "filename": "packages/react/src/components/Pagination/__tests__/Pagination-test.js",
+    "status": "modified",
+    "additions": 21,
+    "deletions": 0,
+    "changes": 21,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2F__tests__%2FPagination-test.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2F__tests__%2FPagination-test.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2F__tests__%2FPagination-test.js?ref=4eb426d3daf52c63ef7c611d32658e0be9f384c8",
+    "patch": "@@ -640,5 +640,26 @@ describe('Pagination', () => {\n \n       expect(nextButton.closest('.cds--popover--bottom')).toBeInTheDocument();\n     });\n+\n+    it('should call onChange when renderPageSelect calls onSetPage', async () => {\n+      const onChange = jest.fn();\n+\n+      render(\n+        <Pagination\n+          totalItems={30}\n+          pageSizes={[10]}\n+          pageSize={10}\n+          page={1}\n+          onChange={onChange}\n+          renderPageSelect={({ onSetPage }) => (\n+            <button onClick={() => onSetPage(3)}>Go to 3</button>\n+          )}\n+        />\n+      );\n+\n+      await userEvent.click(screen.getByText('Go to 3'));\n+\n+      expect(onChange).toHaveBeenCalledWith({ page: 3, pageSize: 10 });\n+    });\n   });\n });"
+  },
+  {
+    "sha": "3d0cdf268f1c5ae6550af78beb2568eed6f43be4",
+    "filename": "packages/react/src/components/Pagination/experimental/PageSelector.js",
+    "status": "modified",
+    "additions": 14,
+    "deletions": 1,
+    "changes": 15,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2FPageSelector.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2FPageSelector.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2FPageSelector.js?ref=4eb426d3daf52c63ef7c611d32658e0be9f384c8",
+    "patch": "@@ -5,14 +5,18 @@\n  * LICENSE file in the root directory of this source tree.\n  */\n \n-import React from 'react';\n+import React, { useEffect } from 'react';\n import PropTypes from 'prop-types';\n import classnames from 'classnames';\n import { useId } from '../../../internal/useId';\n import Select from '../../Select';\n import SelectItem from '../../SelectItem';\n import { usePrefix } from '../../../internal/usePrefix';\n \n+/**\n+ * @deprecated Use `Pagination` with the `renderPageSelect` prop instead.\n+ * `unstable_PageSelector` / `preview_PageSelector` will be removed in v12.\n+ */\n function PageSelector({\n   className = null,\n   currentPage,\n@@ -25,6 +29,15 @@ function PageSelector({\n   const namespace = `${prefix}--unstable-pagination__page-selector`;\n   const instanceId = `${namespace}__select-${useId()}`;\n \n+  useEffect(() => {\n+    if (process.env.NODE_ENV !== 'production') {\n+      console.warn(\n+        '[Carbon] `unstable_PageSelector` / `preview_PageSelector` is deprecated and will be removed in v12. ' +\n+          'Use `Pagination` with the `renderPageSelect` prop instead.'\n+      );\n+    }\n+  }, []);\n+\n   const renderPages = (total) => {\n     const pages = [];\n     for (let counter = 1; counter <= total; counter += 1) {"
+  },
+  {
+    "sha": "b7b967786215abea00d018fb48d7b7e113f8adbf",
+    "filename": "packages/react/src/components/Pagination/experimental/Pagination-story.js",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2FPagination-story.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2FPagination-story.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2FPagination-story.js?ref=4eb426d3daf52c63ef7c611d32658e0be9f384c8",
+    "patch": "@@ -23,7 +23,7 @@ const props = () => ({\n });\n \n export default {\n-  title: 'Preview/preview_Pagination',\n+  title: 'Deprecated/preview_Pagination',\n   component: Pagination,\n   subcomponents: {\n     PageSelector,"
+  },
+  {
+    "sha": "eac1a1adac97d18b5f1246b09faa7442ada85709",
+    "filename": "packages/react/src/components/Pagination/experimental/Pagination.js",
+    "status": "modified",
+    "additions": 15,
+    "deletions": 1,
+    "changes": 16,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2FPagination.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2FPagination.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2FPagination.js?ref=4eb426d3daf52c63ef7c611d32658e0be9f384c8",
+    "patch": "@@ -5,7 +5,7 @@\n  * LICENSE file in the root directory of this source tree.\n  */\n \n-import React, { useState } from 'react';\n+import React, { useEffect, useState } from 'react';\n import PropTypes from 'prop-types';\n import classnames from 'classnames';\n import { CaretRight, CaretLeft } from '@carbon/icons-react';\n@@ -14,6 +14,10 @@ import SelectItem from '../../SelectItem';\n import { IconButton } from '../../IconButton';\n import { usePrefix } from '../../../internal/usePrefix';\n \n+/**\n+ * @deprecated Use the stable `Pagination` component with the `renderPageSelect`\n+ * prop instead. `unstable_Pagination` / `preview_Pagination` will be removed in v12.\n+ */\n function Pagination({\n   backwardText = 'Previous page',\n   children = undefined,\n@@ -38,6 +42,16 @@ function Pagination({\n   const [currentPageSize, setCurrentPageSize] = useState(pageSize);\n   const prefix = usePrefix();\n \n+  useEffect(() => {\n+    if (process.env.NODE_ENV !== 'production') {\n+      console.warn(\n+        '[Carbon] `unstable_Pagination` / `preview_Pagination` is deprecated and will be removed in v12. ' +\n+          'Use the stable `Pagination` component with the `renderPageSelect` prop instead.'\n+      );\n+    }\n+    // eslint-disable-next-line react-hooks/exhaustive-deps\n+  }, []);\n+\n   const totalPages = totalItems\n     ? Math.max(Math.ceil(totalItems / currentPageSize), 1)\n     : undefined;"
+  },
+  {
+    "sha": "371707bd200fdc4298107cf84c368f0c8af71e4e",
+    "filename": "packages/react/src/components/Pagination/experimental/__tests__/Pagination-test.js",
+    "status": "modified",
+    "additions": 38,
+    "deletions": 1,
+    "changes": 39,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2F__tests__%2FPagination-test.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2F__tests__%2FPagination-test.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FPagination%2Fexperimental%2F__tests__%2FPagination-test.js?ref=4eb426d3daf52c63ef7c611d32658e0be9f384c8",
+    "patch": "@@ -1,5 +1,5 @@\n /**\n- * Copyright IBM Corp. 2024\n+ * Copyright IBM Corp. 2024, 2026\n  *\n  * This source code is licensed under the Apache-2.0 license found in the\n  * LICENSE file in the root directory of this source tree.\n@@ -9,8 +9,20 @@ import React from 'react';\n import userEvent from '@testing-library/user-event';\n import { render, screen } from '@testing-library/react';\n import Pagination from '../Pagination';\n+import PageSelector from '../PageSelector';\n \n describe('Preview Pagination', () => {\n+  let consoleWarnSpy;\n+\n+  beforeEach(() => {\n+    // Suppress expected deprecation warnings from unstable_Pagination\n+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});\n+  });\n+\n+  afterEach(() => {\n+    consoleWarnSpy.mockRestore();\n+  });\n+\n   describe('renders as expected - Component API', () => {\n     it('should spread extra props onto outermost element', () => {\n       const { container } = render(\n@@ -102,3 +114,28 @@ describe('Preview Pagination', () => {\n     });\n   });\n });\n+\n+describe('PageSelector', () => {\n+  let consoleWarnSpy;\n+\n+  beforeEach(() => {\n+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});\n+  });\n+\n+  afterEach(() => {\n+    consoleWarnSpy.mockRestore();\n+  });\n+\n+  it('should emit a deprecation warning on mount in non-production', () => {\n+    const originalEnv = process.env.NODE_ENV;\n+    process.env.NODE_ENV = 'development';\n+\n+    render(<PageSelector currentPage={1} totalPages={2} />);\n+\n+    expect(consoleWarnSpy).toHaveBeenCalledWith(\n+      expect.stringContaining('renderPageSelect')\n+    );\n+\n+    process.env.NODE_ENV = originalEnv;\n+  });\n+});"
+  },
+  {
+    "sha": "4e76b337f9d84ba1aa1d6c681dbfd6fd06cb8610",
+    "filename": "packages/react/src/index.ts",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 0,
+    "changes": 3,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/4eb426d3daf52c63ef7c611d32658e0be9f384c8/packages%2Freact%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Findex.ts?ref=4eb426d3daf52c63ef7c611d32658e0be9f384c8",
+    "patch": "@@ -224,6 +224,9 @@ export {\n   OverflowMenuV2 as unstable_OverflowMenuV2,\n   OverflowMenuV2 as preview_OverflowMenuV2,\n } from './components/OverflowMenuV2';\n+// unstable_Pagination / preview_Pagination are deprecated. Use the stable\n+// `Pagination` component with the `pageSelectRenderer` prop instead.\n+// TODO: These exports will be removed in v12.\n export {\n   PageSelector as unstable_PageSelector,\n   Pagination as unstable_Pagination,"
+  }
+]
