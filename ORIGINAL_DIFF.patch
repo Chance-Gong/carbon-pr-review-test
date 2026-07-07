@@ -1,0 +1,278 @@
+diff --git a/packages/react/src/components/FeatureFlags/FeatureFlags.stories.js b/packages/react/src/components/FeatureFlags/FeatureFlags.stories.js
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/FeatureFlags/FeatureFlags.stories.js
+@@ -0,0 +1,109 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React from 'react';
++import { FeatureFlags, useFeatureFlags } from '../FeatureFlags';
++import { Annotation } from '../../../.storybook/templates/Annotation';
++import Tag from '../Tag';
++import { CheckmarkOutline, CloseOutline } from '@carbon/icons-react';
++
++export default {
++  title: 'Getting Started/Feature Flags',
++  component: FeatureFlags,
++  parameters: {
++    controls: { disable: true },
++  },
++  tags: ['!autodocs'],
++};
++
++const ALL_FLAGS = [
++  'enable-v12-tile-default-icons',
++  'enable-v12-tile-radio-icons',
++  'enable-v12-overflowmenu',
++  'enable-treeview-controllable',
++  'enable-experimental-focus-wrap-without-sentinels',
++  'enable-focus-wrap-without-sentinels',
++  'enable-dialog-element',
++  'enable-v12-dynamic-floating-styles',
++  'enable-enhanced-file-uploader',
++  'enable-presence',
++];
++
++// Reads the current scope and renders active flags as green, overridden-to-false
++// flags (present in parent but explicitly turned off here) as red.
++function FlagList({ overrides = [] }) {
++  const scope = useFeatureFlags();
++  const activeFlags = ALL_FLAGS.filter((flag) => scope.enabled(flag));
++  return (
++    <div
++      style={{
++        display: 'flex',
++        flexWrap: 'wrap',
++        gap: '0.25rem',
++        marginBottom: '1rem',
++      }}>
++      {activeFlags.map((flag) => (
++        <Tag key={flag} size="md" type="green" renderIcon={CheckmarkOutline}>
++          {flag}
++        </Tag>
++      ))}
++      {overrides.map((flag) => (
++        <Tag key={flag} size="md" type="red" renderIcon={CloseOutline}>
++          {flag}
++        </Tag>
++      ))}
++    </div>
++  );
++}
++
++function ScopeView({ label, overrides, children }) {
++  return (
++    <Annotation type="feature-flags" text={<code>{label}</code>}>
++      <FlagList overrides={overrides} />
++      {children}
++    </Annotation>
++  );
++}
++
++export const SingleScope = () => (
++  <FeatureFlags
++    enableDialogElement
++    enableFocusWrapWithoutSentinels
++    enableV12DynamicFloatingStyles>
++    <ScopeView label="<FeatureFlags enableDialogElement enableFocusWrapWithoutSentinels enableV12DynamicFloatingStyles>" />
++  </FeatureFlags>
++);
++SingleScope.storyName = 'Single scope';
++
++export const NestedScopes = () => (
++  <FeatureFlags enableV12Overflowmenu>
++    <ScopeView label="<FeatureFlags enableV12Overflowmenu>  ← level 1">
++      <FeatureFlags enableTreeviewControllable>
++        <ScopeView label="<FeatureFlags enableTreeviewControllable>  ← level 2">
++          <FeatureFlags enablePresence>
++            <ScopeView label="<FeatureFlags enablePresence>  ← level 3" />
++          </FeatureFlags>
++        </ScopeView>
++      </FeatureFlags>
++    </ScopeView>
++  </FeatureFlags>
++);
++NestedScopes.storyName = 'Nested scopes';
++
++export const ScopeOverride = () => (
++  <FeatureFlags enableV12TileRadioIcons enableDialogElement>
++    <ScopeView label="<FeatureFlags enableV12TileRadioIcons enableDialogElement>  ← outer">
++      <FeatureFlags enableDialogElement={false}>
++        <ScopeView
++          label="<FeatureFlags enableDialogElement={false}>  ← inner overrides to false"
++          overrides={['enable-dialog-element']}
++        />
++      </FeatureFlags>
++    </ScopeView>
++  </FeatureFlags>
++);
++ScopeOverride.storyName = 'Scope override';
+
+diff --git a/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js b/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js
+--- a/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js
++++ b/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js
+@@ -199,6 +199,8 @@ describe('FeatureFlags', () => {
+       enableTreeviewControllable: true,
+     });
+ 
++    // Inner scope adds enableV12Overflowmenu but does not specify
++    // enableTreeviewControllable, so the parent's true value is inherited.
+     render(
+       <FeatureFlags enableTreeviewControllable>
+         <FeatureFlags enableV12Overflowmenu>
+@@ -209,9 +211,11 @@ describe('FeatureFlags', () => {
+ 
+     expect(checkFlag).toHaveBeenLastCalledWith({
+       enableV12Overflowmenu: true,
+-      enableTreeviewControllable: false,
++      enableTreeviewControllable: true,
+     });
+ 
++    // Explicitly setting a flag to false in an inner scope overrides the
++    // parent scope's true value.
+     render(
+       <FeatureFlags enableTreeviewControllable>
+         <FeatureFlags enableV12Overflowmenu>
+@@ -230,6 +234,40 @@ describe('FeatureFlags', () => {
+     });
+   });
+ 
++  it('should inherit parent scope flags not specified by a nested FeatureFlags scope', () => {
++    // When a component wraps itself in a FeatureFlags to enable an internal flag,
++    // it should not shadow flags set by the consumer in an outer FeatureFlags scope.
++    const checkFlag = jest.fn();
++
++    function TestComponent() {
++      const enableDialogElement = useFeatureFlag('enable-dialog-element');
++      const enableFocusWrapWithoutSentinels = useFeatureFlag(
++        'enable-focus-wrap-without-sentinels'
++      );
++
++      checkFlag({ enableDialogElement, enableFocusWrapWithoutSentinels });
++
++      return null;
++    }
++
++    render(
++      // Consumer enables enableDialogElement in an outer scope
++      <FeatureFlags enableDialogElement>
++        {/* Component internally wraps with FeatureFlags to set enableFocusWrapWithoutSentinels */}
++        <FeatureFlags enableFocusWrapWithoutSentinels>
++          <TestComponent />
++        </FeatureFlags>
++      </FeatureFlags>
++    );
++
++    // Both flags should be true: enableDialogElement inherited from outer scope,
++    // enableFocusWrapWithoutSentinels set by inner scope.
++    expect(checkFlag).toHaveBeenLastCalledWith({
++      enableDialogElement: true,
++      enableFocusWrapWithoutSentinels: true,
++    });
++  });
++
+   it('should update nested scope when parent scope changes', () => {
+     const checkFlag = jest.fn();
+     const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+diff --git a/packages/react/src/components/FeatureFlags/index.tsx b/packages/react/src/components/FeatureFlags/index.tsx
+--- a/packages/react/src/components/FeatureFlags/index.tsx
++++ b/packages/react/src/components/FeatureFlags/index.tsx
+@@ -49,39 +49,67 @@ const FeatureFlagContext = createContext<FeatureFlagScope>(GlobalFeatureFlags);
+  * along with the current `FeatureFlagContext` to provide consumers to check if
+  * a feature flag is enabled or disabled in a given React tree
+  */
++// Maps each camelCase prop name to its kebab-case feature flag key.
++const PROP_TO_FLAG: Record<string, string> = {
++  enableV12TileDefaultIcons: 'enable-v12-tile-default-icons',
++  enableV12TileRadioIcons: 'enable-v12-tile-radio-icons',
++  enableV12Overflowmenu: 'enable-v12-overflowmenu',
++  enableTreeviewControllable: 'enable-treeview-controllable',
++  enableExperimentalFocusWrapWithoutSentinels:
++    'enable-experimental-focus-wrap-without-sentinels',
++  enableFocusWrapWithoutSentinels: 'enable-focus-wrap-without-sentinels',
++  enableDialogElement: 'enable-dialog-element',
++  enableV12DynamicFloatingStyles: 'enable-v12-dynamic-floating-styles',
++  enableEnhancedFileUploader: 'enable-enhanced-file-uploader',
++  enablePresence: 'enable-presence',
++};
++
+ export const FeatureFlags = ({
+   children,
+-  flags = {},
+-  enableV12TileDefaultIcons = false,
+-  enableV12TileRadioIcons = false,
+-  enableV12Overflowmenu = false,
+-  enableTreeviewControllable = false,
+-  enableExperimentalFocusWrapWithoutSentinels = false,
+-  enableFocusWrapWithoutSentinels = false,
+-  enableDialogElement = false,
+-  enableV12DynamicFloatingStyles = false,
+-  enableEnhancedFileUploader = false,
+-  enablePresence = false,
++  flags,
++  enableV12TileDefaultIcons,
++  enableV12TileRadioIcons,
++  enableV12Overflowmenu,
++  enableTreeviewControllable,
++  enableExperimentalFocusWrapWithoutSentinels,
++  enableFocusWrapWithoutSentinels,
++  enableDialogElement,
++  enableV12DynamicFloatingStyles,
++  enableEnhancedFileUploader,
++  enablePresence,
+ }: FeatureFlagsProps) => {
+   const parentScope = useContext(FeatureFlagContext);
+ 
+   const scope = useMemo(() => {
+-    const combinedFlags = {
+-      'enable-v12-tile-default-icons': enableV12TileDefaultIcons,
+-      'enable-v12-tile-radio-icons': enableV12TileRadioIcons,
+-      'enable-v12-overflowmenu': enableV12Overflowmenu,
+-      'enable-treeview-controllable': enableTreeviewControllable,
+-      'enable-experimental-focus-wrap-without-sentinels':
+-        enableExperimentalFocusWrapWithoutSentinels,
+-      'enable-focus-wrap-without-sentinels': enableFocusWrapWithoutSentinels,
+-      'enable-dialog-element': enableDialogElement,
+-      'enable-v12-dynamic-floating-styles': enableV12DynamicFloatingStyles,
+-      'enable-enhanced-file-uploader': enableEnhancedFileUploader,
+-      'enable-presence': enablePresence,
+-      ...flags,
++    // Only include flags that were explicitly provided (not undefined). This
++    // ensures that unspecified props do not shadow flags set by a parent
++    // FeatureFlags scope, which is the correct behaviour for nested scopes.
++    const flagProps = {
++      enableV12TileDefaultIcons,
++      enableV12TileRadioIcons,
++      enableV12Overflowmenu,
++      enableTreeviewControllable,
++      enableExperimentalFocusWrapWithoutSentinels,
++      enableFocusWrapWithoutSentinels,
++      enableDialogElement,
++      enableV12DynamicFloatingStyles,
++      enableEnhancedFileUploader,
++      enablePresence,
+     };
++    const explicitFlags: Record<string, boolean> = {};
++
++    for (const [prop, flagKey] of Object.entries(PROP_TO_FLAG)) {
++      const value = (flagProps as Record<string, boolean | undefined>)[prop];
++      if (value !== undefined) {
++        explicitFlags[flagKey] = value;
++      }
++    }
++
++    if (flags) {
++      Object.assign(explicitFlags, flags);
++    }
+ 
+-    const scope = createScope(combinedFlags) as FeatureFlagScope;
++    const scope = createScope(explicitFlags) as FeatureFlagScope;
+     scope.mergeWithScope(parentScope);
+     return scope;
+   }, [
