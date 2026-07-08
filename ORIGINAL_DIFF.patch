@@ -1,0 +1,194 @@
+diff --git a/packages/web-components/src/components/date-picker/date-picker-input.ts b/packages/web-components/src/components/date-picker/date-picker-input.ts
+--- a/packages/web-components/src/components/date-picker/date-picker-input.ts
++++ b/packages/web-components/src/components/date-picker/date-picker-input.ts
+@@ -63,6 +63,18 @@ class CDSDatePickerInput extends FocusMixin(LitElement) {
+   @query(`.${prefix}--date-picker__icon`)
+   private _iconNode!: SVGElement;
+ 
++  /**
++   * The `<slot>` element for the AI label in the shadow DOM.
++   */
++  @query("slot[name='ai-label']")
++  private _slotAILabelNode!: HTMLSlotElement;
++
++  /**
++   * The `<slot>` element for the slug in the shadow DOM.
++   */
++  @query("slot[name='slug']")
++  private _slotSlugNode!: HTMLSlotElement;
++
+   /**
+    * Handles `click` event on the calendar icon.
+    *
+@@ -348,20 +360,18 @@ class CDSDatePickerInput extends FocusMixin(LitElement) {
+ 
+   updated() {
+     this.toggleAttribute('ai-label', this._hasAILabel);
+-    const label = this.shadowRoot?.querySelector("slot[name='ai-label']");
++    const label = this._slotAILabelNode;
+ 
+     if (label) {
+       label?.classList.toggle(
+         `${prefix}--slug--revert`,
+         this.querySelector(`${prefix}-ai-label`)?.hasAttribute('revert-active')
+       );
+     } else {
+-      this.shadowRoot
+-        ?.querySelector("slot[name='slug']")
+-        ?.classList.toggle(
+-          `${prefix}--slug--revert`,
+-          this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')
+-        );
++      this._slotSlugNode?.classList.toggle(
++        `${prefix}--slug--revert`,
++        this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')
++      );
+     }
+   }
+ 
+
+diff --git a/packages/web-components/src/components/dropdown/dropdown.ts b/packages/web-components/src/components/dropdown/dropdown.ts
+--- a/packages/web-components/src/components/dropdown/dropdown.ts
++++ b/packages/web-components/src/components/dropdown/dropdown.ts
+@@ -137,6 +137,18 @@ class CDSDropdown extends ValidityMixin(
+   @query('slot[name="title-text"]')
+   protected _slotTitleTextNode!: HTMLSlotElement;
+ 
++  /**
++   * The `<slot>` element for the AI label in the shadow DOM.
++   */
++  @query("slot[name='ai-label']")
++  private _slotAILabelNode!: HTMLSlotElement;
++
++  /**
++   * The `<slot>` element for the slug in the shadow DOM.
++   */
++  @query("slot[name='slug']")
++  private _slotSlugNode!: HTMLSlotElement;
++
+   /**
+    * @param itemToSelect A dropdown item. Absense of this argument means clearing selection.
+    * @returns `true` if the selection of this dropdown should change if the given item is selected upon user interaction.
+@@ -1149,19 +1161,17 @@ class CDSDropdown extends ValidityMixin(
+       this.removeAttribute('ai-label');
+     }
+ 
+-    const label = this.shadowRoot?.querySelector("slot[name='ai-label']");
++    const label = this._slotAILabelNode;
+     if (label) {
+       label?.classList.toggle(
+         `${prefix}--slug--revert`,
+         this.querySelector(`${prefix}-ai-label`)?.hasAttribute('revert-active')
+       );
+     } else {
+-      this.shadowRoot
+-        ?.querySelector("slot[name='slug']")
+-        ?.classList.toggle(
+-          `${prefix}--slug--revert`,
+-          this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')
+-        );
++      this._slotSlugNode?.classList.toggle(
++        `${prefix}--slug--revert`,
++        this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')
++      );
+     }
+ 
+     if (
+
+diff --git a/packages/web-components/src/components/select/select.ts b/packages/web-components/src/components/select/select.ts
+--- a/packages/web-components/src/components/select/select.ts
++++ b/packages/web-components/src/components/select/select.ts
+@@ -62,6 +62,18 @@ class CDSSelect extends FormMixin(LitElement) {
+   @queryAll(`.${prefix}--select-option[selected]`)
+   private _selectedOptionNodes!: HTMLOptionElement[];
+ 
++  /**
++   * The `<slot>` element for the AI label in the shadow DOM.
++   */
++  @query("slot[name='ai-label']")
++  private _slotAILabelNode!: HTMLSlotElement;
++
++  /**
++   * The `<slot>` element for the slug in the shadow DOM.
++   */
++  @query("slot[name='slug']")
++  private _slotSlugNode!: HTMLSlotElement;
++
+   /**
+    * Specify whether the textarea is fluid or not
+    */
+@@ -378,7 +390,7 @@ class CDSSelect extends FormMixin(LitElement) {
+       }
+     }
+ 
+-    const label = this.shadowRoot?.querySelector("slot[name='ai-label']");
++    const label = this._slotAILabelNode;
+ 
+     if (label) {
+       if ((label as HTMLSlotElement).assignedNodes()?.length) {
+@@ -392,12 +404,10 @@ class CDSSelect extends FormMixin(LitElement) {
+         this.querySelector(`${prefix}-ai-label`)?.hasAttribute('revert-active')
+       );
+     } else {
+-      this.shadowRoot
+-        ?.querySelector("slot[name='slug']")
+-        ?.classList.toggle(
+-          `${prefix}--slug--revert`,
+-          this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')
+-        );
++      this._slotSlugNode?.classList.toggle(
++        `${prefix}--slug--revert`,
++        this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')
++      );
+     }
+   }
+ 
+
+diff --git a/packages/web-components/src/components/text-input/text-input.ts b/packages/web-components/src/components/text-input/text-input.ts
+--- a/packages/web-components/src/components/text-input/text-input.ts
++++ b/packages/web-components/src/components/text-input/text-input.ts
+@@ -81,6 +81,18 @@ class CDSTextInput extends ValidityMixin(FormMixin(LitElement)) {
+   @query('slot[name="helper-text"]')
+   protected _slotHelperTextNode!: HTMLSlotElement;
+ 
++  /**
++   * The `<slot>` element for the AI label in the shadow DOM.
++   */
++  @query("slot[name='ai-label']")
++  private _slotAILabelNode!: HTMLSlotElement;
++
++  /**
++   * The `<slot>` element for the slug in the shadow DOM.
++   */
++  @query("slot[name='slug']")
++  private _slotSlugNode!: HTMLSlotElement;
++
+   /**
+    * The internal value.
+    */
+@@ -561,20 +573,18 @@ class CDSTextInput extends ValidityMixin(FormMixin(LitElement)) {
+ 
+   updated() {
+     this.toggleAttribute('ai-label', this._hasAILabel);
+-    const label = this.shadowRoot?.querySelector("slot[name='ai-label']");
++    const label = this._slotAILabelNode;
+ 
+     if (label) {
+       label?.classList.toggle(
+         `${prefix}--slug--revert`,
+         this.querySelector(`${prefix}-ai-label`)?.hasAttribute('revert-active')
+       );
+     } else {
+-      this.shadowRoot
+-        ?.querySelector("slot[name='slug']")
+-        ?.classList.toggle(
+-          `${prefix}--slug--revert`,
+-          this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')
+-        );
++      this._slotSlugNode?.classList.toggle(
++        `${prefix}--slug--revert`,
++        this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')
++      );
+     }
+   }
+ 
