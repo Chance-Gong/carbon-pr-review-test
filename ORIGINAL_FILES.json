@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "71092ca1fa43aa5f89b6f257ea61616932aa9906",
+    "filename": "packages/web-components/src/components/popover/popover.scss",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 0,
+    "changes": 2,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/ac32ad91c9f7910463e6a89661edbd26ab05b31d/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fpopover%2Fpopover.scss",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/ac32ad91c9f7910463e6a89661edbd26ab05b31d/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fpopover%2Fpopover.scss",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fpopover%2Fpopover.scss?ref=ac32ad91c9f7910463e6a89661edbd26ab05b31d",
+    "patch": "@@ -46,6 +46,8 @@ $popover-border-color: custom-property.get-var(\n :host(#{$prefix}-popover) {\n   ::slotted(.#{$prefix}--popover--tab-tip__button) {\n     @include popover-tab-tip-button;\n+\n+    color: theme.$icon-primary;\n   }\n }\n "
+  }
+]
