@@ -1,0 +1,257 @@
+diff --git a/e2e/components/Popover/Popover-test.avt.e2e.js b/e2e/components/Popover/Popover-test.avt.e2e.js
+--- a/e2e/components/Popover/Popover-test.avt.e2e.js
++++ b/e2e/components/Popover/Popover-test.avt.e2e.js
+@@ -64,6 +64,11 @@ test.describe('@avt Popover', () => {
+     await page.keyboard.press('Space');
+     await expect(page.locator('.cds--popover--open')).toBeVisible();
+     await page.keyboard.press('Escape');
++
++    // should not close on Esc, focus is not inside the content
++    await expect(page.locator('.cds--popover--open')).toBeVisible();
++
++    await page.keyboard.press('Space');
+     await expect(page.locator('.cds--popover--open')).toBeHidden();
+ 
+     // Testing right popover
+
+diff --git a/packages/react/src/components/Popover/Popover.stories.js b/packages/react/src/components/Popover/Popover.stories.js
+--- a/packages/react/src/components/Popover/Popover.stories.js
++++ b/packages/react/src/components/Popover/Popover.stories.js
+@@ -14,9 +14,6 @@ import RadioButtonGroup from '../RadioButtonGroup';
+ import { default as Checkbox } from '../Checkbox';
+ import mdx from './Popover.mdx';
+ import { Settings } from '@carbon/icons-react';
+-import { keys, match } from '../../internal/keyboard';
+-import OverflowMenu from '../OverflowMenu/OverflowMenu';
+-import OverflowMenuItem from '../OverflowMenuItem';
+ 
+ const prefix = 'cds';
+ 
+@@ -80,11 +77,6 @@ export const TabTip = (args) => {
+       <Popover
+         align={align}
+         open={open}
+-        onKeyDown={(evt) => {
+-          if (match(evt, keys.Escape)) {
+-            setOpen(false);
+-          }
+-        }}
+         isTabTip
+         onRequestClose={() => setOpen(false)}
+         {...args}>
+
+diff --git a/packages/react/src/components/Popover/__tests__/Popover-test.js b/packages/react/src/components/Popover/__tests__/Popover-test.js
+--- a/packages/react/src/components/Popover/__tests__/Popover-test.js
++++ b/packages/react/src/components/Popover/__tests__/Popover-test.js
+@@ -375,6 +375,48 @@ describe('Popover', () => {
+ 
+       expect(onRequestClose).toHaveBeenCalled();
+     });
++
++    it('should call onRequestClose when pressing Escape while the popover content is focused', async () => {
++      const onRequestClose = jest.fn();
++      render(
++        <Popover open onRequestClose={() => onRequestClose()}>
++          <button type="button" data-testid="trigger">
++            Settings
++          </button>
++          <PopoverContent>
++            <button data-testid="inside-button">Inside Button</button>
++          </PopoverContent>
++        </Popover>
++      );
++
++      screen.getByTestId('inside-button').focus();
++      await userEvent.keyboard('{Escape}');
++
++      expect(onRequestClose).toHaveBeenCalled();
++
++      // focus should return to trigger
++      expect(screen.getByTestId('trigger')).toHaveFocus();
++    });
++
++    it('should NOT call onRequestClose when pressing Escape while the trigger is focused', async () => {
++      const onRequestClose = jest.fn();
++      render(
++        <Popover open onRequestClose={() => onRequestClose()}>
++          <button type="button" data-testid="trigger">
++            Settings
++          </button>
++          <PopoverContent>test</PopoverContent>
++        </Popover>
++      );
++
++      screen.getByTestId('trigger').focus();
++      await userEvent.keyboard('{Escape}');
++
++      expect(onRequestClose).not.toHaveBeenCalled();
++
++      // focus should remain on trigger
++      expect(screen.getByTestId('trigger')).toHaveFocus();
++    });
+   });
+ 
+   it('should NOT call onRequestClose when clicking inside the popover content', async () => {
+
+diff --git a/packages/react/src/components/Popover/index.tsx b/packages/react/src/components/Popover/index.tsx
+--- a/packages/react/src/components/Popover/index.tsx
++++ b/packages/react/src/components/Popover/index.tsx
+@@ -20,6 +20,7 @@ import { isComponentElement } from '../../internal';
+ import { useMergedRefs } from '../../internal/useMergedRefs';
+ import { usePrefix } from '../../internal/usePrefix';
+ import { useWindowEvent, useEvent } from '../../internal/useEvent';
++import { selectorTabbable } from '../../internal/keyboard/navigation';
+ import { mapPopoverAlign } from '../../tools/mapPopoverAlign';
+ import {
+   useFloating,
+@@ -276,6 +277,21 @@ export const Popover: PopoverComponent & {
+     }
+   });
+ 
++  useEvent(popover, 'keydown', (event) => {
++    if (event.key !== 'Escape') return;
++
++    // Esc should only close the popover if focus is inside the popover content
++    if (!refs.floating.current?.contains(document.activeElement)) {
++      return;
++    }
++    onRequestClose?.();
++
++    // return focus to the trigger while making sure it is tabbable
++    const trigger =
++      popover.current?.querySelector<HTMLElement>(selectorTabbable);
++    trigger?.focus();
++  });
++
+   useWindowEvent('click', ({ target }) => {
+     if (
+       open &&
+
+diff --git a/packages/web-components/src/components/popover/__tests__/popover-test.js b/packages/web-components/src/components/popover/__tests__/popover-test.js
+--- a/packages/web-components/src/components/popover/__tests__/popover-test.js
++++ b/packages/web-components/src/components/popover/__tests__/popover-test.js
+@@ -561,6 +561,71 @@ describe('cds-popover focusout/outsideclick', () => {
+     expect(document.activeElement).to.equal(outside);
+   });
+ 
++  it('closes when pressing Escape while focus is inside the popover content', async () => {
++    const el = await fixture(html`
++      <div>
++        <cds-popover open id="popover">
++          <button id="trigger" type="button">Test</button>
++          <cds-popover-content>
++            <button id="inside">Inside</button>
++          </cds-popover-content>
++        </cds-popover>
++      </div>
++    `);
++
++    await el.updateComplete;
++    const popover = el.querySelector('#popover');
++    const trigger = popover.querySelector('#trigger');
++    const inside = popover.querySelector('#inside');
++
++    let eventFired = false;
++    popover.addEventListener('cds-popover-closed', () => {
++      eventFired = true;
++    });
++
++    expect(popover.hasAttribute('open')).to.be.true;
++
++    inside.focus();
++    await el.updateComplete;
++
++    await sendKeys({ press: 'Escape' });
++    await el.updateComplete;
++
++    expect(eventFired).to.be.true;
++    expect(popover.hasAttribute('open')).to.be.false;
++
++    // focus should return to trigger
++    expect(document.activeElement).to.equal(trigger);
++  });
++
++  it('does NOT close when pressing Escape while the trigger is focused', async () => {
++    const el = await fixture(html`
++      <div>
++        <cds-popover open id="popover">
++          <button id="trigger" type="button">Test</button>
++          <cds-popover-content></cds-popover-content>
++        </cds-popover>
++      </div>
++    `);
++
++    await el.updateComplete;
++    const popover = el.querySelector('#popover');
++    const trigger = popover.querySelector('#trigger');
++
++    expect(popover.hasAttribute('open')).to.be.true;
++
++    trigger.focus();
++    await el.updateComplete;
++
++    await sendKeys({ press: 'Escape' });
++    await el.updateComplete;
++
++    expect(popover.hasAttribute('open')).to.be.true;
++
++    // focus should remain on trigger
++    expect(document.activeElement).to.equal(trigger);
++  });
++
+   it('should properly handle keyboard nav within elements inside popover', async () => {
+     const el = await fixture(html`
+       <cds-popover open id="popover">
+
+diff --git a/packages/web-components/src/components/popover/popover.ts b/packages/web-components/src/components/popover/popover.ts
+--- a/packages/web-components/src/components/popover/popover.ts
++++ b/packages/web-components/src/components/popover/popover.ts
+@@ -150,6 +150,48 @@ class CDSPopover extends HostListenerMixin(LitElement) {
+     } else {
+       this._tabKeyPressed = false;
+     }
++
++    if (event.key === 'Escape') {
++      // Esc should only close the popover if focus is inside the popover content
++      const content = this.querySelector(
++        (this.constructor as typeof CDSPopover).selectorPopoverContent
++      );
++      if (!content || !deepShadowContains(content, event.target)) {
++        return;
++      }
++
++      if (
++        this.dispatchEvent(
++          new CustomEvent(
++            (this.constructor as typeof CDSPopover).eventBeforeClose,
++            {
++              bubbles: true,
++              cancelable: true,
++              composed: true,
++              detail: {
++                triggeredBy: event.target,
++              },
++            }
++          )
++        )
++      ) {
++        this.open = false;
++        this.dispatchEvent(
++          new CustomEvent(
++            (this.constructor as typeof CDSPopover).eventOnClose,
++            {
++              bubbles: true,
++              composed: true,
++            }
++          )
++        );
++
++        // return focus to the trigger
++        const trigger =
++          this._triggerSlotNode.assignedElements()[0] as HTMLElement;
++        trigger?.focus();
++      }
++    }
+   }
+ 
+   @HostListener('focusout')
