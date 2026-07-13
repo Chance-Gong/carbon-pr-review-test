@@ -1,0 +1,53 @@
+diff --git a/packages/react/src/components/Modal/Modal-test.js b/packages/react/src/components/Modal/Modal-test.js
+--- a/packages/react/src/components/Modal/Modal-test.js
++++ b/packages/react/src/components/Modal/Modal-test.js
+@@ -1670,3 +1670,34 @@ describe.each([
+     expect(onRequestClose).toHaveBeenCalled();
+   });
+ });
++
++describe('Modal - enableDialogElement role attribute', () => {
++  // Regression for #22666: with the enableDialogElement flag, a non-alert Modal set
++  // role="" on the <dialog>, hiding its implicit "dialog" role from assistive tech and
++  // breaking *ByRole('dialog') queries. The attribute should be omitted (undefined) so
++  // the native dialog role is preserved; only alert modals get role="alertdialog".
++  it('does not set an empty role on the dialog element for non-alert modals', () => {
++    const { container } = render(
++      <FeatureFlags enableDialogElement>
++        <Modal open aria-label="Non-alert modal" modalHeading="Heading">
++          <p>Body</p>
++        </Modal>
++      </FeatureFlags>
++    );
++    const dialog = container.querySelector('dialog');
++    expect(dialog).toBeInTheDocument();
++    expect(dialog).not.toHaveAttribute('role');
++  });
++
++  it('sets role="alertdialog" on the dialog element for alert modals', () => {
++    const { container } = render(
++      <FeatureFlags enableDialogElement>
++        <Modal open danger alert aria-label="Alert modal" modalHeading="Heading">
++          <p>Body</p>
++        </Modal>
++      </FeatureFlags>
++    );
++    const dialog = container.querySelector('dialog');
++    expect(dialog).toHaveAttribute('role', 'alertdialog');
++  });
++});
+
+diff --git a/packages/react/src/components/Modal/Modal.tsx b/packages/react/src/components/Modal/Modal.tsx
+--- a/packages/react/src/components/Modal/Modal.tsx
++++ b/packages/react/src/components/Modal/Modal.tsx
+@@ -738,8 +738,8 @@ const ModalDialog = React.forwardRef(function ModalDialog(
+       focusAfterCloseRef={launcherButtonRef}
+       modal
+       ref={innerModal}
+-      role={isAlertDialog ? 'alertdialog' : ''}
+-      aria-describedby={isAlertDialog ? modalBodyId : ''}
++      role={isAlertDialog ? 'alertdialog' : undefined}
++      aria-describedby={isAlertDialog ? modalBodyId : undefined}
+       className={containerClasses}
+       aria-label={ariaLabel}
+       data-exiting={presenceContext?.isExiting || undefined}>
