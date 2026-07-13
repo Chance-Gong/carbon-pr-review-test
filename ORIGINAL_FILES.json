@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "d5fa684d44c6a477a783dda180637776982cb457",
+    "filename": "packages/react/src/components/Modal/Modal-test.js",
+    "status": "modified",
+    "additions": 31,
+    "deletions": 0,
+    "changes": 31,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/1b9035a06ad54566de882195b993b6a6d998a805/packages%2Freact%2Fsrc%2Fcomponents%2FModal%2FModal-test.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/1b9035a06ad54566de882195b993b6a6d998a805/packages%2Freact%2Fsrc%2Fcomponents%2FModal%2FModal-test.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FModal%2FModal-test.js?ref=1b9035a06ad54566de882195b993b6a6d998a805",
+    "patch": "@@ -1670,3 +1670,34 @@ describe.each([\n     expect(onRequestClose).toHaveBeenCalled();\n   });\n });\n+\n+describe('Modal - enableDialogElement role attribute', () => {\n+  // Regression for #22666: with the enableDialogElement flag, a non-alert Modal set\n+  // role=\"\" on the <dialog>, hiding its implicit \"dialog\" role from assistive tech and\n+  // breaking *ByRole('dialog') queries. The attribute should be omitted (undefined) so\n+  // the native dialog role is preserved; only alert modals get role=\"alertdialog\".\n+  it('does not set an empty role on the dialog element for non-alert modals', () => {\n+    const { container } = render(\n+      <FeatureFlags enableDialogElement>\n+        <Modal open aria-label=\"Non-alert modal\" modalHeading=\"Heading\">\n+          <p>Body</p>\n+        </Modal>\n+      </FeatureFlags>\n+    );\n+    const dialog = container.querySelector('dialog');\n+    expect(dialog).toBeInTheDocument();\n+    expect(dialog).not.toHaveAttribute('role');\n+  });\n+\n+  it('sets role=\"alertdialog\" on the dialog element for alert modals', () => {\n+    const { container } = render(\n+      <FeatureFlags enableDialogElement>\n+        <Modal open danger alert aria-label=\"Alert modal\" modalHeading=\"Heading\">\n+          <p>Body</p>\n+        </Modal>\n+      </FeatureFlags>\n+    );\n+    const dialog = container.querySelector('dialog');\n+    expect(dialog).toHaveAttribute('role', 'alertdialog');\n+  });\n+});"
+  },
+  {
+    "sha": "0e7adb24e9a898fd936d798ce7d4eff0e98d1f98",
+    "filename": "packages/react/src/components/Modal/Modal.tsx",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/1b9035a06ad54566de882195b993b6a6d998a805/packages%2Freact%2Fsrc%2Fcomponents%2FModal%2FModal.tsx",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/1b9035a06ad54566de882195b993b6a6d998a805/packages%2Freact%2Fsrc%2Fcomponents%2FModal%2FModal.tsx",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FModal%2FModal.tsx?ref=1b9035a06ad54566de882195b993b6a6d998a805",
+    "patch": "@@ -738,8 +738,8 @@ const ModalDialog = React.forwardRef(function ModalDialog(\n       focusAfterCloseRef={launcherButtonRef}\n       modal\n       ref={innerModal}\n-      role={isAlertDialog ? 'alertdialog' : ''}\n-      aria-describedby={isAlertDialog ? modalBodyId : ''}\n+      role={isAlertDialog ? 'alertdialog' : undefined}\n+      aria-describedby={isAlertDialog ? modalBodyId : undefined}\n       className={containerClasses}\n       aria-label={ariaLabel}\n       data-exiting={presenceContext?.isExiting || undefined}>"
+  }
+]
