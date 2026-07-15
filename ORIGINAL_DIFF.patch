@@ -1,0 +1,1187 @@
+diff --git a/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap b/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
+--- a/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
++++ b/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
+@@ -3429,6 +3429,9 @@ Map {
+       "disabled": {
+         "type": "bool",
+       },
++      "enableSubmit": {
++        "type": "bool",
++      },
+       "id": {
+         "type": "string",
+       },
+@@ -3452,6 +3455,9 @@ Map {
+       "onKeyDown": {
+         "type": "func",
+       },
++      "onSubmit": {
++        "type": "func",
++      },
+       "placeholder": {
+         "type": "string",
+       },
+@@ -3480,9 +3486,15 @@ Map {
+         ],
+         "type": "oneOf",
+       },
++      "submitButtonLabelText": {
++        "type": "string",
++      },
+       "type": {
+         "type": "string",
+       },
++      "validate": {
++        "type": "func",
++      },
+       "value": {
+         "args": [
+           [
+@@ -5034,6 +5046,9 @@ Map {
+       "disabled": {
+         "type": "bool",
+       },
++      "enableSubmit": {
++        "type": "bool",
++      },
+       "id": {
+         "type": "string",
+       },
+@@ -5050,15 +5065,24 @@ Map {
+       "onKeyDown": {
+         "type": "func",
+       },
++      "onSubmit": {
++        "type": "func",
++      },
+       "placeholder": {
+         "type": "string",
+       },
+       "role": {
+         "type": "string",
+       },
++      "submitButtonLabelText": {
++        "type": "string",
++      },
+       "type": {
+         "type": "string",
+       },
++      "validate": {
++        "type": "func",
++      },
+       "value": {
+         "args": [
+           [
+@@ -8695,6 +8719,9 @@ Map {
+       "disabled": {
+         "type": "bool",
+       },
++      "enableSubmit": {
++        "type": "bool",
++      },
+       "id": {
+         "type": "string",
+       },
+@@ -8718,6 +8745,9 @@ Map {
+       "onKeyDown": {
+         "type": "func",
+       },
++      "onSubmit": {
++        "type": "func",
++      },
+       "placeholder": {
+         "type": "string",
+       },
+@@ -8746,9 +8776,15 @@ Map {
+         ],
+         "type": "oneOf",
+       },
++      "submitButtonLabelText": {
++        "type": "string",
++      },
+       "type": {
+         "type": "string",
+       },
++      "validate": {
++        "type": "func",
++      },
+       "value": {
+         "args": [
+           [
+@@ -13172,6 +13208,9 @@ Map {
+       "disabled": {
+         "type": "bool",
+       },
++      "enableSubmit": {
++        "type": "bool",
++      },
+       "id": {
+         "type": "string",
+       },
+@@ -13188,15 +13227,24 @@ Map {
+       "onKeyDown": {
+         "type": "func",
+       },
++      "onSubmit": {
++        "type": "func",
++      },
+       "placeholder": {
+         "type": "string",
+       },
+       "role": {
+         "type": "string",
+       },
++      "submitButtonLabelText": {
++        "type": "string",
++      },
+       "type": {
+         "type": "string",
+       },
++      "validate": {
++        "type": "func",
++      },
+       "value": {
+         "args": [
+           [
+@@ -15214,6 +15262,9 @@ Map {
+       "disabled": {
+         "type": "bool",
+       },
++      "enableSubmit": {
++        "type": "bool",
++      },
+       "id": {
+         "type": "string",
+       },
+@@ -15230,15 +15281,24 @@ Map {
+       "onKeyDown": {
+         "type": "func",
+       },
++      "onSubmit": {
++        "type": "func",
++      },
+       "placeholder": {
+         "type": "string",
+       },
+       "role": {
+         "type": "string",
+       },
++      "submitButtonLabelText": {
++        "type": "string",
++      },
+       "type": {
+         "type": "string",
+       },
++      "validate": {
++        "type": "func",
++      },
+       "value": {
+         "args": [
+           [
+
+diff --git a/packages/react/src/components/FluidSearch/FluidSearch.tsx b/packages/react/src/components/FluidSearch/FluidSearch.tsx
+--- a/packages/react/src/components/FluidSearch/FluidSearch.tsx
++++ b/packages/react/src/components/FluidSearch/FluidSearch.tsx
+@@ -1,5 +1,5 @@
+ /**
+- * Copyright IBM Corp. 2022, 2025
++ * Copyright IBM Corp. 2022, 2026
+  *
+  * This source code is licensed under the Apache-2.0 license found in the
+  * LICENSE file in the root directory of this source tree.
+@@ -11,6 +11,7 @@ import classnames from 'classnames';
+ import Search from '../Search';
+ import { usePrefix } from '../../internal/usePrefix';
+ import { FormContext } from '../FluidForm/FormContext';
++import type { SearchSubmitEvent } from '../Search/Search';
+ 
+ export interface FluidSearchProps {
+   /**
+@@ -34,6 +35,10 @@ export interface FluidSearchProps {
+    * Specify whether the `<input>` should be disabled
+    */
+   disabled?: boolean;
++  /**
++   * Specify whether the Search should render a submit button.
++   */
++  enableSubmit?: boolean;
+   /**
+    * Specify a custom `id` for the input
+    */
+@@ -54,6 +59,10 @@ export interface FluidSearchProps {
+    * Provide a handler that is invoked on the key down event for the input
+    */
+   onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
++  /**
++   * Optional callback called when a valid search is submitted.
++   */
++  onSubmit?: (event: SearchSubmitEvent, value: string) => void;
+   /**
+    * Provide an optional placeholder text for the Search.
+    * Note: if the label and placeholder differ,
+@@ -64,6 +73,10 @@ export interface FluidSearchProps {
+    * Specify the role for the underlying `<input>`, defaults to `searchbox`
+    */
+   role?: string;
++  /**
++   * Specify a label to be read by screen readers on the submit button.
++   */
++  submitButtonLabelText?: string;
+   /**
+    * Optional prop to specify the type of the `<input>`
+    */
+@@ -72,6 +85,11 @@ export interface FluidSearchProps {
+    * Specify the value of the `<input>`
+    */
+   value?: string | number;
++  /**
++   * Optional function used to determine whether the search value can be
++   * submitted. By default, any non-empty value is valid.
++   */
++  validate?: (value: string) => boolean;
+ }
+ 
+ const frFn = forwardRef<HTMLInputElement, FluidSearchProps>;
+@@ -114,6 +132,11 @@ FluidSearch.propTypes = {
+    */
+   disabled: PropTypes.bool,
+ 
++  /**
++   * Specify whether the Search should render a submit button.
++   */
++  enableSubmit: PropTypes.bool,
++
+   /**
+    * Specify a custom `id` for the input
+    */
+@@ -139,6 +162,11 @@ FluidSearch.propTypes = {
+    */
+   onKeyDown: PropTypes.func,
+ 
++  /**
++   * Optional callback called when a valid search is submitted.
++   */
++  onSubmit: PropTypes.func,
++
+   /**
+    * Provide an optional placeholder text for the Search.
+    * Note: if the label and placeholder differ,
+@@ -151,6 +179,11 @@ FluidSearch.propTypes = {
+    */
+   role: PropTypes.string,
+ 
++  /**
++   * Specify a label to be read by screen readers on the submit button.
++   */
++  submitButtonLabelText: PropTypes.string,
++
+   /**
+    * Optional prop to specify the type of the `<input>`
+    */
+@@ -160,6 +193,12 @@ FluidSearch.propTypes = {
+    * Specify the value of the `<input>`
+    */
+   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
++
++  /**
++   * Optional function used to determine whether the search value can be
++   * submitted. By default, any non-empty value is valid.
++   */
++  validate: PropTypes.func,
+ };
+ 
+ export default FluidSearch;
+
+diff --git a/packages/react/src/components/Search/Search-test.js b/packages/react/src/components/Search/Search-test.js
+--- a/packages/react/src/components/Search/Search-test.js
++++ b/packages/react/src/components/Search/Search-test.js
+@@ -106,6 +106,71 @@ describe('Search', () => {
+       expect(screen.getByRole('searchbox')).toBeDisabled();
+     });
+ 
++    it('should render an opt-in submit button', () => {
++      render(
++        <Search
++          labelText="test-search"
++          enableSubmit
++          submitButtonLabelText="Run search"
++        />
++      );
++
++      expect(screen.getByRole('button', { name: 'Run search' })).toBeDisabled();
++    });
++
++    it('should submit the current value from the button and Enter key', async () => {
++      const onSubmit = jest.fn();
++      render(
++        <Search labelText="test-search" enableSubmit onSubmit={onSubmit} />
++      );
++      const input = screen.getByRole('searchbox');
++      const submitButton = screen.getByRole('button', {
++        name: 'Submit search',
++      });
++
++      await userEvent.type(input, 'carbon');
++
++      expect(submitButton).toBeEnabled();
++      await userEvent.click(submitButton);
++      expect(onSubmit).toHaveBeenLastCalledWith(
++        expect.objectContaining({ type: 'click' }),
++        'carbon'
++      );
++
++      await userEvent.type(input, '{Enter}');
++      expect(onSubmit).toHaveBeenLastCalledWith(
++        expect.objectContaining({ key: 'Enter' }),
++        'carbon'
++      );
++      expect(onSubmit).toHaveBeenCalledTimes(2);
++    });
++
++    it('should only submit values accepted by validate', async () => {
++      const onSubmit = jest.fn();
++      render(
++        <Search
++          labelText="test-search"
++          enableSubmit
++          onSubmit={onSubmit}
++          validate={(searchValue) => searchValue.length >= 3}
++        />
++      );
++      const input = screen.getByRole('searchbox');
++      const submitButton = screen.getByRole('button', {
++        name: 'Submit search',
++      });
++
++      await userEvent.type(input, 'ab');
++      expect(submitButton).toBeDisabled();
++      await userEvent.type(input, '{Enter}');
++      expect(onSubmit).not.toHaveBeenCalled();
++
++      await userEvent.type(input, 'c');
++      expect(submitButton).toBeEnabled();
++      await userEvent.click(submitButton);
++      expect(onSubmit).toHaveBeenCalledTimes(1);
++    });
++
+     it('should respect id prop', () => {
+       render(<Search labelText="test-search" id="test-id" />);
+ 
+
+diff --git a/packages/react/src/components/Search/Search.mdx b/packages/react/src/components/Search/Search.mdx
+--- a/packages/react/src/components/Search/Search.mdx
++++ b/packages/react/src/components/Search/Search.mdx
+@@ -17,6 +17,7 @@ import { stackblitzPrefillConfig } from '../../../previewer/codePreviewer';
+ ## Table of Contents
+ 
+ - [Overview](#overview)
++- [Submit a search](#submit-a-search)
+ - [Expandable](#expandable)
+ - [Component API](#component-api)
+ - [Feedback](#feedback)
+@@ -35,6 +36,14 @@ import { stackblitzPrefillConfig } from '../../../previewer/codePreviewer';
+   ]}
+ />
+ 
++## Submit a search
++
++Set `enableSubmit` to render a submit button. The button and Enter key call
++`onSubmit` only when the current value is non-empty and, when provided, accepted
++by `validate`.
++
++<Canvas of={SearchStories.WithSubmit} />
++
+ ## Expandable
+ 
+ <Canvas
+
+diff --git a/packages/react/src/components/Search/Search.stories.js b/packages/react/src/components/Search/Search.stories.js
+--- a/packages/react/src/components/Search/Search.stories.js
++++ b/packages/react/src/components/Search/Search.stories.js
+@@ -6,6 +6,7 @@
+  */
+ 
+ import React from 'react';
++import { action } from 'storybook/actions';
+ 
+ import { WithLayer } from '../../../.storybook/templates/WithLayer';
+ 
+@@ -20,11 +21,13 @@ export default {
+   args: {
+     closeButtonLabelText: 'Clear search input',
+     disabled: false,
++    enableSubmit: false,
+     defaultWidth: 800,
+     labelText: 'Site search',
+     placeholder: 'Placeholder text',
+     size: 'md',
+     type: 'search',
++    submitButtonLabelText: 'Submit search',
+   },
+   argTypes: {
+     light: {
+@@ -45,6 +48,11 @@ export default {
+         type: 'boolean',
+       },
+     },
++    enableSubmit: {
++      control: {
++        type: 'boolean',
++      },
++    },
+     defaultValue: {
+       control: {
+         type: 'text',
+@@ -134,6 +142,20 @@ export const Default = ({ defaultWidth, ...searchArgs }) => (
+ );
+ Default.parameters = { ...defaultParameters };
+ 
++export const WithSubmit = ({ defaultWidth, ...searchArgs }) => (
++  <div style={{ width: defaultWidth }}>
++    <Search
++      id="search-with-submit"
++      {...searchArgs}
++      onSubmit={(_, searchValue) => action('onSubmit')(searchValue)}
++    />
++  </div>
++);
++WithSubmit.args = {
++  enableSubmit: true,
++};
++WithSubmit.parameters = { ...defaultParameters };
++
+ export const Skeleton = ({ size, defaultWidth }) => (
+   <div style={{ width: defaultWidth }}>
+     <SearchSkeleton size={size} />
+
+diff --git a/packages/react/src/components/Search/Search.tsx b/packages/react/src/components/Search/Search.tsx
+--- a/packages/react/src/components/Search/Search.tsx
++++ b/packages/react/src/components/Search/Search.tsx
+@@ -31,7 +31,14 @@ import { noopFn } from '../../internal/noopFn';
+ import { Tooltip } from '../Tooltip';
+ import { isSearchValuePresent } from './utils';
+ 
+-type InputPropsBase = Omit<HTMLAttributes<HTMLInputElement>, 'onChange'>;
++type InputPropsBase = Omit<
++  HTMLAttributes<HTMLInputElement>,
++  'onChange' | 'onSubmit'
++>;
++export type SearchSubmitEvent =
++  | MouseEvent<HTMLButtonElement>
++  | KeyboardEvent<HTMLInputElement>;
++
+ export interface SearchProps extends InputPropsBase {
+   /**
+    * Specify an optional value for the `autocomplete` property on the underlying
+@@ -59,6 +66,11 @@ export interface SearchProps extends InputPropsBase {
+    */
+   disabled?: boolean;
+ 
++  /**
++   * Specify whether the Search should render a submit button.
++   */
++  enableSubmit?: boolean;
++
+   /**
+    * Specify whether or not ExpandableSearch should render expanded or not
+    */
+@@ -91,6 +103,11 @@ export interface SearchProps extends InputPropsBase {
+     e: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>
+   ): void;
+ 
++  /**
++   * Optional callback called when a valid search is submitted.
++   */
++  onSubmit?: (event: SearchSubmitEvent, value: string) => void;
++
+   /**
+    * Provide an optional placeholder text for the Search.
+    * Note: if the label and placeholder differ,
+@@ -115,6 +132,11 @@ export interface SearchProps extends InputPropsBase {
+    */
+   size?: 'xs' | 'sm' | 'md' | 'lg';
+ 
++  /**
++   * Specify a label to be read by screen readers on the submit button.
++   */
++  submitButtonLabelText?: string;
++
+   /**
+    * Specify the type of the `<input>`
+    */
+@@ -124,6 +146,12 @@ export interface SearchProps extends InputPropsBase {
+    * Specify the value of the `<input>`
+    */
+   value?: string | number;
++
++  /**
++   * Optional function used to determine whether the search value can be
++   * submitted. By default, any non-empty value is valid.
++   */
++  validate?: (value: string) => boolean;
+ }
+ 
+ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
+@@ -134,6 +162,7 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
+       closeButtonLabelText = 'Clear search input',
+       defaultValue,
+       disabled,
++      enableSubmit = false,
+       isExpanded = true,
+       inert,
+       id,
+@@ -144,19 +173,25 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
+       onClear = () => {},
+       onKeyDown,
+       onExpand,
++      onSubmit,
+       placeholder = 'Search',
+       renderIcon,
+       role,
+       size,
++      submitButtonLabelText = 'Submit search',
+       tabIndex,
+       type = 'search',
++      validate,
+       value,
+       ...rest
+     },
+     forwardRef
+   ) => {
+-    const hasPropValue =
+-      isSearchValuePresent(value) || isSearchValuePresent(defaultValue);
++    const initialSearchValue = isSearchValuePresent(value)
++      ? String(value)
++      : isSearchValuePresent(defaultValue)
++        ? String(defaultValue)
++        : '';
+     const prefix = usePrefix();
+     const { isFluid } = useContext(FormContext);
+     const inputRef = useRef<HTMLInputElement>(null);
+@@ -165,7 +200,10 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
+     const inputId = useId('search-input');
+     const uniqueId = id || inputId;
+     const searchId = `${uniqueId}-search`;
+-    const [hasContent, setHasContent] = useState(hasPropValue || false);
++    const [searchValue, setSearchValue] = useState(initialSearchValue);
++    const hasContent = isSearchValuePresent(searchValue);
++    const isSubmitValid =
++      hasContent && (validate ? validate(searchValue) : true);
+     const isExpandableCollapsed = !!onExpand && !isExpanded;
+     const searchClasses = cx(
+       {
+@@ -175,6 +213,7 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
+         [`${prefix}--search--light`]: light,
+         [`${prefix}--search--disabled`]: disabled,
+         [`${prefix}--search--fluid`]: isFluid,
++        [`${prefix}--search--with-submit`]: enableSubmit,
+       },
+       className
+     );
+@@ -187,7 +226,7 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
+     useEffect(() => {
+       // Sync content state when used as a controlled input.
+       if (typeof value !== 'undefined') {
+-        setHasContent(isSearchValuePresent(value));
++        setSearchValue(isSearchValuePresent(value) ? String(value) : '');
+       }
+     }, [value]);
+ 
+@@ -220,12 +259,18 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
+       }
+ 
+       onClear();
+-      setHasContent(false);
++      setSearchValue('');
+       inputRef.current?.focus();
+     }
+ 
+     function handleChange(event: ChangeEvent<HTMLInputElement>) {
+-      setHasContent(event.target.value !== '');
++      setSearchValue(event.target.value);
++    }
++
++    function submitSearch(event: SearchSubmitEvent) {
++      if (isSubmitValid) {
++        onSubmit?.(event, searchValue);
++      }
+     }
+ 
+     function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+@@ -238,6 +283,9 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
+         else if (onExpand && isExpanded) {
+           expandButtonRef.current?.focus();
+         }
++      } else if (enableSubmit && match(event, keys.Enter)) {
++        event.preventDefault();
++        submitSearch(event);
+       }
+     }
+ 
+@@ -319,6 +367,17 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(
+           type="button">
+           <Close />
+         </button>
++        {enableSubmit && (
++          <button
++            aria-label={submitButtonLabelText}
++            className={`${prefix}--search-button`}
++            disabled={disabled || !isSubmitValid}
++            onClick={submitSearch}
++            title={submitButtonLabelText}
++            type="button">
++            <CustomSearchIcon icon={renderIcon} />
++          </button>
++        )}
+       </div>
+     );
+   }
+@@ -352,6 +411,11 @@ Search.propTypes = {
+    */
+   disabled: PropTypes.bool,
+ 
++  /**
++   * Specify whether the Search should render a submit button.
++   */
++  enableSubmit: PropTypes.bool,
++
+   /**
+    * Specify a custom `id` for the input
+    */
+@@ -391,6 +455,11 @@ Search.propTypes = {
+    */
+   onExpand: PropTypes.func,
+ 
++  /**
++   * Optional callback called when a valid search is submitted.
++   */
++  onSubmit: PropTypes.func,
++
+   /**
+    * Provide a handler that is invoked on the key down event for the input
+    */
+@@ -423,6 +492,11 @@ Search.propTypes = {
+    */
+   size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg']),
+ 
++  /**
++   * Specify a label to be read by screen readers on the submit button.
++   */
++  submitButtonLabelText: PropTypes.string,
++
+   /**
+    * Specify the type of the `<input>`
+    */
+@@ -432,6 +506,12 @@ Search.propTypes = {
+    * Specify the value of the `<input>`
+    */
+   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
++
++  /**
++   * Optional function used to determine whether the search value can be
++   * submitted. By default, any non-empty value is valid.
++   */
++  validate: PropTypes.func,
+ };
+ 
+ function CustomSearchIcon({ icon: Icon }) {
+
+diff --git a/packages/styles/scss/components/search/_search.scss b/packages/styles/scss/components/search/_search.scss
+--- a/packages/styles/scss/components/search/_search.scss
++++ b/packages/styles/scss/components/search/_search.scss
+@@ -154,6 +154,29 @@
+     }
+   }
+ 
++  .#{$prefix}--search--with-submit {
++    .#{$prefix}--search-magnifier {
++      display: none;
++    }
++
++    .#{$prefix}--search-input {
++      padding-inline-end: calc(layout.size('height') * 2);
++      padding-inline-start: $spacing-05;
++    }
++
++    .#{$prefix}--search-close {
++      inset-inline-end: layout.size('height');
++    }
++
++    .#{$prefix}--search-button {
++      position: absolute;
++      z-index: 2;
++      inset-block-start: 0;
++      inset-inline-end: 0;
++      margin-inline-start: 0;
++    }
++  }
++
+   // Keep the clear icon above the hover fill overlay.
+   .#{$prefix}--search-close svg {
+     position: relative;
+@@ -193,6 +216,19 @@
+     }
+   }
+ 
++  .#{$prefix}--search-button:disabled {
++    background-color: $field;
++    cursor: not-allowed;
++    fill: $icon-disabled;
++
++    &:hover,
++    &:active {
++      border-color: transparent;
++      background-color: $field;
++      outline: none;
++    }
++  }
++
+   // Preserve the field focus outline while the clear button is hovered.
+   .#{$prefix}--search-input:focus ~ .#{$prefix}--search-close:hover {
+     background-color: transparent;
+
+diff --git a/packages/web-components/src/components/search/__tests__/search-test.js b/packages/web-components/src/components/search/__tests__/search-test.js
+--- a/packages/web-components/src/components/search/__tests__/search-test.js
++++ b/packages/web-components/src/components/search/__tests__/search-test.js
+@@ -1,5 +1,5 @@
+ /**
+- * Copyright IBM Corp. 2025
++ * Copyright IBM Corp. 2025, 2026
+  *
+  * This source code is licensed under the Apache-2.0 license found in the
+  * LICENSE file in the root directory of this source tree.
+@@ -50,6 +50,81 @@ describe('cds-search', () => {
+       expect(input).to.have.attribute('disabled');
+     });
+ 
++    it('should render an opt-in submit button', async () => {
++      const el = await fixture(html`
++        <cds-search
++          label-text="test-search"
++          enable-submit
++          submit-button-label-text="Run search"></cds-search>
++      `);
++
++      const submitButton = el.shadowRoot?.querySelector(
++        'button.cds--search-button'
++      );
++      expect(submitButton).to.exist;
++      expect(submitButton).to.have.attribute('aria-label', 'Run search');
++      expect(submitButton).to.have.attribute('disabled');
++    });
++
++    it('should submit the current value from the button and Enter key', async () => {
++      const el = await fixture(html`
++        <cds-search label-text="test-search" enable-submit></cds-search>
++      `);
++      const input = el.shadowRoot?.querySelector('input');
++      const submitButton = el.shadowRoot?.querySelector(
++        'button.cds--search-button'
++      );
++      const submittedValues = [];
++      el.addEventListener('cds-search-submit', (event) => {
++        submittedValues.push(event.detail.value);
++      });
++
++      input.value = 'carbon';
++      input.dispatchEvent(new Event('input', { bubbles: true }));
++      await el.updateComplete;
++
++      expect(submitButton).to.not.have.attribute('disabled');
++      submitButton.click();
++      expect(submittedValues).to.deep.equal(['carbon']);
++
++      input.focus();
++      input.dispatchEvent(
++        new KeyboardEvent('keydown', {
++          key: 'Enter',
++          bubbles: true,
++          composed: true,
++        })
++      );
++      expect(submittedValues).to.deep.equal(['carbon', 'carbon']);
++    });
++
++    it('should only submit values accepted by validate', async () => {
++      const el = await fixture(html`
++        <cds-search label-text="test-search" enable-submit></cds-search>
++      `);
++      el.validate = (searchValue) => searchValue.length >= 3;
++      const input = el.shadowRoot?.querySelector('input');
++      const submitButton = el.shadowRoot?.querySelector(
++        'button.cds--search-button'
++      );
++      let submitCount = 0;
++      el.addEventListener('cds-search-submit', () => {
++        submitCount++;
++      });
++
++      input.value = 'ab';
++      input.dispatchEvent(new Event('input', { bubbles: true }));
++      await el.updateComplete;
++      expect(submitButton).to.have.attribute('disabled');
++
++      input.value = 'abc';
++      input.dispatchEvent(new Event('input', { bubbles: true }));
++      await el.updateComplete;
++      expect(submitButton).to.not.have.attribute('disabled');
++      submitButton.click();
++      expect(submitCount).to.equal(1);
++    });
++
+     it('should respect the autofocus attribute', async () => {
+       const el = await fixture(html`
+         <cds-search label-text="test-search" autofocus></cds-search>
+
+diff --git a/packages/web-components/src/components/search/search.mdx b/packages/web-components/src/components/search/search.mdx
+--- a/packages/web-components/src/components/search/search.mdx
++++ b/packages/web-components/src/components/search/search.mdx
+@@ -15,6 +15,7 @@ import * as SearchStories from './search.stories';
+ ## Table of Contents
+ 
+ - [Overview](#overview)
++- [Submit a search](#submit-a-search)
+ - [Expandable](#expandable)
+ - [Component API](#component-api)
+ - [CDN](#cdn)
+@@ -24,6 +25,14 @@ import * as SearchStories from './search.stories';
+ 
+ <Canvas of={SearchStories.Default} />
+ 
++## Submit a search
++
++Set `enable-submit` to render a submit button. The button and Enter key emit
++`cds-search-submit` only when the current value is non-empty and, when provided,
++accepted by the `validate` property.
++
++<Canvas of={SearchStories.WithSubmit} />
++
+ ## Expandable
+ 
+ <Canvas of={SearchStories.Expandable} />
+
+diff --git a/packages/web-components/src/components/search/search.scss b/packages/web-components/src/components/search/search.scss
+--- a/packages/web-components/src/components/search/search.scss
++++ b/packages/web-components/src/components/search/search.scss
+@@ -29,6 +29,10 @@ $css--plex: true !default;
+   @extend .#{$prefix}--search--expandable;
+ }
+ 
++:host(#{$prefix}-search[enable-submit]) {
++  @extend .#{$prefix}--search--with-submit;
++}
++
+ :host([expandable]:focus-within) .#{$prefix}--search-magnifier {
+   outline: $spacing-01 solid var(--cds-focus);
+ 
+
+diff --git a/packages/web-components/src/components/search/search.stories.ts b/packages/web-components/src/components/search/search.stories.ts
+--- a/packages/web-components/src/components/search/search.stories.ts
++++ b/packages/web-components/src/components/search/search.stories.ts
+@@ -7,6 +7,7 @@
+ 
+ import { html } from 'lit';
+ import { ifDefined } from 'lit/directives/if-defined.js';
++import { action } from 'storybook/actions';
+ import { SEARCH_SIZE } from './defs';
+ import './search-skeleton';
+ import '../layer';
+@@ -26,11 +27,13 @@ const args = {
+   closeButtonLabelText: 'Clear search input',
+   defaultWidth: 800,
+   disabled: false,
++  enableSubmit: false,
+   labelText: 'Search',
+   placeholder: 'Placeholder text',
+   role: 'searchbox',
+   size: SEARCH_SIZE.MEDIUM,
+   type: 'text',
++  submitButtonLabelText: 'Submit search',
+   value: '',
+ };
+ 
+@@ -58,6 +61,10 @@ const argTypes = {
+     description:
+       'Specify whether the <code>&lt;input&gt;</code> should be disabled.',
+   },
++  enableSubmit: {
++    control: 'boolean',
++    description: 'Specify whether the Search should render a submit button.',
++  },
+   expanded: {
+     control: 'boolean',
+     description: 'Specify whether the Expandable Search should be expanded',
+@@ -86,6 +93,11 @@ const argTypes = {
+     description:
+       'Optional prop to specify the type of the <code>&lt;input&gt;</code>.',
+   },
++  submitButtonLabelText: {
++    control: 'text',
++    description:
++      'Specify a label to be read by screen readers on the submit button.',
++  },
+   value: {
+     control: 'text',
+     description: 'Specify the value of the <code>&lt;input&gt;</code>.',
+@@ -173,6 +185,45 @@ export const Expandable = {
+   },
+ };
+ 
++export const WithSubmit = {
++  args: { ...args, enableSubmit: true },
++  argTypes,
++  render: (args) => {
++    const {
++      autoComplete,
++      autofocus,
++      closeButtonLabelText,
++      defaultWidth,
++      disabled,
++      enableSubmit,
++      labelText,
++      placeholder,
++      size,
++      submitButtonLabelText,
++      type,
++      value,
++    } = args ?? {};
++    return html`
++      <div style="width: ${defaultWidth}px;">
++        <cds-search
++          autocomplete="${autoComplete}"
++          ?autofocus="${autofocus}"
++          close-button-label-text="${ifDefined(closeButtonLabelText)}"
++          ?disabled="${disabled}"
++          ?enable-submit="${enableSubmit}"
++          label-text="${ifDefined(labelText)}"
++          placeholder="${ifDefined(placeholder)}"
++          size="${ifDefined(size)}"
++          submit-button-label-text="${ifDefined(submitButtonLabelText)}"
++          type="${ifDefined(type)}"
++          value="${ifDefined(value)}"
++          @cds-search-submit="${(event) =>
++            action('cds-search-submit')(event.detail.value)}"></cds-search>
++      </div>
++    `;
++  },
++};
++
+ export const ExpandableWithLayer = {
+   args: { ...args, expanded: false },
+   argTypes,
+
+diff --git a/packages/web-components/src/components/search/search.ts b/packages/web-components/src/components/search/search.ts
+--- a/packages/web-components/src/components/search/search.ts
++++ b/packages/web-components/src/components/search/search.ts
+@@ -32,7 +32,9 @@ export { SEARCH_SIZE };
+  * @csspart input The input box.
+  * @csspart close-button The close button.
+  * @csspart close-icon The close icon.
++ * @csspart submit-button The submit button.
+  * @fires cds-search-input - The custom event fired after the search content is changed upon a user gesture.
++ * @fires cds-search-submit - The custom event fired after a valid search is submitted.
+  */
+ @customElement(`${prefix}-search`)
+ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
+@@ -89,6 +91,30 @@ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
+     }
+   }
+ 
++  /**
++   * Submits the current search value when it is valid.
++   */
++  private _handleSubmit() {
++    if (!this._isSubmitValid()) {
++      return;
++    }
++
++    this.dispatchEvent(
++      new CustomEvent((this.constructor as typeof CDSSearch).eventSubmit, {
++        bubbles: true,
++        composed: true,
++        cancelable: false,
++        detail: {
++          value: this.value,
++        },
++      })
++    );
++  }
++
++  private _isSubmitValid() {
++    return !!this.value && (this.validate ? this.validate(this.value) : true);
++  }
++
+   /**
+    * Expand only when the magnifier icon is clicked
+    */
+@@ -125,11 +151,22 @@ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
+   private _handleKeys(event: KeyboardEvent) {
+     const key = event.key;
+ 
++    const inputEl = this.shadowRoot?.getElementById(
++      'input'
++    ) as HTMLInputElement | null;
++
++    if (
++      key === 'Enter' &&
++      this.enableSubmit &&
++      this.shadowRoot?.activeElement === inputEl
++    ) {
++      event.preventDefault();
++      this._handleSubmit();
++      return;
++    }
++
+     // Esc only works when the input is the active element
+     if (key === 'Escape') {
+-      const inputEl = this.shadowRoot?.getElementById(
+-        'input'
+-      ) as HTMLInputElement | null;
+       if (this.shadowRoot?.activeElement === inputEl) {
+         event.stopPropagation();
+         event.preventDefault();
+@@ -188,7 +225,13 @@ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
+     const icon = this.querySelector('svg');
+     icon?.setAttribute('part', 'search-icon');
+     icon?.setAttribute('class', `${prefix}--search-magnifier-icon`);
+-    icon?.setAttribute('role', `img`);
++    if (this.enableSubmit) {
++      icon?.setAttribute('aria-hidden', 'true');
++      icon?.removeAttribute('role');
++    } else {
++      icon?.removeAttribute('aria-hidden');
++      icon?.setAttribute('role', `img`);
++    }
+     this.hasCustomIcon = true;
+   }
+ 
+@@ -238,6 +281,12 @@ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
+   @property({ type: Boolean, reflect: true })
+   disabled = false;
+ 
++  /**
++   * `true` if the Search should render a submit button.
++   */
++  @property({ type: Boolean, reflect: true, attribute: 'enable-submit' })
++  enableSubmit = false;
++
+   /**
+    * `true` if the search bar can be expandable
+    */
+@@ -283,6 +332,12 @@ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
+   @property({ reflect: true })
+   size?: SEARCH_SIZE;
+ 
++  /**
++   * Specify a label to be read by screen readers on the submit button.
++   */
++  @property({ attribute: 'submit-button-label-text' })
++  submitButtonLabelText = 'Submit search';
++
+   /**
+    * The `<input>` name.
+    */
+@@ -295,39 +350,51 @@ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
+   @property({ type: String })
+   value = '';
+ 
++  /**
++   * Optional function used to determine whether the search value can be
++   * submitted. By default, any non-empty value is valid.
++   */
++  @property({ attribute: false })
++  validate?: (value: string) => boolean;
++
+   render() {
+     const {
+       autoComplete,
+       autofocus,
+       closeButtonLabelText,
+       disabled,
++      enableSubmit,
+       hasCustomIcon,
+       labelText,
+       name,
+       placeholder,
+       role,
++      submitButtonLabelText,
+       type,
+       value = '',
+       _handleInput: handleInput,
+       _handleClearInputButtonClick: handleClearInputButtonClick,
++      _handleSubmit: handleSubmit,
+       _handleSlotChange: handleSlotChange,
+     } = this;
+     const clearClasses = classMap({
+       [`${prefix}--search-close`]: true,
+       [`${prefix}--search-close--hidden`]: !this.value,
+     });
+     return html`
+-      <div class="${prefix}--search-magnifier">
+-        <slot name="icon" @slotchange=${handleSlotChange}>
+-          ${hasCustomIcon
+-            ? html``
+-            : iconLoader(Search16, {
+-                part: 'search-icon',
+-                class: `${prefix}--search-magnifier-icon`,
+-                role: 'img',
+-              })}
+-        </slot>
+-      </div>
++      ${enableSubmit
++        ? html``
++        : html`<div class="${prefix}--search-magnifier">
++            <slot name="icon" @slotchange=${handleSlotChange}>
++              ${hasCustomIcon
++                ? html``
++                : iconLoader(Search16, {
++                    part: 'search-icon',
++                    class: `${prefix}--search-magnifier-icon`,
++                    role: 'img',
++                  })}
++            </slot>
++          </div>`}
+       <label for="input" part="label-text" class="${prefix}--label">
+         <slot>${labelText}</slot>
+       </label>
+@@ -357,6 +424,26 @@ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
+           role: 'img',
+         })}
+       </button>
++      ${enableSubmit
++        ? html`<button
++            part="submit-button"
++            ?disabled="${disabled || !this._isSubmitValid()}"
++            class="${prefix}--search-button"
++            @click="${handleSubmit}"
++            type="button"
++            title="${submitButtonLabelText}"
++            aria-label="${submitButtonLabelText}">
++            <slot name="icon" @slotchange=${handleSlotChange}>
++              ${hasCustomIcon
++                ? html``
++                : iconLoader(Search16, {
++                    part: 'search-icon',
++                    class: `${prefix}--search-magnifier-icon`,
++                    'aria-hidden': 'true',
++                  })}
++            </slot>
++          </button>`
++        : html``}
+     `;
+   }
+ 
+@@ -367,6 +454,13 @@ class CDSSearch extends HostListenerMixin(FocusMixin(FormMixin(LitElement))) {
+     return `${prefix}-search-input`;
+   }
+ 
++  /**
++   * The name of the custom event fired after a valid search is submitted.
++   */
++  static get eventSubmit() {
++    return `${prefix}-search-submit`;
++  }
++
+   static shadowRootOptions = {
+     ...LitElement.shadowRootOptions,
+     delegatesFocus: true,
