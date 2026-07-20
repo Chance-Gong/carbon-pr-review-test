@@ -1,0 +1,174 @@
+diff --git a/packages/react/src/components/FormGroup/FormGroup.stories.js b/packages/react/src/components/FormGroup/FormGroup.stories.js
+--- a/packages/react/src/components/FormGroup/FormGroup.stories.js
++++ b/packages/react/src/components/FormGroup/FormGroup.stories.js
+@@ -7,10 +7,7 @@
+ 
+ import React from 'react';
+ import { FormGroup } from '../FormGroup';
+-import TextInput from '../TextInput';
+-import RadioButtonGroup from '../RadioButtonGroup';
+-import RadioButton from '../RadioButton';
+-import Button from '../Button';
++import Checkbox from '../Checkbox';
+ import { Stack } from '../Stack';
+ 
+ import mdx from './FormGroup.mdx';
+@@ -31,18 +28,10 @@ export default {
+ export const Default = (args) => {
+   return (
+     <FormGroup style={{ maxWidth: '400px' }} {...args}>
+-      <Stack gap={7}>
+-        <TextInput id="one" labelText="First Name" />
+-        <TextInput id="two" labelText="Last Name" />
+-        <RadioButtonGroup
+-          legendText="Radio button heading"
+-          name="formgroup-default-radio-button-group"
+-          defaultSelected="radio-1">
+-          <RadioButton labelText="Option 1" value="radio-1" id="radio-1" />
+-          <RadioButton labelText="Option 2" value="radio-2" id="radio-2" />
+-          <RadioButton labelText="Option 3" value="radio-3" id="radio-3" />
+-        </RadioButtonGroup>
+-        <Button>Submit</Button>
++      <Stack gap={3}>
++        <Checkbox id="form-group-email" labelText="Email" />
++        <Checkbox id="form-group-phone" labelText="Phone" />
++        <Checkbox id="form-group-text-message" labelText="Text message" />
+       </Stack>
+     </FormGroup>
+   );
+@@ -73,6 +62,6 @@ Default.argTypes = {
+ 
+ Default.args = {
+   legendId: 'form-group-1',
+-  legendText: 'FormGroup Legend',
++  legendText: 'Contact preferences',
+   message: false,
+ };
+
+diff --git a/packages/react/src/components/FormLabel/FormLabel.stories.js b/packages/react/src/components/FormLabel/FormLabel.stories.js
+--- a/packages/react/src/components/FormLabel/FormLabel.stories.js
++++ b/packages/react/src/components/FormLabel/FormLabel.stories.js
+@@ -8,7 +8,6 @@
+ import React from 'react';
+ 
+ import FormLabel from './FormLabel';
+-import { Tooltip } from '../Tooltip';
+ import { Information } from '@carbon/icons-react';
+ import { ActionableNotification } from '../Notification';
+ import { Toggletip, ToggletipButton, ToggletipContent } from '../Toggletip';
+
+diff --git a/packages/styles/scss/components/__tests__/fluid-text-input-test.js b/packages/styles/scss/components/__tests__/fluid-text-input-test.js
+--- a/packages/styles/scss/components/__tests__/fluid-text-input-test.js
++++ b/packages/styles/scss/components/__tests__/fluid-text-input-test.js
+@@ -24,4 +24,17 @@ describe('scss/components/fluid-text-input', () => {
+     `);
+     expect(unwrap('mixin')).toBe(true);
+   });
++
++  test('invalid inputs have a distinct focus indicator', async () => {
++    const { result } = await render(`
++      @use '../fluid-text-input';
++
++      @include fluid-text-input.fluid-text-input;
++    `);
++    const cssText = result.css.toString();
++
++    expect(cssText).toMatch(
++      /\.cds--text-input--fluid \.cds--text-input__field-wrapper\[data-invalid\]:focus-within\s*{[^}]*outline: 4px solid[^}]*outline-offset: -4px;/
++    );
++  });
+ });
+
+diff --git a/packages/styles/scss/components/__tests__/text-input-test.js b/packages/styles/scss/components/__tests__/text-input-test.js
+--- a/packages/styles/scss/components/__tests__/text-input-test.js
++++ b/packages/styles/scss/components/__tests__/text-input-test.js
+@@ -23,4 +23,17 @@ describe('scss/components/text-input', () => {
+      `);
+     expect(unwrap('mixin')).toBe(true);
+   });
++
++  test('invalid inputs have a distinct focus indicator', async () => {
++    const { result } = await render(`
++      @use '../text-input';
++
++      @include text-input.text-input;
++    `);
++    const cssText = result.css.toString();
++
++    expect(cssText).toMatch(
++      /\.cds--text-input--invalid:focus\s*{[^}]*outline: 4px solid[^}]*outline-offset: -4px;/
++    );
++  });
+ });
+
+diff --git a/packages/styles/scss/components/fluid-text-input/_fluid-text-input.scss b/packages/styles/scss/components/fluid-text-input/_fluid-text-input.scss
+--- a/packages/styles/scss/components/fluid-text-input/_fluid-text-input.scss
++++ b/packages/styles/scss/components/fluid-text-input/_fluid-text-input.scss
+@@ -145,7 +145,10 @@
+   }
+ 
+   .#{$prefix}--text-input--fluid
+-    .#{$prefix}--text-input__field-wrapper[data-invalid]:focus-within,
++    .#{$prefix}--text-input__field-wrapper[data-invalid]:focus-within {
++    @include focus-outline('outline-lg');
++  }
++
+   .#{$prefix}--text-input--fluid
+     .#{$prefix}--text-input__field-wrapper--warning:focus-within {
+     @include focus-outline('outline');
+
+diff --git a/packages/styles/scss/components/text-input/_text-input.scss b/packages/styles/scss/components/text-input/_text-input.scss
+--- a/packages/styles/scss/components/text-input/_text-input.scss
++++ b/packages/styles/scss/components/text-input/_text-input.scss
+@@ -236,6 +236,10 @@
+     box-shadow: none;
+   }
+ 
++  .#{$prefix}--text-input--invalid:focus {
++    @include focus-outline('outline-lg');
++  }
++
+   //-----------------------------
+   // Skeleton
+   //-----------------------------
+@@ -322,7 +326,10 @@
+   }
+ 
+   .#{$prefix}--form--fluid
+-    .#{$prefix}--text-input__field-wrapper[data-invalid]:focus-within,
++    .#{$prefix}--text-input__field-wrapper[data-invalid]:focus-within {
++    @include focus-outline('outline-lg');
++  }
++
+   .#{$prefix}--form--fluid
+     .#{$prefix}--text-input__field-wrapper--warning:focus-within {
+     @include focus-outline('outline');
+
+diff --git a/packages/styles/scss/utilities/_focus-outline.scss b/packages/styles/scss/utilities/_focus-outline.scss
+--- a/packages/styles/scss/utilities/_focus-outline.scss
++++ b/packages/styles/scss/utilities/_focus-outline.scss
+@@ -9,7 +9,7 @@
+ 
+ /// Adds outline styles depending on specific type
+ /// @access public
+-/// @param {String} $type ['border'] - Type of outline from: `border`, `blurred`, `outline`, `invalid`, `reset`
++/// @param {String} $type ['border'] - Type of outline from: `border`, `blurred`, `outline`, `outline-lg`, `invalid`, `reset`
+ /// @example @include focus-outline('outline');
+ /// @group utilities
+ @mixin focus-outline($type: 'border') {
+@@ -35,6 +35,15 @@
+     }
+   }
+ 
++  @if ($type == 'outline-lg') {
++    outline: 4px solid theme.$focus;
++    outline-offset: -4px;
++
++    @media screen and (prefers-contrast) {
++      outline-style: dotted;
++    }
++  }
++
+   @if ($type == 'outline-compat') {
+     box-sizing: border-box;
+     border: 2px solid theme.$focus;
