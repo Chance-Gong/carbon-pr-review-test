@@ -1,0 +1,86 @@
+[
+  {
+    "sha": "24c60c664c9382ad5c48477209ea34c5a4098ebe",
+    "filename": "packages/react/src/components/FormGroup/FormGroup.stories.js",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 17,
+    "changes": 23,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Freact%2Fsrc%2Fcomponents%2FFormGroup%2FFormGroup.stories.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Freact%2Fsrc%2Fcomponents%2FFormGroup%2FFormGroup.stories.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FFormGroup%2FFormGroup.stories.js?ref=544320003378e5e50ea0f1a27fd206037d71a8c7",
+    "patch": "@@ -7,10 +7,7 @@\n \n import React from 'react';\n import { FormGroup } from '../FormGroup';\n-import TextInput from '../TextInput';\n-import RadioButtonGroup from '../RadioButtonGroup';\n-import RadioButton from '../RadioButton';\n-import Button from '../Button';\n+import Checkbox from '../Checkbox';\n import { Stack } from '../Stack';\n \n import mdx from './FormGroup.mdx';\n@@ -31,18 +28,10 @@ export default {\n export const Default = (args) => {\n   return (\n     <FormGroup style={{ maxWidth: '400px' }} {...args}>\n-      <Stack gap={7}>\n-        <TextInput id=\"one\" labelText=\"First Name\" />\n-        <TextInput id=\"two\" labelText=\"Last Name\" />\n-        <RadioButtonGroup\n-          legendText=\"Radio button heading\"\n-          name=\"formgroup-default-radio-button-group\"\n-          defaultSelected=\"radio-1\">\n-          <RadioButton labelText=\"Option 1\" value=\"radio-1\" id=\"radio-1\" />\n-          <RadioButton labelText=\"Option 2\" value=\"radio-2\" id=\"radio-2\" />\n-          <RadioButton labelText=\"Option 3\" value=\"radio-3\" id=\"radio-3\" />\n-        </RadioButtonGroup>\n-        <Button>Submit</Button>\n+      <Stack gap={3}>\n+        <Checkbox id=\"form-group-email\" labelText=\"Email\" />\n+        <Checkbox id=\"form-group-phone\" labelText=\"Phone\" />\n+        <Checkbox id=\"form-group-text-message\" labelText=\"Text message\" />\n       </Stack>\n     </FormGroup>\n   );\n@@ -73,6 +62,6 @@ Default.argTypes = {\n \n Default.args = {\n   legendId: 'form-group-1',\n-  legendText: 'FormGroup Legend',\n+  legendText: 'Contact preferences',\n   message: false,\n };"
+  },
+  {
+    "sha": "aa0d31bf710d05b2610a144ebcb4dc7da409a618",
+    "filename": "packages/react/src/components/FormLabel/FormLabel.stories.js",
+    "status": "modified",
+    "additions": 0,
+    "deletions": 1,
+    "changes": 1,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Freact%2Fsrc%2Fcomponents%2FFormLabel%2FFormLabel.stories.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Freact%2Fsrc%2Fcomponents%2FFormLabel%2FFormLabel.stories.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FFormLabel%2FFormLabel.stories.js?ref=544320003378e5e50ea0f1a27fd206037d71a8c7",
+    "patch": "@@ -8,7 +8,6 @@\n import React from 'react';\n \n import FormLabel from './FormLabel';\n-import { Tooltip } from '../Tooltip';\n import { Information } from '@carbon/icons-react';\n import { ActionableNotification } from '../Notification';\n import { Toggletip, ToggletipButton, ToggletipContent } from '../Toggletip';"
+  },
+  {
+    "sha": "793b31f4ec5c521c5b429fb9beb0b198e9cec5ac",
+    "filename": "packages/styles/scss/components/__tests__/fluid-text-input-test.js",
+    "status": "modified",
+    "additions": 13,
+    "deletions": 0,
+    "changes": 13,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Fstyles%2Fscss%2Fcomponents%2F__tests__%2Ffluid-text-input-test.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Fstyles%2Fscss%2Fcomponents%2F__tests__%2Ffluid-text-input-test.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fstyles%2Fscss%2Fcomponents%2F__tests__%2Ffluid-text-input-test.js?ref=544320003378e5e50ea0f1a27fd206037d71a8c7",
+    "patch": "@@ -24,4 +24,17 @@ describe('scss/components/fluid-text-input', () => {\n     `);\n     expect(unwrap('mixin')).toBe(true);\n   });\n+\n+  test('invalid inputs have a distinct focus indicator', async () => {\n+    const { result } = await render(`\n+      @use '../fluid-text-input';\n+\n+      @include fluid-text-input.fluid-text-input;\n+    `);\n+    const cssText = result.css.toString();\n+\n+    expect(cssText).toMatch(\n+      /\\.cds--text-input--fluid \\.cds--text-input__field-wrapper\\[data-invalid\\]:focus-within\\s*{[^}]*outline: 4px solid[^}]*outline-offset: -4px;/\n+    );\n+  });\n });"
+  },
+  {
+    "sha": "7f53713443d4460d1c7d4cd8b486f9f43d9bb611",
+    "filename": "packages/styles/scss/components/__tests__/text-input-test.js",
+    "status": "modified",
+    "additions": 13,
+    "deletions": 0,
+    "changes": 13,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Fstyles%2Fscss%2Fcomponents%2F__tests__%2Ftext-input-test.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Fstyles%2Fscss%2Fcomponents%2F__tests__%2Ftext-input-test.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fstyles%2Fscss%2Fcomponents%2F__tests__%2Ftext-input-test.js?ref=544320003378e5e50ea0f1a27fd206037d71a8c7",
+    "patch": "@@ -23,4 +23,17 @@ describe('scss/components/text-input', () => {\n      `);\n     expect(unwrap('mixin')).toBe(true);\n   });\n+\n+  test('invalid inputs have a distinct focus indicator', async () => {\n+    const { result } = await render(`\n+      @use '../text-input';\n+\n+      @include text-input.text-input;\n+    `);\n+    const cssText = result.css.toString();\n+\n+    expect(cssText).toMatch(\n+      /\\.cds--text-input--invalid:focus\\s*{[^}]*outline: 4px solid[^}]*outline-offset: -4px;/\n+    );\n+  });\n });"
+  },
+  {
+    "sha": "d0caa76774816c04aa2c52281cca662266a1888d",
+    "filename": "packages/styles/scss/components/fluid-text-input/_fluid-text-input.scss",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 1,
+    "changes": 5,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Fstyles%2Fscss%2Fcomponents%2Ffluid-text-input%2F_fluid-text-input.scss",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Fstyles%2Fscss%2Fcomponents%2Ffluid-text-input%2F_fluid-text-input.scss",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fstyles%2Fscss%2Fcomponents%2Ffluid-text-input%2F_fluid-text-input.scss?ref=544320003378e5e50ea0f1a27fd206037d71a8c7",
+    "patch": "@@ -145,7 +145,10 @@\n   }\n \n   .#{$prefix}--text-input--fluid\n-    .#{$prefix}--text-input__field-wrapper[data-invalid]:focus-within,\n+    .#{$prefix}--text-input__field-wrapper[data-invalid]:focus-within {\n+    @include focus-outline('outline-lg');\n+  }\n+\n   .#{$prefix}--text-input--fluid\n     .#{$prefix}--text-input__field-wrapper--warning:focus-within {\n     @include focus-outline('outline');"
+  },
+  {
+    "sha": "9acdac22e03e5c0014e1afcf1d584b00264a5ba4",
+    "filename": "packages/styles/scss/components/text-input/_text-input.scss",
+    "status": "modified",
+    "additions": 8,
+    "deletions": 1,
+    "changes": 9,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Fstyles%2Fscss%2Fcomponents%2Ftext-input%2F_text-input.scss",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Fstyles%2Fscss%2Fcomponents%2Ftext-input%2F_text-input.scss",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fstyles%2Fscss%2Fcomponents%2Ftext-input%2F_text-input.scss?ref=544320003378e5e50ea0f1a27fd206037d71a8c7",
+    "patch": "@@ -236,6 +236,10 @@\n     box-shadow: none;\n   }\n \n+  .#{$prefix}--text-input--invalid:focus {\n+    @include focus-outline('outline-lg');\n+  }\n+\n   //-----------------------------\n   // Skeleton\n   //-----------------------------\n@@ -322,7 +326,10 @@\n   }\n \n   .#{$prefix}--form--fluid\n-    .#{$prefix}--text-input__field-wrapper[data-invalid]:focus-within,\n+    .#{$prefix}--text-input__field-wrapper[data-invalid]:focus-within {\n+    @include focus-outline('outline-lg');\n+  }\n+\n   .#{$prefix}--form--fluid\n     .#{$prefix}--text-input__field-wrapper--warning:focus-within {\n     @include focus-outline('outline');"
+  },
+  {
+    "sha": "c15dead02fcdf3781b39b739e5eaf91a3ba3ea1a",
+    "filename": "packages/styles/scss/utilities/_focus-outline.scss",
+    "status": "modified",
+    "additions": 10,
+    "deletions": 1,
+    "changes": 11,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Fstyles%2Fscss%2Futilities%2F_focus-outline.scss",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/544320003378e5e50ea0f1a27fd206037d71a8c7/packages%2Fstyles%2Fscss%2Futilities%2F_focus-outline.scss",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fstyles%2Fscss%2Futilities%2F_focus-outline.scss?ref=544320003378e5e50ea0f1a27fd206037d71a8c7",
+    "patch": "@@ -9,7 +9,7 @@\n \n /// Adds outline styles depending on specific type\n /// @access public\n-/// @param {String} $type ['border'] - Type of outline from: `border`, `blurred`, `outline`, `invalid`, `reset`\n+/// @param {String} $type ['border'] - Type of outline from: `border`, `blurred`, `outline`, `outline-lg`, `invalid`, `reset`\n /// @example @include focus-outline('outline');\n /// @group utilities\n @mixin focus-outline($type: 'border') {\n@@ -35,6 +35,15 @@\n     }\n   }\n \n+  @if ($type == 'outline-lg') {\n+    outline: 4px solid theme.$focus;\n+    outline-offset: -4px;\n+\n+    @media screen and (prefers-contrast) {\n+      outline-style: dotted;\n+    }\n+  }\n+\n   @if ($type == 'outline-compat') {\n     box-sizing: border-box;\n     border: 2px solid theme.$focus;"
+  }
+]
