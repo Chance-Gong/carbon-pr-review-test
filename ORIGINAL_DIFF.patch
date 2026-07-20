@@ -1,0 +1,1690 @@
+diff --git a/packages/feature-flags/index.scss b/packages/feature-flags/index.scss
+--- a/packages/feature-flags/index.scss
++++ b/packages/feature-flags/index.scss
+@@ -5,13 +5,24 @@
+ // LICENSE file in the root directory of this source tree.
+ //
+ 
++@use 'sass:list';
+ @use 'sass:map';
+ @use 'sass:string';
+ @use 'scss/generated/feature-flags';
+ 
+ $v12-release-flag: 'enable-v12-release';
+ $v12-flag-prefix: 'enable-v12-';
+ 
++// Flags that carry v12 behavior without the `enable-v12-` prefix. The prefix is
++// the convention, but some flags were named before it settled.
++//
++// Keep in sync with `unprefixedV12Flags` in `src/FeatureFlagScope.ts`. The two
++// are separate implementations of the same rule, and a flag that appears in
++// only one of them gets v12 behavior in Sass but not JavaScript, or the
++// reverse.
++$unprefixed-v12-flags: 'enable-focus-wrap-without-sentinels',
++  'enable-tile-contrast';
++
+ $feature-flags: () !default;
+ $feature-flags: map.merge(
+   feature-flags.$generated-feature-flags,
+@@ -25,12 +36,22 @@ $feature-flags: map.merge(
+   @error 'Unable to find a feature flag named: #{$name}';
+ }
+ 
++/// Check if a flag becomes the default behavior in v12, and so is turned on by
++/// `enable-v12-release`
++/// @param {String} $name
++/// @returns {Boolean}
++@function is-v12-flag($name) {
++  @return $name != $v12-release-flag and
++    (
++      string.index($name, $v12-flag-prefix) == 1 or
++        list.index($unprefixed-v12-flags, $name) != null
++    );
++}
++
+ @function enabled-by-v12-release($name) {
+-  $is-v12-flag: string.index($name, $v12-flag-prefix) == 1;
+   $is-v12-release-enabled: map.get($feature-flags, $v12-release-flag) == true;
+ 
+-  @return $name != $v12-release-flag and $is-v12-flag and
+-    $is-v12-release-enabled;
++  @return is-v12-flag($name) and $is-v12-release-enabled;
+ }
+ 
+ @mixin add($name, $enabled: false) {
+
+diff --git a/packages/feature-flags/src/FeatureFlagScope.ts b/packages/feature-flags/src/FeatureFlagScope.ts
+--- a/packages/feature-flags/src/FeatureFlagScope.ts
++++ b/packages/feature-flags/src/FeatureFlagScope.ts
+@@ -10,9 +10,28 @@ export type FeatureFlagRecord = Record<string, boolean>;
+ /** @deprecated Use `FeatureFlagRecord` instead. */
+ export type FeatureFlags = FeatureFlagRecord;
+ 
+-const v12ReleaseFlag = 'enable-v12-release';
++export const v12ReleaseFlag = 'enable-v12-release';
+ const v12FlagPrefix = 'enable-v12-';
+ 
++// Flags that carry v12 behavior without the `enable-v12-` prefix. The prefix is
++// the convention, but some flags were named before it settled.
++//
++// Keep in sync with `$unprefixed-v12-flags` in `index.scss`. The two are
++// separate implementations of the same rule, and a flag that appears in only
++// one of them gets v12 behavior in JavaScript but not Sass, or the reverse.
++const unprefixedV12Flags = new Set([
++  'enable-focus-wrap-without-sentinels',
++  'enable-tile-contrast',
++]);
++
++/**
++ * Whether a flag becomes the default behavior in v12, and so is turned on by
++ * `enable-v12-release`.
++ */
++export const isV12Flag = (name: string) =>
++  name !== v12ReleaseFlag &&
++  (name.startsWith(v12FlagPrefix) || unprefixedV12Flags.has(name));
++
+ export class FeatureFlagScope {
+   flags: Map<string, boolean>;
+ 
+@@ -88,11 +107,7 @@ export class FeatureFlagScope {
+   enabled(name: string) {
+     this.checkForFlag(name);
+ 
+-    if (
+-      name !== v12ReleaseFlag &&
+-      name.startsWith(v12FlagPrefix) &&
+-      this.flags.get(v12ReleaseFlag) === true
+-    ) {
++    if (isV12Flag(name) && this.flags.get(v12ReleaseFlag) === true) {
+       return true;
+     }
+ 
+
+diff --git a/packages/feature-flags/src/__tests__/feature-flags-test.js b/packages/feature-flags/src/__tests__/feature-flags-test.js
+--- a/packages/feature-flags/src/__tests__/feature-flags-test.js
++++ b/packages/feature-flags/src/__tests__/feature-flags-test.js
+@@ -83,6 +83,34 @@ describe('@carbon/feature-flags', () => {
+       expect(FeatureFlags.enabled('enable-not-v12-example')).toBe(false);
+     });
+ 
++    it('should enable unprefixed v12 flags when the v12 release flag is enabled', () => {
++      FeatureFlags.merge({
++        'enable-v12-release': true,
++        'enable-focus-wrap-without-sentinels': false,
++        'enable-tile-contrast': false,
++      });
++
++      expect(FeatureFlags.enabled('enable-focus-wrap-without-sentinels')).toBe(
++        true
++      );
++      expect(FeatureFlags.enabled('enable-tile-contrast')).toBe(true);
++    });
++
++    it('should not enable the deprecated experimental flags via the v12 release flag', () => {
++      FeatureFlags.merge({
++        'enable-v12-release': true,
++        'enable-experimental-tile-contrast': false,
++        'enable-experimental-focus-wrap-without-sentinels': false,
++      });
++
++      expect(FeatureFlags.enabled('enable-experimental-tile-contrast')).toBe(
++        false
++      );
++      expect(
++        FeatureFlags.enabled('enable-experimental-focus-wrap-without-sentinels')
++      ).toBe(false);
++    });
++
+     it('should allow v12 flags to be enabled independently of the v12 release flag', () => {
+       FeatureFlags.merge({
+         'enable-v12-release': false,
+@@ -121,4 +149,81 @@ describe('@carbon/feature-flags', () => {
+       expect(FeatureFlags.enabled('flag-b')).toBe(false);
+     });
+   });
++
++  describe('notifyAvailableFlag', () => {
++    let info;
++    let notifyAvailableFlag;
++
++    beforeEach(() => {
++      ({ notifyAvailableFlag } = FeatureFlags);
++      info = jest.spyOn(console, 'info').mockImplementation(() => {});
++    });
++
++    afterEach(() => {
++      info.mockRestore();
++    });
++
++    it('should notify when a v12 flag is available but not enabled', () => {
++      notifyAvailableFlag('enable-v12-example', false);
++
++      expect(info).toHaveBeenCalledTimes(1);
++      expect(info.mock.calls[0][0]).toContain('enable-v12-example');
++    });
++
++    it('should only notify once per flag', () => {
++      notifyAvailableFlag('enable-v12-example', false);
++      notifyAvailableFlag('enable-v12-example', false);
++      notifyAvailableFlag('enable-v12-example', false);
++
++      expect(info).toHaveBeenCalledTimes(1);
++    });
++
++    it('should not notify when the flag is already enabled', () => {
++      notifyAvailableFlag('enable-v12-example', true);
++
++      expect(info).not.toHaveBeenCalled();
++    });
++
++    it('should not notify for non-v12 flags', () => {
++      notifyAvailableFlag('enable-example', false);
++
++      expect(info).not.toHaveBeenCalled();
++    });
++
++    it('should not notify for the release flag itself', () => {
++      notifyAvailableFlag('enable-v12-release', false);
++
++      expect(info).not.toHaveBeenCalled();
++    });
++
++    it('should include the flag description when there is one', () => {
++      notifyAvailableFlag('enable-v12-overflowmenu', false);
++
++      expect(info.mock.calls[0][0]).toContain('Menu subcomponents');
++    });
++
++    it('should point at the release flag, which enables every v12 flag', () => {
++      notifyAvailableFlag('enable-v12-overflowmenu', false);
++
++      expect(info.mock.calls[0][0]).toContain(
++        'enable `enable-v12-release` to turn on every v12 flag'
++      );
++    });
++
++    it.each(['enable-focus-wrap-without-sentinels', 'enable-tile-contrast'])(
++      'should notify for the unprefixed v12 flag %s',
++      (flag) => {
++        notifyAvailableFlag(flag, false);
++
++        expect(info).toHaveBeenCalledTimes(1);
++        expect(info.mock.calls[0][0]).toContain(flag);
++      }
++    );
++
++    it('should stay silent for an unprefixed v12 flag that is enabled', () => {
++      notifyAvailableFlag('enable-focus-wrap-without-sentinels', true);
++
++      expect(info).not.toHaveBeenCalled();
++    });
++  });
+ });
+
+diff --git a/packages/feature-flags/src/index.ts b/packages/feature-flags/src/index.ts
+--- a/packages/feature-flags/src/index.ts
++++ b/packages/feature-flags/src/index.ts
+@@ -8,6 +8,10 @@
+ import { featureFlagInfo } from './generated/feature-flags';
+ import { FeatureFlagScope, type FeatureFlagRecord } from './FeatureFlagScope';
+ export type { FeatureFlagRecord } from './FeatureFlagScope';
++// Exported for framework packages whose flag lookup can resolve without
++// reaching a scope. Web Components do this when a component has no
++// `<feature-flags>` ancestor.
++export { notifyAvailableFlag } from './notify';
+ 
+ export const createScope = (flags?: FeatureFlagRecord) =>
+   new FeatureFlagScope(flags);
+
+diff --git a/packages/feature-flags/src/notify.ts b/packages/feature-flags/src/notify.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/feature-flags/src/notify.ts
+@@ -0,0 +1,55 @@
++/**
++ * Copyright IBM Corp. 2015, 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { isV12Flag, v12ReleaseFlag } from './FeatureFlagScope';
++import { featureFlagInfo } from './generated/feature-flags';
++
++const descriptions = new Map<string, string>(
++  featureFlagInfo.map(({ name, description }) => [name, description])
++);
++
++// Flags that have already been reported, so that a flag checked on every render
++// only produces a single notice per session.
++const notified = new Set<string>();
++
++/**
++ * Log a one-time notice that a v12 feature flag is available but not enabled.
++ *
++ * A v12 flag becomes the default behavior in v12, so a consumer on v11 is opted
++ * out of a change they will eventually receive regardless. Surfacing it lets
++ * them preview and migrate on their own schedule instead of absorbing it all at
++ * the major release.
++ *
++ * Only v12 flags are reported. Other flags are opt-in indefinitely and have no
++ * deadline attached, so announcing them would be noise.
++ *
++ * Callers are responsible for restricting this to development. This package is
++ * bundled with `process.env.NODE_ENV` inlined at publish time, so a guard here
++ * would be resolved once when the package is built rather than by the
++ * consumer's bundler. The framework packages guard at their call sites, where
++ * `process.env.NODE_ENV` survives for the consumer to replace.
++ *
++ * @param name - The flag that was checked.
++ * @param enabled - Whether the flag resolved to enabled.
++ */
++export const notifyAvailableFlag = (name: string, enabled: boolean) => {
++  if (enabled || !isV12Flag(name) || notified.has(name)) {
++    return;
++  }
++
++  notified.add(name);
++
++  const description = descriptions.get(name)?.trim();
++
++  // eslint-disable-next-line no-console
++  console.info(
++    `[@carbon/feature-flags] \`${name}\` is available but not enabled.` +
++      (description ? `\n${description}` : '') +
++      `\nThis becomes the default behavior in v12. Enable it to migrate early, ` +
++      `or enable \`${v12ReleaseFlag}\` to turn on every v12 flag at once.`
++  );
++};
+
+diff --git a/packages/react/src/components/ComboBox/ComboBox.tsx b/packages/react/src/components/ComboBox/ComboBox.tsx
+--- a/packages/react/src/components/ComboBox/ComboBox.tsx
++++ b/packages/react/src/components/ComboBox/ComboBox.tsx
+@@ -372,6 +372,23 @@ export interface ComboBoxProps<ItemType>
+   inputProps?: InputHTMLAttributes<HTMLInputElement>;
+ }
+ 
++/**
++ * Combo box component.
++ *
++ * @featureFlag enable-v12-dynamic-floating-styles - Uses Floating UI for
++ * dynamic positioning of the dropdown menu. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12DynamicFloatingStyles>
++ *   <ComboBox id="my-combo-box" items={items} />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ const ComboBox = forwardRef(
+   <ItemType,>(
+     props: ComboBoxProps<ItemType>,
+
+diff --git a/packages/react/src/components/ComboButton/index.tsx b/packages/react/src/components/ComboButton/index.tsx
+--- a/packages/react/src/components/ComboButton/index.tsx
++++ b/packages/react/src/components/ComboButton/index.tsx
+@@ -89,6 +89,25 @@ interface ComboButtonProps extends TranslateWithId<TranslationKey> {
+   tooltipAlignment?: React.ComponentProps<typeof IconButton>['align'];
+ }
+ 
++/**
++ * Combo button component.
++ *
++ * @featureFlag enable-v12-dynamic-floating-styles - Uses Floating UI for
++ * dynamic positioning of the menu. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12DynamicFloatingStyles>
++ *   <ComboButton label="Primary action">
++ *     <MenuItem label="Option" />
++ *   </ComboButton>
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ const ComboButton = React.forwardRef<HTMLDivElement, ComboButtonProps>(
+   function ComboButton(
+     {
+
+diff --git a/packages/react/src/components/ComposedModal/ComposedModal.tsx b/packages/react/src/components/ComposedModal/ComposedModal.tsx
+--- a/packages/react/src/components/ComposedModal/ComposedModal.tsx
++++ b/packages/react/src/components/ComposedModal/ComposedModal.tsx
+@@ -255,6 +255,24 @@ export interface ComposedModalProps extends HTMLAttributes<HTMLDivElement> {
+    */
+   slug?: ReactNode;
+ }
++
++/**
++ * Composed modal component.
++ *
++ * @featureFlag enable-focus-wrap-without-sentinels - Enables a focus-wrapping
++ * strategy that does not rely on sentinel DOM nodes. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableFocusWrapWithoutSentinels>
++ *   <ComposedModal open={open} onClose={handleClose} />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ const ComposedModal = React.forwardRef<HTMLDivElement, ComposedModalProps>(
+   function ComposedModal({ open, ...props }, ref) {
+     const id = useId();
+
+diff --git a/packages/react/src/components/Dropdown/Dropdown.tsx b/packages/react/src/components/Dropdown/Dropdown.tsx
+--- a/packages/react/src/components/Dropdown/Dropdown.tsx
++++ b/packages/react/src/components/Dropdown/Dropdown.tsx
+@@ -285,6 +285,23 @@ function stateReducer(state, actionAndChanges) {
+   }
+ }
+ 
++/**
++ * Dropdown component.
++ *
++ * @featureFlag enable-v12-dynamic-floating-styles - Uses Floating UI for
++ * dynamic positioning of the dropdown menu. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12DynamicFloatingStyles>
++ *   <Dropdown id="my-dropdown" items={items} />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ const Dropdown = React.forwardRef(
+   <ItemType,>(
+     {
+
+diff --git a/packages/react/src/components/FeatureFlags/FeatureFlagsKitchenSink.stories.js b/packages/react/src/components/FeatureFlags/FeatureFlagsKitchenSink.stories.js
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/FeatureFlags/FeatureFlagsKitchenSink.stories.js
+@@ -0,0 +1,264 @@
++/**
++ * Copyright IBM Corp. 2016, 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React, { useState } from 'react';
++
++// `OverflowMenu` is imported from the component index on purpose. The index is
++// the dispatcher that reads `enable-v12-overflowmenu`; importing `./OverflowMenu`
++// reaches the v11 implementation directly and never checks the flag.
++import { OverflowMenu } from '../OverflowMenu';
++import { default as OverflowMenuItem } from '../OverflowMenuItem';
++import { ClickableTile } from '../Tile';
++import { default as RadioTile } from '../RadioTile';
++import { TileGroup } from '../TileGroup';
++import { CheckmarkFilled } from '@carbon/icons-react';
++const prefix = 'cds';
++import { default as Dropdown } from '../Dropdown';
++import { ComposedModal, ModalBody, ModalHeader } from '../ComposedModal';
++import { default as Button } from '../Button';
++import { default as Toggle } from '../Toggle';
++import {
++  StructuredListWrapper,
++  StructuredListHead,
++  StructuredListBody,
++  StructuredListRow,
++  StructuredListInput,
++  StructuredListCell,
++} from '../StructuredList';
++
++export default {
++  title: 'Components/FeatureFlags/Kitchen Sink',
++  parameters: {
++    docs: {
++      description: {
++        component:
++          'Renders every component behind a v12 feature flag in one place. ' +
++          'Open the console and filter for `@carbon/feature-flags`.',
++      },
++    },
++  },
++};
++
++const Section = ({ kind, title, flag, note, children }) => {
++  const color = { logs: '#0f62fe', visual: '#8a3ffc', silent: '#6f6f6f' }[kind];
++  const label = { logs: 'LOGS', visual: 'VISUAL ONLY', silent: 'NO LOG' }[kind];
++
++  return (
++    <section style={{ marginBottom: '2.5rem', maxWidth: '30rem' }}>
++      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
++        <span
++          style={{
++            background: color,
++            color: '#fff',
++            fontSize: '0.625rem',
++            padding: '0.125rem 0.375rem',
++            borderRadius: '2px',
++          }}>
++          {label}
++        </span>
++        <h4 style={{ margin: 0 }}>{title}</h4>
++      </div>
++      <code
++        style={{ display: 'block', margin: '0.25rem 0', fontSize: '0.75rem' }}>
++        {flag}
++      </code>
++      <p
++        style={{
++          margin: '0 0 0.75rem',
++          fontSize: '0.75rem',
++          color: '#525252',
++        }}>
++        {note}
++      </p>
++      {children}
++    </section>
++  );
++};
++
++const items = [
++  { id: 'a', text: 'Option A' },
++  { id: 'b', text: 'Option B' },
++];
++
++export const KitchenSink = () => {
++  const [open, setOpen] = useState(false);
++
++  return (
++    <div style={{ padding: '1rem' }}>
++      <p
++        style={{
++          marginBottom: '2rem',
++          maxWidth: '38rem',
++          fontSize: '0.875rem',
++        }}>
++        <strong>LOGS</strong> — flag is read in JavaScript, so it prints a
++        console notice on v11 and stays silent on v12.{' '}
++        <strong>VISUAL ONLY</strong> — flag is read in Sass, never in
++        JavaScript, so it can never log. Compare the rendering between the v11
++        and v12 storybooks instead. <strong>NO LOG</strong> — not a v12 flag, so
++        it is intentionally never announced.
++      </p>
++
++      <Section
++        kind="logs"
++        title="OverflowMenu"
++        flag="enable-v12-overflowmenu"
++        note="Uses the Menu subcomponents in v12.">
++        <OverflowMenu aria-label="overflow-menu">
++          <OverflowMenuItem itemText="Item one" />
++          <OverflowMenuItem itemText="Item two" />
++        </OverflowMenu>
++      </Section>
++
++      <Section
++        kind="logs"
++        title="Dropdown"
++        flag="enable-v12-dynamic-floating-styles"
++        note="Floating UI drives positioning in v12.">
++        <Dropdown
++          id="kitchen-sink-dropdown"
++          titleText="Dropdown"
++          label="Choose an option"
++          items={items}
++          itemToString={(item) => (item ? item.text : '')}
++        />
++      </Section>
++
++      <Section
++        kind="logs"
++        title="ClickableTile"
++        flag="enable-v12-tile-default-icons"
++        note="Renders a default arrow icon in v12.">
++        <ClickableTile id="kitchen-sink-clickable" href="#">
++          Clickable tile
++        </ClickableTile>
++      </Section>
++
++      <Section
++        kind="logs"
++        title="RadioTile"
++        flag="enable-v12-tile-radio-icons"
++        note="Renders radio icons in v12.">
++        <TileGroup name="kitchen-sink-radio" legend="RadioTile group">
++          <RadioTile id="kitchen-sink-radio-1" value="one">
++            Option one
++          </RadioTile>
++          <RadioTile id="kitchen-sink-radio-2" value="two">
++            Option two
++          </RadioTile>
++        </TileGroup>
++      </Section>
++
++      <Section
++        kind="logs"
++        title="ComposedModal"
++        flag="enable-focus-wrap-without-sentinels"
++        note="A v12 flag without the enable-v12- prefix. Open the modal and tab to the end.">
++        <Button onClick={() => setOpen(true)}>Open modal</Button>
++        <ComposedModal open={open} onClose={() => setOpen(false)}>
++          <ModalHeader title="Kitchen sink modal" />
++          <ModalBody>
++            <p>Tab through to exercise focus wrapping.</p>
++          </ModalBody>
++        </ComposedModal>
++      </Section>
++
++      <Section
++        kind="visual"
++        title="ClickableTile"
++        flag="enable-tile-contrast"
++        note="Sass only. v11: no border. v12: 1px border. Nothing is logged for this flag.">
++        <ClickableTile id="kitchen-sink-clickable" href="#">
++          A border around this tile means enable-tile-contrast is on
++        </ClickableTile>
++      </Section>
++
++      <Section
++        kind="visual"
++        title="StructuredList (old API)"
++        flag="enable-v12-structured-list-visible-icons"
++        note="Old API: StructuredListRow with no selection prop. Requires a manual StructuredListCell containing CheckmarkFilled.">
++        <StructuredListWrapper selection>
++          <StructuredListHead>
++            <StructuredListRow head>
++              <StructuredListCell head>ColumnA</StructuredListCell>
++              <StructuredListCell head>ColumnB</StructuredListCell>
++              <StructuredListCell head>ColumnC</StructuredListCell>
++            </StructuredListRow>
++          </StructuredListHead>
++          <StructuredListBody>
++            {['row-0', 'row-1', 'row-2'].map((value, i) => (
++              <StructuredListRow key={value}>
++                <StructuredListCell>Row {i}</StructuredListCell>
++                <StructuredListCell>Row {i}</StructuredListCell>
++                <StructuredListCell>
++                  Lorem ipsum dolor sit amet
++                </StructuredListCell>
++                <StructuredListInput
++                  id={`kitchen-sink-list-old-${i}`}
++                  value={value}
++                  title={value}
++                  name="kitchen-sink-list-old"
++                  aria-label={value}
++                />
++                <StructuredListCell>
++                  <CheckmarkFilled
++                    className={`${prefix}--structured-list-svg`}
++                    aria-label="select an option">
++                    <title>select an option</title>
++                  </CheckmarkFilled>
++                </StructuredListCell>
++              </StructuredListRow>
++            ))}
++          </StructuredListBody>
++        </StructuredListWrapper>
++      </Section>
++
++      <Section
++        kind="visual"
++        title="StructuredList (new API)"
++        flag="enable-v12-structured-list-visible-icons"
++        note="New API: add selection to StructuredListRow. The icon cell is rendered automatically — no CheckmarkFilled needed.">
++        <StructuredListWrapper selection>
++          <StructuredListHead>
++            <StructuredListRow head selection>
++              <StructuredListCell head>ColumnA</StructuredListCell>
++              <StructuredListCell head>ColumnB</StructuredListCell>
++              <StructuredListCell head>ColumnC</StructuredListCell>
++            </StructuredListRow>
++          </StructuredListHead>
++          <StructuredListBody>
++            {['row-0', 'row-1', 'row-2'].map((value, i) => (
++              <StructuredListRow key={value} selection>
++                <StructuredListCell>Row {i}</StructuredListCell>
++                <StructuredListCell>Row {i}</StructuredListCell>
++                <StructuredListCell>
++                  Lorem ipsum dolor sit amet
++                </StructuredListCell>
++                <StructuredListInput
++                  id={`kitchen-sink-list-new-${i}`}
++                  value={value}
++                  title={value}
++                  name="kitchen-sink-list-new"
++                  aria-label={value}
++                />
++              </StructuredListRow>
++            ))}
++          </StructuredListBody>
++        </StructuredListWrapper>
++      </Section>
++
++      <Section
++        kind="visual"
++        title="Toggle"
++        flag="enable-v12-toggle-reduced-label-spacing"
++        note="Sass only. v12 reduces the gap between the control and its label.">
++        <Toggle id="kitchen-sink-toggle" labelText="Toggle" />
++      </Section>
++    </div>
++  );
++};
+
+diff --git a/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js b/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js
+--- a/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js
++++ b/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js
+@@ -1014,4 +1014,62 @@ describe('FeatureFlags', () => {
+       });
+     });
+   });
++
++  // Notices are deduped per flag for the lifetime of the module, so each test
++  // uses a flag name of its own rather than resetting shared state.
++  describe('v12 flag notice', () => {
++    let info;
++
++    beforeEach(() => {
++      info = jest.spyOn(console, 'info').mockImplementation(() => {});
++    });
++
++    afterEach(() => {
++      info.mockRestore();
++    });
++
++    it('should notify when a v12 flag is available but not enabled', () => {
++      add('enable-v12-notice-available', false);
++
++      function TestComponent() {
++        useFeatureFlag('enable-v12-notice-available');
++        return null;
++      }
++
++      render(<TestComponent />);
++
++      expect(info).toHaveBeenCalledTimes(1);
++      expect(info.mock.calls[0][0]).toContain('enable-v12-notice-available');
++    });
++
++    it('should not notify for a flag enabled by the v12 release flag', () => {
++      add('enable-v12-notice-released', false);
++
++      function TestComponent() {
++        useFeatureFlag('enable-v12-notice-released');
++        return null;
++      }
++
++      render(
++        <FeatureFlags enableV12Release>
++          <TestComponent />
++        </FeatureFlags>
++      );
++
++      expect(info).not.toHaveBeenCalled();
++    });
++
++    it('should not notify for non-v12 flags', () => {
++      add('enable-notice-non-v12', false);
++
++      function TestComponent() {
++        useFeatureFlag('enable-notice-non-v12');
++        return null;
++      }
++
++      render(<TestComponent />);
++
++      expect(info).not.toHaveBeenCalled();
++    });
++  });
+ });
+
+diff --git a/packages/react/src/components/FeatureFlags/index.tsx b/packages/react/src/components/FeatureFlags/index.tsx
+--- a/packages/react/src/components/FeatureFlags/index.tsx
++++ b/packages/react/src/components/FeatureFlags/index.tsx
+@@ -8,6 +8,7 @@
+ import {
+   FeatureFlags as GlobalFeatureFlags,
+   createScope,
++  notifyAvailableFlag,
+ } from '@carbon/feature-flags';
+ import PropTypes from 'prop-types';
+ import React, {
+@@ -20,17 +21,86 @@ import { deprecate } from '../../prop-types/deprecate';
+ 
+ export interface FeatureFlagsProps {
+   children?: ReactNode;
++
++  /**
++   * Provide the feature flags to enable or disable in the current React tree.
++   *
++   * @deprecated Use the individual boolean props instead. Run the
++   * `featureflag-deprecate-flags-prop` codemod to migrate:
++   * `npx @carbon/upgrade migrate featureflag-deprecate-flags-prop --write`
++   */
+   flags?: Record<string, boolean>;
++
++  /**
++   * Enable the features and functionality for the v12 Release.
++   *
++   * Enabling this turns on every `enableV12*` flag at once.
++   */
+   enableV12Release?: boolean;
++
++  /**
++   * Enable rendering of default icons in the tile components.
++   *
++   * Becomes the default behavior in v12.
++   */
+   enableV12TileDefaultIcons?: boolean;
++
++  /**
++   * Enable rendering of radio icons in the `RadioTile` component.
++   *
++   * Becomes the default behavior in v12.
++   */
+   enableV12TileRadioIcons?: boolean;
++
++  /**
++   * Enable the use of the v12 `OverflowMenu` leveraging the `Menu`
++   * subcomponents.
++   *
++   * Becomes the default behavior in v12.
++   */
+   enableV12Overflowmenu?: boolean;
++
++  /**
++   * Enable the new `TreeView` controllable API.
++   */
+   enableTreeviewControllable?: boolean;
++
++  /**
++   * Enable the new focus wrap behavior that doesn't use sentinel nodes.
++   *
++   * @deprecated Use `enableFocusWrapWithoutSentinels` instead.
++   */
+   enableExperimentalFocusWrapWithoutSentinels?: boolean;
++
++  /**
++   * Enable the new focus wrap behavior that doesn't use sentinel nodes.
++   */
+   enableFocusWrapWithoutSentinels?: boolean;
++
++  /**
++   * Enable components to utilize the native `dialog` element.
++   */
+   enableDialogElement?: boolean;
++
++  /**
++   * Enable dynamic setting of floating styles for components like `Popover`,
++   * `Tooltip`, etc.
++   *
++   * Becomes the default behavior in v12.
++   */
+   enableV12DynamicFloatingStyles?: boolean;
++
++  /**
++   * Enable enhanced functionality for the `FileUploader` component, including
++   * richer callback data and expanded trigger events for `onChange` and
++   * `onDelete`.
++   */
+   enableEnhancedFileUploader?: boolean;
++
++  /**
++   * Enable components to remain unmounted in closed state and mount in open
++   * state.
++   */
+   enablePresence?: boolean;
+ }
+ 
+@@ -169,7 +239,13 @@ FeatureFlags.propTypes = {
+  */
+ export const useFeatureFlag = (flag: string) => {
+   const scope = useContext(FeatureFlagContext);
+-  return scope.enabled(flag);
++  const enabled = scope.enabled(flag);
++
++  if (process.env.NODE_ENV !== 'production') {
++    notifyAvailableFlag(flag, enabled);
++  }
++
++  return enabled;
+ };
+ 
+ /**
+
+diff --git a/packages/react/src/components/FileUploader/FileUploader.tsx b/packages/react/src/components/FileUploader/FileUploader.tsx
+--- a/packages/react/src/components/FileUploader/FileUploader.tsx
++++ b/packages/react/src/components/FileUploader/FileUploader.tsx
+@@ -171,6 +171,24 @@ export interface FileUploaderHandle {
+   setCurrentFiles?: (files: FileItem[]) => void;
+ }
+ 
++/**
++ * File uploader component.
++ *
++ * @featureFlag enable-enhanced-file-uploader - Enables richer `onChange`/
++ * `onDelete` callbacks that provide file metadata, and expands the trigger
++ * events.
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableEnhancedFileUploader>
++ *   <FileUploader labelTitle="Upload files" buttonLabel="Add file" />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ const FileUploader = forwardRef<FileUploaderHandle, FileUploaderProps>(
+   (
+     {
+
+diff --git a/packages/react/src/components/Grid/Grid.tsx b/packages/react/src/components/Grid/Grid.tsx
+--- a/packages/react/src/components/Grid/Grid.tsx
++++ b/packages/react/src/components/Grid/Grid.tsx
+@@ -12,6 +12,25 @@ import { CSSGrid } from './CSSGrid';
+ import { FlexGrid } from './FlexGrid';
+ import { GridComponent, GridProps } from './GridTypes';
+ 
++/**
++ * Grid component.
++ *
++ * @featureFlag enable-css-grid - Switches the grid implementation from
++ * Flexbox (`FlexGrid`) to CSS Grid (`CSSGrid`).
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags flags={{ 'enable-css-grid': true }}>
++ *   <Grid>
++ *     <Column lg={4}>Content</Column>
++ *   </Grid>
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ function Grid<T extends React.ElementType>(props: GridProps<T>) {
+   const enableCSSGrid = useFeatureFlag('enable-css-grid');
+   if (enableCSSGrid) {
+
+diff --git a/packages/react/src/components/MenuButton/index.tsx b/packages/react/src/components/MenuButton/index.tsx
+--- a/packages/react/src/components/MenuButton/index.tsx
++++ b/packages/react/src/components/MenuButton/index.tsx
+@@ -93,6 +93,25 @@ export interface MenuButtonProps extends ComponentProps<'div'> {
+   menuTarget?: Element;
+ }
+ 
++/**
++ * Menu button component.
++ *
++ * @featureFlag enable-v12-dynamic-floating-styles - Uses Floating UI for
++ * dynamic positioning of the menu. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12DynamicFloatingStyles>
++ *   <MenuButton label="Actions">
++ *     <MenuItem label="Option" />
++ *   </MenuButton>
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ // eslint-disable-next-line react/display-name -- https://github.com/carbon-design-system/carbon/issues/20452
+ const MenuButton = forwardRef<HTMLDivElement, MenuButtonProps>(
+   (
+
+diff --git a/packages/react/src/components/Modal/Modal.tsx b/packages/react/src/components/Modal/Modal.tsx
+--- a/packages/react/src/components/Modal/Modal.tsx
++++ b/packages/react/src/components/Modal/Modal.tsx
+@@ -257,6 +257,30 @@ export interface ModalProps extends HTMLAttributes<HTMLDivElement> {
+    */
+   slug?: ReactNode;
+ }
++
++/**
++ * Modal component.
++ *
++ * @featureFlag enable-presence - Mounts the modal in the DOM only when open,
++ * unmounts when closed.
++ *
++ * @featureFlag enable-dialog-element - Uses the native `<dialog>` element
++ * instead of a `<div>` with ARIA attributes.
++ *
++ * @featureFlag enable-focus-wrap-without-sentinels - Wraps focus without
++ * relying on sentinel DOM nodes. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enablePresence enableDialogElement enableFocusWrapWithoutSentinels>
++ *   <Modal open={open} onRequestClose={handleClose} />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal(
+   { open, ...props },
+   ref
+
+diff --git a/packages/react/src/components/MultiSelect/MultiSelect.tsx b/packages/react/src/components/MultiSelect/MultiSelect.tsx
+--- a/packages/react/src/components/MultiSelect/MultiSelect.tsx
++++ b/packages/react/src/components/MultiSelect/MultiSelect.tsx
+@@ -293,6 +293,23 @@ export interface MultiSelectProps<ItemType>
+   warnText?: ReactNode;
+ }
+ 
++/**
++ * Multi-select component.
++ *
++ * @featureFlag enable-v12-dynamic-floating-styles - Uses Floating UI for
++ * dynamic positioning of the dropdown menu. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12DynamicFloatingStyles>
++ *   <MultiSelect id="my-multi-select" items={items} />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ export const MultiSelect = React.forwardRef(
+   <ItemType,>(
+     {
+
+diff --git a/packages/react/src/components/Notification/Notification.tsx b/packages/react/src/components/Notification/Notification.tsx
+--- a/packages/react/src/components/Notification/Notification.tsx
++++ b/packages/react/src/components/Notification/Notification.tsx
+@@ -925,6 +925,24 @@ export interface ActionableNotificationProps
+   title?: string;
+ }
+ 
++/**
++ * Actionable notification component.
++ *
++ * @featureFlag enable-focus-wrap-without-sentinels - Wraps focus inside the
++ * notification without relying on sentinel DOM nodes.
++ * **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableFocusWrapWithoutSentinels>
++ *   <ActionableNotification title="Title" subtitle="Subtitle" />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ export function ActionableNotification({
+   actionButtonLabel,
+   ['aria-label']: ariaLabel,
+
+diff --git a/packages/react/src/components/OverflowMenu/OverflowMenu.tsx b/packages/react/src/components/OverflowMenu/OverflowMenu.tsx
+--- a/packages/react/src/components/OverflowMenu/OverflowMenu.tsx
++++ b/packages/react/src/components/OverflowMenu/OverflowMenu.tsx
+@@ -256,6 +256,23 @@ export interface OverflowMenuProps
+   innerRef?: Ref<any>;
+ }
+ 
++/**
++ * Overflow menu component.
++ *
++ * @featureFlag enable-v12-overflowmenu - Replaces this implementation with the
++ * newer `Menu`-based version. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12Overflowmenu>
++ *   <OverflowMenu />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ // eslint-disable-next-line react/display-name -- https://github.com/carbon-design-system/carbon/issues/20452
+ export const OverflowMenu = forwardRef<HTMLButtonElement, OverflowMenuProps>(
+   (
+
+diff --git a/packages/react/src/components/OverflowMenu/index.tsx b/packages/react/src/components/OverflowMenu/index.tsx
+--- a/packages/react/src/components/OverflowMenu/index.tsx
++++ b/packages/react/src/components/OverflowMenu/index.tsx
+@@ -13,6 +13,23 @@ import {
+   type OverflowMenuProps,
+ } from './OverflowMenu';
+ 
++/**
++ * Overflow menu component.
++ *
++ * @featureFlag enable-v12-overflowmenu - Switches to the newer `Menu`-based
++ * implementation. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12Overflowmenu>
++ *   <OverflowMenu />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ const OverflowMenu = forwardRef<HTMLDivElement, OverflowMenuProps>(
+   (props, ref) => {
+     const enableV12OverflowMenu = useFeatureFlag('enable-v12-overflowmenu');
+
+diff --git a/packages/react/src/components/OverflowMenu/next/index.tsx b/packages/react/src/components/OverflowMenu/next/index.tsx
+--- a/packages/react/src/components/OverflowMenu/next/index.tsx
++++ b/packages/react/src/components/OverflowMenu/next/index.tsx
+@@ -75,6 +75,24 @@ interface OverflowMenuProps {
+   menuTarget?: Element;
+ }
+ 
++/**
++ * v12 Menu-based overflow menu component. Active when `enable-v12-overflowmenu`
++ * is enabled.
++ *
++ * @featureFlag enable-v12-dynamic-floating-styles - Uses Floating UI for
++ * dynamic positioning of the menu. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12Overflowmenu enableV12DynamicFloatingStyles>
++ *   <OverflowMenu />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ // eslint-disable-next-line react/display-name -- https://github.com/carbon-design-system/carbon/issues/20452
+ const OverflowMenu = React.forwardRef<HTMLDivElement, OverflowMenuProps>(
+   (
+
+diff --git a/packages/react/src/components/Popover/index.tsx b/packages/react/src/components/Popover/index.tsx
+--- a/packages/react/src/components/Popover/index.tsx
++++ b/packages/react/src/components/Popover/index.tsx
+@@ -164,6 +164,25 @@ export type PopoverComponent = <E extends React.ElementType = 'span'>(
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/carbon-design-system/carbon/issues/20452
+ ) => React.ReactElement | any;
+ 
++/**
++ * Popover component.
++ *
++ * @featureFlag enable-v12-dynamic-floating-styles - Uses Floating UI for
++ * dynamic positioning of the popover. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12DynamicFloatingStyles>
++ *   <Popover open>
++ *     <PopoverContent>Content</PopoverContent>
++ *   </Popover>
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ export const Popover: PopoverComponent & {
+   displayName?: string;
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- https://github.com/carbon-design-system/carbon/issues/20452
+
+diff --git a/packages/react/src/components/RadioTile/RadioTile.tsx b/packages/react/src/components/RadioTile/RadioTile.tsx
+--- a/packages/react/src/components/RadioTile/RadioTile.tsx
++++ b/packages/react/src/components/RadioTile/RadioTile.tsx
+@@ -108,6 +108,25 @@ export interface RadioTileProps {
+ }
+ type AriaSupportedProps = React.AriaAttributes;
+ 
++/**
++ * Radio tile component.
++ *
++ * @featureFlag enable-v12-tile-radio-icons - Renders radio selection icons
++ * inside the tile. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12TileRadioIcons>
++ *   <TileGroup>
++ *     <RadioTile value="option-1">Option 1</RadioTile>
++ *   </TileGroup>
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ const RadioTile = React.forwardRef(
+   (
+     {
+
+diff --git a/packages/react/src/components/StructuredList/StructuredList.stories.js b/packages/react/src/components/StructuredList/StructuredList.stories.js
+--- a/packages/react/src/components/StructuredList/StructuredList.stories.js
++++ b/packages/react/src/components/StructuredList/StructuredList.stories.js
+@@ -18,7 +18,7 @@ import {
+   StructuredListCell,
+ } from './';
+ import { CheckmarkFilled } from '@carbon/icons-react';
+-const prefix = 'cds';
++const prefix = 'cds'; // TODO: remove
+ import StructuredListSkeleton from './StructuredList.Skeleton';
+ 
+ export default {
+
+diff --git a/packages/react/src/components/Tile/Tile.tsx b/packages/react/src/components/Tile/Tile.tsx
+--- a/packages/react/src/components/Tile/Tile.tsx
++++ b/packages/react/src/components/Tile/Tile.tsx
+@@ -214,6 +214,23 @@ export interface ClickableTileProps extends HTMLAttributes<HTMLAnchorElement> {
+   slug?: boolean;
+ }
+ 
++/**
++ * Clickable tile component.
++ *
++ * @featureFlag enable-v12-tile-default-icons - Renders a default arrow icon
++ * inside the tile. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12TileDefaultIcons>
++ *   <ClickableTile href="#" />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ export const ClickableTile = React.forwardRef<
+   HTMLAnchorElement,
+   ClickableTileProps
+
+diff --git a/packages/react/src/components/Toggle/Toggle.tsx b/packages/react/src/components/Toggle/Toggle.tsx
+--- a/packages/react/src/components/Toggle/Toggle.tsx
++++ b/packages/react/src/components/Toggle/Toggle.tsx
+@@ -99,6 +99,23 @@ export interface ToggleProps
+   toggled?: boolean;
+ }
+ 
++/**
++ * Toggle component.
++ *
++ * @featureFlag enable-v12-toggle-reduced-label-spacing - Reduces the spacing
++ * between the toggle control and its label. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableV12ToggleReducedLabelSpacing>
++ *   <Toggle labelText="Label" />
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ export function Toggle({
+   'aria-labelledby': ariaLabelledby,
+   className,
+
+diff --git a/packages/react/src/components/TreeView/TreeNode.tsx b/packages/react/src/components/TreeView/TreeNode.tsx
+--- a/packages/react/src/components/TreeView/TreeNode.tsx
++++ b/packages/react/src/components/TreeView/TreeNode.tsx
+@@ -246,6 +246,25 @@ const useEllipsisCheck = (
+   };
+ };
+ 
++/**
++ * Tree node component.
++ *
++ * @featureFlag enable-treeview-controllable - Enables the controllable API;
++ * used internally by `TreeView` when the flag is on.
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableTreeviewControllable>
++ *   <TreeView label="Tree view">
++ *     <TreeNode id="node-1" label="Node 1" />
++ *   </TreeView>
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ const TreeNode = React.forwardRef<HTMLElement, TreeNodeProps>(
+   (
+     {
+
+diff --git a/packages/react/src/components/TreeView/TreeView.tsx b/packages/react/src/components/TreeView/TreeView.tsx
+--- a/packages/react/src/components/TreeView/TreeView.tsx
++++ b/packages/react/src/components/TreeView/TreeView.tsx
+@@ -77,6 +77,25 @@ type TreeViewComponent = {
+   TreeNode: typeof TreeNode;
+ };
+ 
++/**
++ * Tree view component.
++ *
++ * @featureFlag enable-treeview-controllable - Enables the controllable API for
++ * `TreeView`, allowing external state to drive the active/selected nodes.
++ *
++ * Enable in your app:
++ * ```jsx
++ * import { FeatureFlags } from '@carbon/react';
++ *
++ * <FeatureFlags enableTreeviewControllable>
++ *   <TreeView label="Tree view">
++ *     <TreeNode id="node-1" label="Node 1" />
++ *   </TreeView>
++ * </FeatureFlags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
++ */
+ const TreeView: TreeViewComponent = ({
+   active: prespecifiedActive,
+   children,
+
+diff --git a/packages/web-components/src/components/feature-flags/feature-flags-kitchen-sink.stories.ts b/packages/web-components/src/components/feature-flags/feature-flags-kitchen-sink.stories.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/web-components/src/components/feature-flags/feature-flags-kitchen-sink.stories.ts
+@@ -0,0 +1,171 @@
++/**
++ * Copyright IBM Corp. 2025, 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { html } from 'lit';
++import './index';
++import '../overflow-menu/overflow-menu';
++import '../overflow-menu/overflow-menu-body';
++import '../overflow-menu/overflow-menu-item';
++import '../tile/index';
++import '../toggle/index';
++import '../structured-list/index';
++import { prefix } from '../../globals/settings';
++import OverflowMenuVertical16 from '@carbon/icons/es/overflow-menu--vertical/16.js';
++import { iconLoader } from '../../globals/internal/icon-loader';
++
++export default {
++  title: 'Components/FeatureFlags/Kitchen Sink',
++  parameters: {
++    docs: {
++      description: {
++        component:
++          'Renders every component behind a v12 feature flag in one place. ' +
++          'Open the console and filter for `@carbon/feature-flags`.',
++      },
++    },
++  },
++};
++
++const badges = {
++  logs: ['LOGS', '#0f62fe'],
++  visual: ['VISUAL ONLY', '#8a3ffc'],
++};
++
++const section = (kind: 'logs' | 'visual', title, flag, note, content) => {
++  const [label, color] = badges[kind];
++  return html`
++    <section style="margin-bottom:2.5rem;max-width:30rem">
++      <div style="display:flex;align-items:center;gap:0.5rem">
++        <span
++          style="background:${color};color:#fff;font-size:0.625rem;padding:0.125rem 0.375rem;border-radius:2px">
++          ${label}
++        </span>
++        <h4 style="margin:0">${title}</h4>
++      </div>
++      <code style="display:block;margin:0.25rem 0;font-size:0.75rem">
++        ${flag}
++      </code>
++      <p style="margin:0 0 0.75rem;font-size:0.75rem;color:#525252">${note}</p>
++      ${content}
++    </section>
++  `;
++};
++
++/**
++ * Components render without a `<feature-flags>` wrapper on purpose. That is the
++ * path where `isFeatureFlagEnabled` resolves to `false` without ever reaching a
++ * scope, which is what a real consumer hits. The v12 storybook wraps every story
++ * for you, so this same story is the silent case there.
++ */
++export const KitchenSink = {
++  render: () => html`
++    <div style="padding:1rem">
++      <p style="margin-bottom:2rem;max-width:38rem;font-size:0.875rem">
++        <strong>LOGS</strong> — flag is read in JavaScript, so it prints a
++        console notice on v11 and stays silent on v12.
++        <strong>VISUAL ONLY</strong> — flag is read in Sass, never in
++        JavaScript, so it can never log. Compare the rendering between the v11
++        and v12 storybooks instead.
++      </p>
++
++      ${section(
++        'logs',
++        'cds-overflow-menu',
++        'enable-v12-overflowmenu',
++        'Logs on render. This component also reads enable-v12-dynamic-floating-styles, but that flag can never be reported in Web Components: it is only read from _syncMenuChild(), which returns early unless a `cds-menu` child exists — and that child only exists once enable-v12-overflowmenu is already on. By then the floating flag is on too, so there is nothing to report. React reads it unconditionally and does log it.',
++        html`<cds-overflow-menu>
++          ${iconLoader(OverflowMenuVertical16, {
++            class: `${prefix}--overflow-menu__icon`,
++            slot: 'icon',
++          })}
++          <span slot="tooltip-content">Options</span>
++          <cds-overflow-menu-body>
++            <cds-overflow-menu-item>Item one</cds-overflow-menu-item>
++            <cds-overflow-menu-item>Item two</cds-overflow-menu-item>
++          </cds-overflow-menu-body>
++        </cds-overflow-menu>`
++      )}
++      ${section(
++        'logs',
++        'cds-clickable-tile',
++        'enable-v12-tile-default-icons',
++        'Renders default icons in v12.',
++        html`<cds-clickable-tile href="#">Clickable tile</cds-clickable-tile>`
++      )}
++      ${section(
++        'logs',
++        'cds-radio-tile',
++        'enable-v12-tile-radio-icons',
++        'Renders radio icons in v12.',
++        html`<cds-tile-group name="kitchen-sink-radio">
++          <cds-radio-tile value="one">Option one</cds-radio-tile>
++          <cds-radio-tile value="two">Option two</cds-radio-tile>
++        </cds-tile-group>`
++      )}
++      ${section(
++        'visual',
++        'cds-clickable-tile (contrast)',
++        'enable-tile-contrast',
++        'Sass only. v11: no border. v12: 1px border. Nothing is logged for this flag.',
++        html`<cds-clickable-tile href="#">
++          A border around this tile means enable-tile-contrast is on
++        </cds-clickable-tile>`
++      )}
++      ${section(
++        'visual',
++        'cds-structured-list',
++        'enable-v12-structured-list-visible-icons',
++        'Sass only. v12 shows the selection icons without needing hover or focus. Use selection-name on cds-structured-list and selection-value on each row — the component renders the input and icon automatically.',
++        html`<cds-structured-list selection-name="kitchen-sink-sl">
++          <cds-structured-list-head>
++            <cds-structured-list-header-row>
++              <cds-structured-list-header-cell
++                >ColumnA</cds-structured-list-header-cell
++              >
++              <cds-structured-list-header-cell
++                >ColumnB</cds-structured-list-header-cell
++              >
++              <cds-structured-list-header-cell
++                >ColumnC</cds-structured-list-header-cell
++              >
++            </cds-structured-list-header-row>
++          </cds-structured-list-head>
++          <cds-structured-list-body>
++            <cds-structured-list-row selection-value="row-0">
++              <cds-structured-list-cell>Row 0</cds-structured-list-cell>
++              <cds-structured-list-cell>Row 0</cds-structured-list-cell>
++              <cds-structured-list-cell
++                >Lorem ipsum dolor sit amet</cds-structured-list-cell
++              >
++            </cds-structured-list-row>
++            <cds-structured-list-row selection-value="row-1">
++              <cds-structured-list-cell>Row 1</cds-structured-list-cell>
++              <cds-structured-list-cell>Row 1</cds-structured-list-cell>
++              <cds-structured-list-cell
++                >Lorem ipsum dolor sit amet</cds-structured-list-cell
++              >
++            </cds-structured-list-row>
++            <cds-structured-list-row selection-value="row-2">
++              <cds-structured-list-cell>Row 2</cds-structured-list-cell>
++              <cds-structured-list-cell>Row 2</cds-structured-list-cell>
++              <cds-structured-list-cell
++                >Lorem ipsum dolor sit amet</cds-structured-list-cell
++              >
++            </cds-structured-list-row>
++          </cds-structured-list-body>
++        </cds-structured-list>`
++      )}
++      ${section(
++        'visual',
++        'cds-toggle',
++        'enable-v12-toggle-reduced-label-spacing',
++        'Sass only. v12 reduces the gap between the control and its label.',
++        html`<cds-toggle label-text="Toggle"></cds-toggle>`
++      )}
++    </div>
++  `,
++};
+
+diff --git a/packages/web-components/src/components/feature-flags/index.ts b/packages/web-components/src/components/feature-flags/index.ts
+--- a/packages/web-components/src/components/feature-flags/index.ts
++++ b/packages/web-components/src/components/feature-flags/index.ts
+@@ -13,10 +13,8 @@
+  *   <component></component>
+  * </feature-flags>
+  *
+- * Available flags:
+- * - enable-dialog-element
+- * - enable-treeview-controllable
+- * - ... (and others listed in observedAttributes)
++ * The supported flags are documented as `@attr` tags on `FeatureFlagsElement`
++ * below, which is also what surfaces them in `custom-elements.json`.
+  *
+  * How to check a Flag in your component:
+  *   import { isFeatureFlagEnabled } from './feature-flags';
+@@ -27,20 +25,53 @@
+ import {
+   FeatureFlags as GlobalFeatureFlags,
+   createScope,
++  notifyAvailableFlag,
+ } from '@carbon/feature-flags';
+ import { carbonElement as customElement } from '../../globals/decorators/carbon-element';
+ import { LitElement, html } from 'lit';
+ 
+-/**
+- * Feature Flags
+- *
+- * @element feature-flags
+- */
+ type FeatureFlags = Record<string, boolean>;
+ 
+ const hasOwn = <T extends object>(obj: T, key: PropertyKey): key is keyof T =>
+   Object.prototype.hasOwnProperty.call(obj, key);
+ 
++/**
++ * Feature Flags
++ *
++ * Provides scoped feature flags to child components. Flags are read from the
++ * nearest `<feature-flags>` ancestor, and nested elements inherit any flag they
++ * do not set themselves.
++ *
++ * Attributes are declared below rather than inferred, because the flag list is
++ * built at runtime from `observedAttributes` and cannot be read statically.
++ *
++ * @element feature-flags
++ *
++ * @attr {boolean} enable-v12-release - Enable the features and functionality
++ * for the v12 Release. Enabling this turns on every `enable-v12-*` flag at
++ * once.
++ * @attr {boolean} enable-v12-tile-default-icons - Enable rendering of default
++ * icons in the tile components. Becomes the default behavior in v12.
++ * @attr {boolean} enable-v12-tile-radio-icons - Enable rendering of radio icons
++ * in the `cds-radio-tile` component. Becomes the default behavior in v12.
++ * @attr {boolean} enable-v12-overflowmenu - Enable the use of the v12
++ * `cds-overflow-menu` leveraging the menu subcomponents. Becomes the default
++ * behavior in v12.
++ * @attr {boolean} enable-v12-dynamic-floating-styles - Enable dynamic setting
++ * of floating styles for components like `cds-popover`, `cds-tooltip`, etc.
++ * Becomes the default behavior in v12.
++ * @attr {boolean} enable-v12-toggle-reduced-label-spacing - Enable a reduced
++ * spacing between the toggle control and its label. Becomes the default
++ * behavior in v12.
++ * @attr {boolean} enable-treeview-controllable - Enable the new `cds-treeview`
++ * controllable API.
++ * @attr {boolean} enable-dialog-element - Enable components to utilize the
++ * native `dialog` element.
++ * @attr {boolean} enable-focus-wrap-without-sentinels - Enable the new focus
++ * wrap behavior that doesn't use sentinel nodes.
++ * @attr {boolean} enable-experimental-focus-wrap-without-sentinels - Deprecated,
++ * use `enable-focus-wrap-without-sentinels` instead.
++ */
+ @customElement('feature-flags')
+ class FeatureFlagsElement extends LitElement {
+   private scope = GlobalFeatureFlags;
+@@ -211,5 +242,11 @@ export function isFeatureFlagEnabled(
+   context: HTMLElement
+ ): boolean {
+   const instance = findParentFeatureFlags(context);
+-  return instance?.isFeatureFlagEnabled(flag) ?? false;
++  const enabled = instance?.isFeatureFlagEnabled(flag) ?? false;
++
++  if (process.env.NODE_ENV !== 'production') {
++    notifyAvailableFlag(flag, enabled);
++  }
++
++  return enabled;
+ }
+
+diff --git a/packages/web-components/src/components/overflow-menu/overflow-menu.ts b/packages/web-components/src/components/overflow-menu/overflow-menu.ts
+--- a/packages/web-components/src/components/overflow-menu/overflow-menu.ts
++++ b/packages/web-components/src/components/overflow-menu/overflow-menu.ts
+@@ -60,6 +60,23 @@ const warnInDev = (message: string) => {
+  *
+  * @element cds-overflow-menu
+  * @slot icon - The icon for the trigger button.
++ *
++ * @featureFlag enable-v12-overflowmenu - Replaces this implementation with the
++ * newer `cds-menu`-based version. **Will be on by default in v12.**
++ *
++ * @featureFlag enable-v12-dynamic-floating-styles - Uses Floating UI for
++ * dynamic positioning of the menu. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```html
++ * import '@carbon/web-components/es/components/feature-flags/feature-flags.js';
++ *
++ * <feature-flags enable-v12-overflowmenu enable-v12-dynamic-floating-styles>
++ *   <cds-overflow-menu></cds-overflow-menu>
++ * </feature-flags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
+  */
+ @customElement(`${prefix}-overflow-menu`)
+ class CDSOverflowMenu
+
+diff --git a/packages/web-components/src/components/tile/clickable-tile.ts b/packages/web-components/src/components/tile/clickable-tile.ts
+--- a/packages/web-components/src/components/tile/clickable-tile.ts
++++ b/packages/web-components/src/components/tile/clickable-tile.ts
+@@ -23,6 +23,20 @@ import { isFeatureFlagEnabled } from '../feature-flags';
+  * Clickable tile.
+  *
+  * @element cds-clickable-tile
++ *
++ * @featureFlag enable-v12-tile-default-icons - Renders a default arrow icon
++ * inside the tile. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```html
++ * import '@carbon/web-components/es/components/feature-flags/feature-flags.js';
++ *
++ * <feature-flags enable-v12-tile-default-icons>
++ *   <cds-clickable-tile href="#"></cds-clickable-tile>
++ * </feature-flags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
+  */
+ @customElement(`${prefix}-clickable-tile`)
+ class CDSClickableTile extends CDSLink {
+
+diff --git a/packages/web-components/src/components/tile/radio-tile.ts b/packages/web-components/src/components/tile/radio-tile.ts
+--- a/packages/web-components/src/components/tile/radio-tile.ts
++++ b/packages/web-components/src/components/tile/radio-tile.ts
+@@ -23,6 +23,22 @@ import { isFeatureFlagEnabled } from '../feature-flags';
+  * @element cds-radio-tile
+  * @fires cds-radio-tile-selected
+  *   The name of the custom event fired after this radio tile changes its selected state.
++ *
++ * @featureFlag enable-v12-tile-radio-icons - Renders radio selection icons
++ * inside the tile. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```html
++ * import '@carbon/web-components/es/components/feature-flags/feature-flags.js';
++ *
++ * <feature-flags enable-v12-tile-radio-icons>
++ *   <cds-tile-group>
++ *     <cds-radio-tile value="option-1">Option 1</cds-radio-tile>
++ *   </cds-tile-group>
++ * </feature-flags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
+  */
+ @customElement(`${prefix}-radio-tile`)
+ class CDSRadioTile extends SelectableTile {
+
+diff --git a/packages/web-components/src/components/toggle/toggle.ts b/packages/web-components/src/components/toggle/toggle.ts
+--- a/packages/web-components/src/components/toggle/toggle.ts
++++ b/packages/web-components/src/components/toggle/toggle.ts
+@@ -26,6 +26,20 @@ export { TOGGLE_SIZE };
+  * @slot checked-text - The text for the checked state.
+  * @slot unchecked-text - The text for the unchecked state.
+  * @fires cds-toggle-changed - The custom event fired after this changebox changes its checked state.
++ *
++ * @featureFlag enable-v12-toggle-reduced-label-spacing - Reduces the spacing
++ * between the toggle control and its label. **Will be on by default in v12.**
++ *
++ * Enable in your app:
++ * ```html
++ * import '@carbon/web-components/es/components/feature-flags/feature-flags.js';
++ *
++ * <feature-flags enable-v12-toggle-reduced-label-spacing>
++ *   <cds-toggle label-text="Label"></cds-toggle>
++ * </feature-flags>
++ * ```
++ *
++ * @see https://github.com/carbon-design-system/carbon/blob/main/docs/feature-flags.md
+  */
+ @customElement(`${prefix}-toggle`)
+ class CDSToggle extends HostListenerMixin(CDSCheckbox) {
