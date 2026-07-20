@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "9e698ab94dfe6f29f88fc4aa1ec091c5be12e4cf",
+    "filename": "packages/web-components/src/components/textarea/textarea.ts",
+    "status": "modified",
+    "additions": 10,
+    "deletions": 1,
+    "changes": 11,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/d30007165cdae70667db2da6d96dc7348aa553c2/packages%2Fweb-components%2Fsrc%2Fcomponents%2Ftextarea%2Ftextarea.ts",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/d30007165cdae70667db2da6d96dc7348aa553c2/packages%2Fweb-components%2Fsrc%2Fcomponents%2Ftextarea%2Ftextarea.ts",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fweb-components%2Fsrc%2Fcomponents%2Ftextarea%2Ftextarea.ts?ref=d30007165cdae70667db2da6d96dc7348aa553c2",
+    "patch": "@@ -232,9 +232,17 @@ class CDSTextarea extends CDSTextInput {\n       return null;\n     };\n \n+    const hasHelperText =\n+      this.helperText ||\n+      (this._slotHelperTextNode?.assignedNodes().length ?? 0) > 0;\n+\n     const helper = html`\n       <div class=\"${helperTextClasses}\" id=\"helper-text\">\n-        <slot name=\"helper-text\">${this.helperText}</slot>\n+        <slot\n+          name=\"helper-text\"\n+          @slotchange=\"${this._handleHelperTextSlotChange}\">\n+          ${this.helperText}\n+        </slot>\n       </div>\n     `;\n \n@@ -271,6 +279,7 @@ class CDSTextarea extends CDSTextInput {\n           cols=\"${ifDefined(this.cols)}\"\n           ?data-invalid=\"${this.invalid}\"\n           ?disabled=\"${this.disabled}\"\n+          ?aria-describedby=\"${hasHelperText ? 'helper-text' : undefined}\"\n           id=\"input\"\n           name=\"${ifNonEmpty(this.name)}\"\n           pattern=\"${ifNonEmpty(this.pattern)}\""
+  },
+  {
+    "sha": "a164d8f9c75216c7a41d3ace7c7ec542865e8598",
+    "filename": "packages/web-components/tests/spec/textarea_spec.ts",
+    "status": "modified",
+    "additions": 9,
+    "deletions": 0,
+    "changes": 9,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/d30007165cdae70667db2da6d96dc7348aa553c2/packages%2Fweb-components%2Ftests%2Fspec%2Ftextarea_spec.ts",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/d30007165cdae70667db2da6d96dc7348aa553c2/packages%2Fweb-components%2Ftests%2Fspec%2Ftextarea_spec.ts",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fweb-components%2Ftests%2Fspec%2Ftextarea_spec.ts?ref=d30007165cdae70667db2da6d96dc7348aa553c2",
+    "patch": "@@ -63,6 +63,15 @@ xdescribe('cds-textarea', () => {\n       });\n     });\n \n+    it('Should associate the helper text with the textarea via aria-describedby', async () => {\n+      render(template({ helperText: 'helper-text-foo' }), document.body);\n+      await Promise.resolve();\n+      const textarea = document.body\n+        .querySelector('cds-textarea')!\n+        .shadowRoot!.querySelector('textarea');\n+      expect(textarea!.getAttribute('aria-describedby')).toBe('helper-text');\n+    });\n+\n     it('Should reflect value in DOM', async () => {\n       render(\n         template({"
+  }
+]
