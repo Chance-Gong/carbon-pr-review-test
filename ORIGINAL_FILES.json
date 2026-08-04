@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "37b51afa4f96221ef2aafc08bb3174965d0ac371",
+    "filename": "packages/react/src/components/ClassPrefix/ClassPrefix.stories.js",
+    "status": "modified",
+    "additions": 20,
+    "deletions": 11,
+    "changes": 31,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/fe66856720ca5649f1137bf3d8815a1d423039b5/packages%2Freact%2Fsrc%2Fcomponents%2FClassPrefix%2FClassPrefix.stories.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/fe66856720ca5649f1137bf3d8815a1d423039b5/packages%2Freact%2Fsrc%2Fcomponents%2FClassPrefix%2FClassPrefix.stories.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FClassPrefix%2FClassPrefix.stories.js?ref=fe66856720ca5649f1137bf3d8815a1d423039b5",
+    "patch": "@@ -1,5 +1,5 @@\n /**\n- * Copyright IBM Corp. 2016, 2023\n+ * Copyright IBM Corp. 2016, 2026\n  *\n  * This source code is licensed under the Apache-2.0 license found in the\n  * LICENSE file in the root directory of this source tree.\n@@ -20,17 +20,26 @@ export default {\n   },\n };\n \n-export const Default = () => {\n-  function ExampleComponent() {\n-    const prefix = usePrefix();\n-    return <p>The current prefix is: {prefix}</p>;\n-  }\n+function ExampleComponent() {\n+  const prefix = usePrefix();\n+\n+  return <p>The current prefix is: {prefix}</p>;\n+}\n+\n+export const Default = (args) => {\n   return (\n-    <>\n+    <ClassPrefix {...args}>\n       <ExampleComponent />\n-      <ClassPrefix prefix=\"custom\">\n-        <ExampleComponent />\n-      </ClassPrefix>\n-    </>\n+    </ClassPrefix>\n   );\n };\n+\n+Default.args = {\n+  prefix: 'custom',\n+};\n+\n+Default.parameters = {\n+  controls: {\n+    include: ['prefix'],\n+  },\n+};"
+  }
+]
