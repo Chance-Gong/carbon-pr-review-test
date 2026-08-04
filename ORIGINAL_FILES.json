@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "003723fbcb4b1b89d3d1f8254ef048c4ca521b7b",
+    "filename": "packages/styles/files.js",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 3,
+    "changes": 9,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/5fea2c9c4d095c56c1e5b2740bb1367eac7ec06c/packages%2Fstyles%2Ffiles.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/5fea2c9c4d095c56c1e5b2740bb1367eac7ec06c/packages%2Fstyles%2Ffiles.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fstyles%2Ffiles.js?ref=5fea2c9c4d095c56c1e5b2740bb1367eac7ec06c",
+    "patch": "@@ -248,22 +248,25 @@ module.exports = {\n \n     // If we have an `_index.scss` entrypoint, we can re-export from the\n     // directory itself\n+    // Sass import specifiers are always `/`-separated, so these are built with\n+    // `path.posix` — plain `path.join` emits `\\` on Windows and every generated\n+    // `@forward` fails to resolve.\n     if (basename === '_index.scss') {\n-      importPath = path.dirname(filepath);\n+      importPath = path.posix.dirname(filepath);\n     } else if (filepath !== 'index.scss') {\n       // Otherwise, let's drop the leading `_` and trailing `.scss` from the\n       // file name to get the import\n       const basename = path\n         .basename(filepath)\n         .replace(/^_/, '')\n         .replace(/\\.scss$/, '');\n-      importPath = path.join(path.dirname(filepath), basename);\n+      importPath = path.posix.join(path.posix.dirname(filepath), basename);\n     }\n \n     return {\n       filepath,\n       relativePath: importPath,\n-      importPath: path.join('@carbon/styles', importPath),\n+      importPath: path.posix.join('@carbon/styles', importPath),\n     };\n   }),\n };"
+  }
+]
