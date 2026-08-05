@@ -1,0 +1,50 @@
+[
+  {
+    "sha": "07c54917e4eb609bd3c524cd791d6ee0427508d7",
+    "filename": "packages/web-components/src/components/date-picker/date-picker-input.ts",
+    "status": "modified",
+    "additions": 17,
+    "deletions": 7,
+    "changes": 24,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/ab6a6362f1c40ce51f12600e4c7fcca2f726507f/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fdate-picker%2Fdate-picker-input.ts",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/ab6a6362f1c40ce51f12600e4c7fcca2f726507f/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fdate-picker%2Fdate-picker-input.ts",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fdate-picker%2Fdate-picker-input.ts?ref=ab6a6362f1c40ce51f12600e4c7fcca2f726507f",
+    "patch": "@@ -63,6 +63,18 @@ class CDSDatePickerInput extends FocusMixin(LitElement) {\n   @query(`.${prefix}--date-picker__icon`)\n   private _iconNode!: SVGElement;\n \n+  /**\n+   * The `<slot>` element for the AI label in the shadow DOM.\n+   */\n+  @query(\"slot[name='ai-label']\")\n+  private _slotAILabelNode!: HTMLSlotElement;\n+\n+  /**\n+   * The `<slot>` element for the slug in the shadow DOM.\n+   */\n+  @query(\"slot[name='slug']\")\n+  private _slotSlugNode!: HTMLSlotElement;\n+\n   /**\n    * Handles `click` event on the calendar icon.\n    *\n@@ -348,20 +360,18 @@ class CDSDatePickerInput extends FocusMixin(LitElement) {\n \n   updated() {\n     this.toggleAttribute('ai-label', this._hasAILabel);\n-    const label = this.shadowRoot?.querySelector(\"slot[name='ai-label']\");\n+    const label = this._slotAILabelNode;\n \n     if (label) {\n       label?.classList.toggle(\n         `${prefix}--slug--revert`,\n         this.querySelector(`${prefix}-ai-label`)?.hasAttribute('revert-active')\n       );\n     } else {\n-      this.shadowRoot\n-        ?.querySelector(\"slot[name='slug']\")\n-        ?.classList.toggle(\n-          `${prefix}--slug--revert`,\n-          this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')\n-        );\n+      this._slotSlugNode?.classList.toggle(\n+        `${prefix}--slug--revert`,\n+        this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')\n+      );\n     }\n   }\n "
+  },
+  {
+    "sha": "30fa9642df13f3ff897ce329f48b8cab410d0d83",
+    "filename": "packages/web-components/src/components/dropdown/dropdown.ts",
+    "status": "modified",
+    "additions": 17,
+    "deletions": 7,
+    "changes": 24,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/ab6a6362f1c40ce51f12600e4c7fcca2f726507f/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fdropdown%2Fdropdown.ts",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/ab6a6362f1c40ce51f12600e4c7fcca2f726507f/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fdropdown%2Fdropdown.ts",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fdropdown%2Fdropdown.ts?ref=ab6a6362f1c40ce51f12600e4c7fcca2f726507f",
+    "patch": "@@ -137,6 +137,18 @@ class CDSDropdown extends ValidityMixin(\n   @query('slot[name=\"title-text\"]')\n   protected _slotTitleTextNode!: HTMLSlotElement;\n \n+  /**\n+   * The `<slot>` element for the AI label in the shadow DOM.\n+   */\n+  @query(\"slot[name='ai-label']\")\n+  private _slotAILabelNode!: HTMLSlotElement;\n+\n+  /**\n+   * The `<slot>` element for the slug in the shadow DOM.\n+   */\n+  @query(\"slot[name='slug']\")\n+  private _slotSlugNode!: HTMLSlotElement;\n+\n   /**\n    * @param itemToSelect A dropdown item. Absense of this argument means clearing selection.\n    * @returns `true` if the selection of this dropdown should change if the given item is selected upon user interaction.\n@@ -1149,19 +1161,17 @@ class CDSDropdown extends ValidityMixin(\n       this.removeAttribute('ai-label');\n     }\n \n-    const label = this.shadowRoot?.querySelector(\"slot[name='ai-label']\");\n+    const label = this._slotAILabelNode;\n     if (label) {\n       label?.classList.toggle(\n         `${prefix}--slug--revert`,\n         this.querySelector(`${prefix}-ai-label`)?.hasAttribute('revert-active')\n       );\n     } else {\n-      this.shadowRoot\n-        ?.querySelector(\"slot[name='slug']\")\n-        ?.classList.toggle(\n-          `${prefix}--slug--revert`,\n-          this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')\n-        );\n+      this._slotSlugNode?.classList.toggle(\n+        `${prefix}--slug--revert`,\n+        this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')\n+      );\n     }\n \n     if ("
+  },
+  {
+    "sha": "87ccf6a68e80c7052655434c326b2f10152c9a6d",
+    "filename": "packages/web-components/src/components/select/select.ts",
+    "status": "modified",
+    "additions": 17,
+    "deletions": 7,
+    "changes": 24,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/ab6a6362f1c40ce51f12600e4c7fcca2f726507f/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fselect%2Fselect.ts",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/ab6a6362f1c40ce51f12600e4c7fcca2f726507f/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fselect%2Fselect.ts",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fselect%2Fselect.ts?ref=ab6a6362f1c40ce51f12600e4c7fcca2f726507f",
+    "patch": "@@ -62,6 +62,18 @@ class CDSSelect extends FormMixin(LitElement) {\n   @queryAll(`.${prefix}--select-option[selected]`)\n   private _selectedOptionNodes!: HTMLOptionElement[];\n \n+  /**\n+   * The `<slot>` element for the AI label in the shadow DOM.\n+   */\n+  @query(\"slot[name='ai-label']\")\n+  private _slotAILabelNode!: HTMLSlotElement;\n+\n+  /**\n+   * The `<slot>` element for the slug in the shadow DOM.\n+   */\n+  @query(\"slot[name='slug']\")\n+  private _slotSlugNode!: HTMLSlotElement;\n+\n   /**\n    * Specify whether the textarea is fluid or not\n    */\n@@ -378,7 +390,7 @@ class CDSSelect extends FormMixin(LitElement) {\n       }\n     }\n \n-    const label = this.shadowRoot?.querySelector(\"slot[name='ai-label']\");\n+    const label = this._slotAILabelNode;\n \n     if (label) {\n       if ((label as HTMLSlotElement).assignedNodes()?.length) {\n@@ -392,12 +404,10 @@ class CDSSelect extends FormMixin(LitElement) {\n         this.querySelector(`${prefix}-ai-label`)?.hasAttribute('revert-active')\n       );\n     } else {\n-      this.shadowRoot\n-        ?.querySelector(\"slot[name='slug']\")\n-        ?.classList.toggle(\n-          `${prefix}--slug--revert`,\n-          this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')\n-        );\n+      this._slotSlugNode?.classList.toggle(\n+        `${prefix}--slug--revert`,\n+        this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')\n+      );\n     }\n   }\n "
+  },
+  {
+    "sha": "eee15650c313372a9ab9868227c1b1df11c995a6",
+    "filename": "packages/web-components/src/components/text-input/text-input.ts",
+    "status": "modified",
+    "additions": 17,
+    "deletions": 7,
+    "changes": 24,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/ab6a6362f1c40ce51f12600e4c7fcca2f726507f/packages%2Fweb-components%2Fsrc%2Fcomponents%2Ftext-input%2Ftext-input.ts",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/ab6a6362f1c40ce51f12600e4c7fcca2f726507f/packages%2Fweb-components%2Fsrc%2Fcomponents%2Ftext-input%2Ftext-input.ts",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fweb-components%2Fsrc%2Fcomponents%2Ftext-input%2Ftext-input.ts?ref=ab6a6362f1c40ce51f12600e4c7fcca2f726507f",
+    "patch": "@@ -81,6 +81,18 @@ class CDSTextInput extends ValidityMixin(FormMixin(LitElement)) {\n   @query('slot[name=\"helper-text\"]')\n   protected _slotHelperTextNode!: HTMLSlotElement;\n \n+  /**\n+   * The `<slot>` element for the AI label in the shadow DOM.\n+   */\n+  @query(\"slot[name='ai-label']\")\n+  private _slotAILabelNode!: HTMLSlotElement;\n+\n+  /**\n+   * The `<slot>` element for the slug in the shadow DOM.\n+   */\n+  @query(\"slot[name='slug']\")\n+  private _slotSlugNode!: HTMLSlotElement;\n+\n   /**\n    * The internal value.\n    */\n@@ -561,20 +573,18 @@ class CDSTextInput extends ValidityMixin(FormMixin(LitElement)) {\n \n   updated() {\n     this.toggleAttribute('ai-label', this._hasAILabel);\n-    const label = this.shadowRoot?.querySelector(\"slot[name='ai-label']\");\n+    const label = this._slotAILabelNode;\n \n     if (label) {\n       label?.classList.toggle(\n         `${prefix}--slug--revert`,\n         this.querySelector(`${prefix}-ai-label`)?.hasAttribute('revert-active')\n       );\n     } else {\n-      this.shadowRoot\n-        ?.querySelector(\"slot[name='slug']\")\n-        ?.classList.toggle(\n-          `${prefix}--slug--revert`,\n-          this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')\n-        );\n+      this._slotSlugNode?.classList.toggle(\n+        `${prefix}--slug--revert`,\n+        this.querySelector(`${prefix}-slug`)?.hasAttribute('revert-active')\n+      );\n     }\n   }\n "
+  }
+]
