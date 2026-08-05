@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "f0ca823bb2816e6c9b7dc4fc907854222f10896d",
+    "filename": "packages/react/src/components/OverflowMenuItem/OverflowMenuItem-test.js",
+    "status": "modified",
+    "additions": 34,
+    "deletions": 1,
+    "changes": 35,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/70cd013eeb111743bc627a1123d470ad3b6c6a09/packages%2Freact%2Fsrc%2Fcomponents%2FOverflowMenuItem%2FOverflowMenuItem-test.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/70cd013eeb111743bc627a1123d470ad3b6c6a09/packages%2Freact%2Fsrc%2Fcomponents%2FOverflowMenuItem%2FOverflowMenuItem-test.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FOverflowMenuItem%2FOverflowMenuItem-test.js?ref=70cd013eeb111743bc627a1123d470ad3b6c6a09",
+    "patch": "@@ -1,5 +1,5 @@\n /**\n- * Copyright IBM Corp. 2016, 2023\n+ * Copyright IBM Corp. 2016, 2026\n  *\n  * This source code is licensed under the Apache-2.0 license found in the\n  * LICENSE file in the root directory of this source tree.\n@@ -101,6 +101,39 @@ describe('OverflowMenuItem - RTL', () => {\n       expect(container.firstChild.firstChild).toHaveProperty('disabled', true);\n     });\n \n+    it('should set aria-disabled on the button node when disabled', () => {\n+      render(\n+        <OverflowMenuItem closeMenu={jest.fn()} itemText=\"one\" disabled />\n+      );\n+\n+      expect(screen.getByRole('menuitem')).toHaveAttribute(\n+        'aria-disabled',\n+        'true'\n+      );\n+    });\n+\n+    it('should set aria-disabled on the anchor node when disabled', () => {\n+      render(\n+        <OverflowMenuItem\n+          closeMenu={jest.fn()}\n+          href=\"https://carbondesignsystem.com\"\n+          itemText=\"one\"\n+          disabled\n+        />\n+      );\n+\n+      expect(screen.getByRole('menuitem')).toHaveAttribute(\n+        'aria-disabled',\n+        'true'\n+      );\n+    });\n+\n+    it('should not set aria-disabled when not disabled', () => {\n+      render(<OverflowMenuItem closeMenu={jest.fn()} itemText=\"one\" />);\n+\n+      expect(screen.getByRole('menuitem')).not.toHaveAttribute('aria-disabled');\n+    });\n+\n     it('should have divider', () => {\n       const { container } = render(\n         <OverflowMenuItem closeMenu={jest.fn()} itemText=\"one\" hasDivider />"
+  },
+  {
+    "sha": "9f8eb655578c381b1b6de83c58d957c3fb6b3b75",
+    "filename": "packages/react/src/components/OverflowMenuItem/OverflowMenuItem.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/70cd013eeb111743bc627a1123d470ad3b6c6a09/packages%2Freact%2Fsrc%2Fcomponents%2FOverflowMenuItem%2FOverflowMenuItem.tsx",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/70cd013eeb111743bc627a1123d470ad3b6c6a09/packages%2Freact%2Fsrc%2Fcomponents%2FOverflowMenuItem%2FOverflowMenuItem.tsx",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FOverflowMenuItem%2FOverflowMenuItem.tsx?ref=70cd013eeb111743bc627a1123d470ad3b6c6a09",
+    "patch": "@@ -176,6 +176,7 @@ const OverflowMenuItem = frFn((props, ref) => {\n   return (\n     <Text as=\"li\" className={overflowMenuItemClasses} role=\"none\">\n       <TagToUse\n+        aria-disabled={disabled ? true : undefined}\n         className={overflowMenuBtnClasses}\n         disabled={disabled}\n         href={href}"
+  }
+]
