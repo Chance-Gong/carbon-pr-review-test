@@ -1,0 +1,552 @@
+diff --git a/packages/react/src/components/Notification/stories/Callout.stories.js b/packages/react/src/components/Notification/stories/Callout.stories.js
+--- a/packages/react/src/components/Notification/stories/Callout.stories.js
++++ b/packages/react/src/components/Notification/stories/Callout.stories.js
+@@ -23,6 +23,12 @@ export default {
+     lowContrast: false,
+     statusIconDescription: 'notification',
+   },
++  argTypes: {
++    kind: {
++      options: ['info', 'warning'],
++      control: { type: 'select' },
++    },
++  },
+ };
+ 
+ export const Default = (args) => (
+@@ -33,24 +39,38 @@ export const Default = (args) => (
+   />
+ );
+ 
+-export const WithInteractiveElements = () => (
+-  <Callout
+-    title="Notification title"
+-    titleId="my fancy id 123"
+-    kind="info"
+-    lowContrast>
++Default.args = {
++  subtitle: 'Subtitle text goes here',
++  title: 'Notification title',
++};
++
++export const WithInteractiveElements = ({ titleId, ...args }) => (
++  <Callout titleId={titleId} {...args}>
+     <div className="cds--inline-notification__subtitle">
+       Additional text can describe the notification, or a link to{' '}
+-      <Link inline href="#" aria-describedby="my fancy id 123">
++      <Link inline href="#" aria-describedby={titleId}>
+         learn more
+       </Link>
+     </div>
+   </Callout>
+ );
+ 
+-Default.argTypes = {
+-  kind: {
+-    options: ['info', 'warning'],
+-    control: { type: 'select' },
++WithInteractiveElements.args = {
++  kind: 'info',
++  lowContrast: true,
++  statusIconDescription: 'notification',
++  title: 'Notification title',
++  titleId: 'callout-title-interactive'',
++};
++
++WithInteractiveElements.parameters = {
++  controls: {
++    include: [
++      'kind',
++      'lowContrast',
++      'statusIconDescription',
++      'title',
++      'titleId',
++    ],
+   },
+ };
+
+diff --git a/packages/react/src/components/Notification/stories/StaticNotification.stories.js b/packages/react/src/components/Notification/stories/StaticNotification.stories.js
+--- a/packages/react/src/components/Notification/stories/StaticNotification.stories.js
++++ b/packages/react/src/components/Notification/stories/StaticNotification.stories.js
+@@ -21,9 +21,9 @@ export default {
+   },
+ };
+ 
+-export const Default = () => (
++export const Default = (args) => (
+   <>
+-    <StaticNotification title="StaticNotification has been renamed to Callout" />
++    <StaticNotification {...args} />
+ 
+     <div style={{ marginLeft: '.5rem', marginTop: '2rem' }}>
+       <p style={{ marginBottom: '1rem' }}>
+@@ -36,3 +36,13 @@ export const Default = () => (
+     </div>
+   </>
+ );
++
++Default.args = {
++  title: 'StaticNotification has been renamed to Callout',
++};
++
++Default.parameters = {
++  controls: {
++    include: ['title'],
++  },
++};
+
+diff --git a/packages/web-components/src/components/notification/actionable-notification.stories.ts b/packages/web-components/src/components/notification/actionable-notification.stories.ts
+--- a/packages/web-components/src/components/notification/actionable-notification.stories.ts
++++ b/packages/web-components/src/components/notification/actionable-notification.stories.ts
+@@ -94,73 +94,67 @@ const argTypes = {
+   },
+ };
+ 
++const renderNotification = (args) => {
++  const {
++    actionButtonLabel,
++    caption,
++    closeOnEscape,
++    hasFocus,
++    kind,
++    title,
++    subtitle,
++    hideCloseButton,
++    lowContrast,
++    role,
++    inline,
++    statusIconDescription,
++    disableClose,
++    onBeforeClose = noop,
++    onClose = noop,
++  } = args ?? {};
++  const handleBeforeClose = (event: CustomEvent) => {
++    onBeforeClose(event);
++    if (disableClose) {
++      event.preventDefault();
++    }
++  };
++  return html`
++    <cds-actionable-notification
++      ?close-on-escape="${closeOnEscape}"
++      ?has-focus="${hasFocus}"
++      caption="${ifDefined(caption)}"
++      kind="${ifDefined(kind)}"
++      title="${ifDefined(title)}"
++      subtitle="${ifDefined(subtitle)}"
++      role="${ifDefined(role)}"
++      ?inline="${inline}"
++      ?hide-close-button="${hideCloseButton}"
++      ?low-contrast="${lowContrast}"
++      status-icon-description="${ifDefined(statusIconDescription)}"
++      @cds-notification-beingclosed="${handleBeforeClose}"
++      @cds-notification-closed="${onClose}">
++      <cds-actionable-notification-button slot="action"
++        >${actionButtonLabel}</cds-actionable-notification-button
++      >
++    </cds-actionable-notification>
++  `;
++};
++
+ export const Default = {
+-  render: () => {
+-    return html`
+-      <cds-actionable-notification
+-        kind="${NOTIFICATION_KIND.ERROR}"
+-        title="Notification title"
+-        subtitle="Subtitle text goes here">
+-        <cds-actionable-notification-button slot="action"
+-          >Action</cds-actionable-notification-button
+-        >
+-      </cds-actionable-notification>
+-    `;
++  args: {
++    kind: NOTIFICATION_KIND.ERROR,
+   },
++  render: renderNotification,
+ };
+ 
+ export const Playground = {
+-  args,
+-  argTypes,
+-  render: (args) => {
+-    const {
+-      actionButtonLabel,
+-      caption,
+-      closeOnEscape,
+-      hasFocus,
+-      kind,
+-      title,
+-      subtitle,
+-      hideCloseButton,
+-      lowContrast,
+-      role,
+-      inline,
+-      statusIconDescription,
+-      disableClose,
+-      onBeforeClose = noop,
+-      onClose = noop,
+-    } = args ?? {};
+-    const handleBeforeClose = (event: CustomEvent) => {
+-      onBeforeClose(event);
+-      if (disableClose) {
+-        event.preventDefault();
+-      }
+-    };
+-    return html`
+-      <cds-actionable-notification
+-        ?close-on-escape="${closeOnEscape}"
+-        ?has-focus="${hasFocus}"
+-        caption="${ifDefined(caption)}"
+-        kind="${ifDefined(kind)}"
+-        title="${ifDefined(title)}"
+-        subtitle="${ifDefined(subtitle)}"
+-        role="${ifDefined(role)}"
+-        ?inline="${inline}"
+-        ?hide-close-button="${hideCloseButton}"
+-        ?low-contrast="${lowContrast}"
+-        status-icon-description="${ifDefined(statusIconDescription)}"
+-        @cds-notification-beingclosed="${handleBeforeClose}"
+-        @cds-notification-closed="${onClose}">
+-        <cds-actionable-notification-button slot="action"
+-          >${actionButtonLabel}</cds-actionable-notification-button
+-        >
+-      </cds-actionable-notification>
+-    `;
+-  },
++  render: renderNotification,
+ };
+ 
+ const meta = {
+   title: 'Components/Notifications/Actionable',
++  args,
++  argTypes,
+   parameters: {
+     docs: {
+       page: storyDocs,
+
+diff --git a/packages/web-components/src/components/notification/callout-notification.stories.ts b/packages/web-components/src/components/notification/callout-notification.stories.ts
+--- a/packages/web-components/src/components/notification/callout-notification.stories.ts
++++ b/packages/web-components/src/components/notification/callout-notification.stories.ts
+@@ -65,8 +65,6 @@ const argTypes = {
+ };
+ 
+ export const Default = {
+-  args,
+-  argTypes,
+   render: (args) => {
+     const {
+       actionButtonLabel,
+@@ -97,18 +95,36 @@ export const Default = {
+ };
+ 
+ export const WithInteractiveElements = {
+-  render: () => {
++  args: {
++    actionButtonLabel: '',
++    kind: NOTIFICATION_KIND.INFO,
++    lowContrast: true,
++    statusIconDescription: 'notification',
++    title: 'Notification title',
++    titleId: 'callout-title-interactive',
++  },
++  parameters: {
++    controls: {
++      include: [
++        'kind',
++        'lowContrast',
++        'statusIconDescription',
++        'title',
++        'titleId',
++      ],
++    },
++  },
++  render: ({ kind, lowContrast, statusIconDescription, title, titleId }) => {
+     return html`
+       <cds-callout-notification
+-        kind="${NOTIFICATION_KIND.INFO}"
+-        title="Notification title"
+-        title-id="callout-title-interactive"
+-        ?low-contrast="${true}">
++        kind="${ifDefined(kind)}"
++        title="${ifDefined(title)}"
++        title-id="${ifDefined(titleId)}"
++        status-icon-description="${ifDefined(statusIconDescription)}"
++        ?low-contrast="${lowContrast}">
+         <div class="${prefix}--actionable-notification__subtitle">
+           Additional text can describe the notification, or a link to
+-          <a href="#" aria-describedby="callout-title-interactive"
+-            >learn more</a
+-          >
++          <a href="#" aria-describedby="${ifDefined(titleId)}">learn more</a>
+         </div>
+       </cds-callout-notification>
+     `;
+@@ -117,6 +133,8 @@ export const WithInteractiveElements = {
+ 
+ const meta = {
+   title: 'Components/Notifications/Callout',
++  args,
++  argTypes,
+   parameters: {
+     docs: {
+       page: storyDocs,
+
+diff --git a/packages/web-components/src/components/notification/inline-notification.stories.ts b/packages/web-components/src/components/notification/inline-notification.stories.ts
+--- a/packages/web-components/src/components/notification/inline-notification.stories.ts
++++ b/packages/web-components/src/components/notification/inline-notification.stories.ts
+@@ -21,6 +21,7 @@ const args = {
+   role: 'status',
+   statusIconDescription: 'notification',
+   subtitle: 'Subtitle text goes here',
++  timeout: 0,
+   title: 'Notification title',
+ };
+ 
+@@ -54,6 +55,11 @@ const argTypes = {
+     control: 'text',
+     description: 'Specify the subtitle.',
+   },
++  timeout: {
++    control: 'number',
++    description:
++      'Specify an optional duration in milliseconds before the notification closes.',
++  },
+   title: {
+     control: 'text',
+     description: 'Specify the title.',
+@@ -66,60 +72,57 @@ const argTypes = {
+   },
+ };
+ 
++const renderNotification = (args) => {
++  const {
++    kind,
++    title,
++    subtitle,
++    hideCloseButton,
++    lowContrast,
++    role,
++    statusIconDescription,
++    timeout,
++    disableClose,
++    onBeforeClose = noop,
++    onClose = noop,
++  } = args ?? {};
++  const handleBeforeClose = (event: CustomEvent) => {
++    onBeforeClose(event);
++    if (disableClose) {
++      event.preventDefault();
++    }
++  };
++  return html`
++    <cds-inline-notification
++      kind="${ifDefined(kind)}"
++      title="${ifDefined(title)}"
++      subtitle="${ifDefined(subtitle)}"
++      ?hide-close-button="${hideCloseButton}"
++      ?low-contrast="${lowContrast}"
++      role="${ifDefined(role)}"
++      status-icon-description="${ifDefined(statusIconDescription)}"
++      timeout="${ifDefined(timeout)}"
++      @cds-notification-beingclosed="${handleBeforeClose}"
++      @cds-notification-closed="${onClose}">
++    </cds-inline-notification>
++  `;
++};
++
+ export const Default = {
+-  render: () => {
+-    return html`
+-      <cds-inline-notification
+-        kind="${NOTIFICATION_KIND.ERROR}"
+-        title="Notification title"
+-        subtitle="Subtitle text goes here">
+-      </cds-inline-notification>
+-    `;
++  args: {
++    kind: NOTIFICATION_KIND.ERROR,
+   },
++  render: renderNotification,
+ };
+ 
+ export const Playground = {
+-  args,
+-  argTypes,
+-  render: (args) => {
+-    const {
+-      kind,
+-      title,
+-      subtitle,
+-      hideCloseButton,
+-      lowContrast,
+-      role,
+-      statusIconDescription,
+-      timeout,
+-      disableClose,
+-      onBeforeClose = noop,
+-      onClose = noop,
+-    } = args ?? {};
+-    const handleBeforeClose = (event: CustomEvent) => {
+-      onBeforeClose(event);
+-      if (disableClose) {
+-        event.preventDefault();
+-      }
+-    };
+-    return html`
+-      <cds-inline-notification
+-        kind="${ifDefined(kind)}"
+-        title="${ifDefined(title)}"
+-        subtitle="${ifDefined(subtitle)}"
+-        ?hide-close-button="${hideCloseButton}"
+-        ?low-contrast="${lowContrast}"
+-        role="${ifDefined(role)}"
+-        status-icon-description="${ifDefined(statusIconDescription)}"
+-        timeout="${ifDefined(timeout)}"
+-        @cds-notification-beingclosed="${handleBeforeClose}"
+-        @cds-notification-closed="${onClose}">
+-      </cds-inline-notification>
+-    `;
+-  },
++  render: renderNotification,
+ };
+ 
+ const meta = {
+   title: 'Components/Notifications/Inline',
++  args,
++  argTypes,
+   parameters: {
+     docs: {
+       page: storyDocs,
+
+diff --git a/packages/web-components/src/components/notification/toast-notification.stories.ts b/packages/web-components/src/components/notification/toast-notification.stories.ts
+--- a/packages/web-components/src/components/notification/toast-notification.stories.ts
++++ b/packages/web-components/src/components/notification/toast-notification.stories.ts
+@@ -23,7 +23,7 @@ const args = {
+   role: 'status',
+   statusIconDescription: 'notification',
+   subtitle: 'Subtitle text goes here',
+-  timeout: '0',
++  timeout: 0,
+   title: 'Notification title',
+ };
+ 
+@@ -62,7 +62,7 @@ const argTypes = {
+     description: 'Specify the subtitle.',
+   },
+   timeout: {
+-    control: 'text',
++    control: 'number',
+     description:
+       'Specify an optional duration the notification should be closed in.',
+   },
+@@ -78,65 +78,59 @@ const argTypes = {
+   },
+ };
+ 
++const renderNotification = (args) => {
++  const {
++    kind,
++    title,
++    subtitle,
++    caption,
++    hideCloseButton,
++    statusIconDescription,
++    lowContrast,
++    timeout,
++    role,
++    disableClose,
++    onBeforeClose = noop,
++    onClose = noop,
++  } = args ?? {};
++  const handleBeforeClose = (event: CustomEvent) => {
++    onBeforeClose(event);
++    if (disableClose) {
++      event.preventDefault();
++    }
++  };
++  return html`
++    <cds-toast-notification
++      kind="${ifDefined(kind)}"
++      title="${ifDefined(title)}"
++      subtitle="${ifDefined(subtitle)}"
++      caption="${ifDefined(caption)}"
++      role="${ifDefined(role)}"
++      ?hide-close-button="${hideCloseButton}"
++      ?low-contrast="${lowContrast}"
++      status-icon-description="${ifDefined(statusIconDescription)}"
++      timeout="${ifDefined(timeout)}"
++      @cds-notification-beingclosed="${handleBeforeClose}"
++      @cds-notification-closed="${onClose}">
++    </cds-toast-notification>
++  `;
++};
++
+ export const Default = {
+-  render: () => {
+-    return html`
+-      <cds-toast-notification
+-        kind="${NOTIFICATION_KIND.ERROR}"
+-        title="Notification title"
+-        subtitle="Subtitle text goes here"
+-        caption="00:00:00 AM"
+-        role="status"
+-        timeout="0">
+-      </cds-toast-notification>
+-    `;
++  args: {
++    kind: NOTIFICATION_KIND.ERROR,
+   },
++  render: renderNotification,
+ };
+ 
+ export const Playground = {
+-  args,
+-  argTypes,
+-  render: (args) => {
+-    const {
+-      kind,
+-      title,
+-      subtitle,
+-      caption,
+-      hideCloseButton,
+-      statusIconDescription,
+-      lowContrast,
+-      timeout,
+-      role,
+-      disableClose,
+-      onBeforeClose = noop,
+-      onClose = noop,
+-    } = args ?? {};
+-    const handleBeforeClose = (event: CustomEvent) => {
+-      onBeforeClose(event);
+-      if (disableClose) {
+-        event.preventDefault();
+-      }
+-    };
+-    return html`
+-      <cds-toast-notification
+-        kind="${ifDefined(kind)}"
+-        title="${ifDefined(title)}"
+-        subtitle="${ifDefined(subtitle)}"
+-        caption="${ifDefined(caption)}"
+-        role="${ifDefined(role)}"
+-        ?hide-close-button="${hideCloseButton}"
+-        ?low-contrast="${lowContrast}"
+-        status-icon-description="${ifDefined(statusIconDescription)}"
+-        timeout="${ifDefined(timeout)}"
+-        @cds-notification-beingclosed="${handleBeforeClose}"
+-        @cds-notification-closed="${onClose}">
+-      </cds-toast-notification>
+-    `;
+-  },
++  render: renderNotification,
+ };
+ 
+ const meta = {
+   title: 'Components/Notifications/Toast',
++  args,
++  argTypes,
+   parameters: {
+     docs: {
+       page: storyDocs,
