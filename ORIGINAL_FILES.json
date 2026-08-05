@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "7226d3e09dd63117019264a2ef99fdda8abaeae9",
+    "filename": "packages/web-components/src/components/ui-shell/__tests__/ui-shell-test.js",
+    "status": "added",
+    "additions": 47,
+    "deletions": 0,
+    "changes": 47,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/ca86a20c8defaf71e8b0ae7f53e51127dbbbf009/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fui-shell%2F__tests__%2Fui-shell-test.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/ca86a20c8defaf71e8b0ae7f53e51127dbbbf009/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fui-shell%2F__tests__%2Fui-shell-test.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fui-shell%2F__tests__%2Fui-shell-test.js?ref=ca86a20c8defaf71e8b0ae7f53e51127dbbbf009",
+    "patch": "@@ -0,0 +1,47 @@\n+/**\n+ * Copyright IBM Corp. 2026\n+ *\n+ * This source code is licensed under the Apache-2.0 license found in the\n+ * LICENSE file in the root directory of this source tree.\n+ */\n+\n+import { expect, fixture, html } from '@open-wc/testing';\n+import '@carbon/web-components/es/components/ui-shell/index.js';\n+\n+describe('cds-header-global-action', () => {\n+  describe('Handling click', () => {\n+    it('should set expanded on the linked panel when the panel is collapsed', async () => {\n+      const el = await fixture(html`\n+        <div>\n+          <cds-header-global-action panel-id=\"test-panel-1\">\n+          </cds-header-global-action>\n+          <cds-header-panel id=\"test-panel-1\"></cds-header-panel>\n+        </div>\n+      `);\n+\n+      const action = el.querySelector('cds-header-global-action');\n+      const panel = el.querySelector('cds-header-panel');\n+\n+      action.click();\n+\n+      expect(panel.hasAttribute('expanded')).to.be.true;\n+    });\n+\n+    it('should remove expanded from the linked panel when the panel is already expanded', async () => {\n+      const el = await fixture(html`\n+        <div>\n+          <cds-header-global-action panel-id=\"test-panel-2\">\n+          </cds-header-global-action>\n+          <cds-header-panel id=\"test-panel-2\" expanded></cds-header-panel>\n+        </div>\n+      `);\n+\n+      const action = el.querySelector('cds-header-global-action');\n+      const panel = el.querySelector('cds-header-panel');\n+\n+      action.click();\n+\n+      expect(panel.hasAttribute('expanded')).to.be.false;\n+    });\n+  });\n+});"
+  },
+  {
+    "sha": "b4cb626b9a402cb48c5899c87abe671c9d691877",
+    "filename": "packages/web-components/src/components/ui-shell/header-global-action.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 6,
+    "changes": 8,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/ca86a20c8defaf71e8b0ae7f53e51127dbbbf009/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fui-shell%2Fheader-global-action.ts",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/ca86a20c8defaf71e8b0ae7f53e51127dbbbf009/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fui-shell%2Fheader-global-action.ts",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fui-shell%2Fheader-global-action.ts?ref=ca86a20c8defaf71e8b0ae7f53e51127dbbbf009",
+    "patch": "@@ -124,13 +124,9 @@ class CDSHeaderGlobalAction extends CDSButton {\n       // see if there is related panel for header-global-action button first\n       // and then set the expanded attr of it accordingly\n       if (panel) {\n-        const expanded = panel.getAttribute('expanded');\n+        const expanded = panel.hasAttribute('expanded');\n \n-        if (expanded) {\n-          panel.removeAttribute('expanded');\n-        } else {\n-          panel.setAttribute('expanded', 'true');\n-        }\n+        panel.toggleAttribute('expanded', !expanded);\n \n         const active = !this.active;\n         this.active = active;"
+  }
+]
