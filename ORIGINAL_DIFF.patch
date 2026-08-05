@@ -1,0 +1,600 @@
+diff --git a/packages/react/src/components/OverflowMenu/OverflowMenu.featureflag.stories.js b/packages/react/src/components/OverflowMenu/OverflowMenu.featureflag.stories.js
+--- a/packages/react/src/components/OverflowMenu/OverflowMenu.featureflag.stories.js
++++ b/packages/react/src/components/OverflowMenu/OverflowMenu.featureflag.stories.js
+@@ -17,6 +17,52 @@ import { OverflowMenu } from './';
+ import { WithFeatureFlags } from '../../../.storybook/templates/WithFeatureFlags';
+ import { FeatureFlags } from '../FeatureFlags';
+ 
++const args = {
++  autoAlign: false,
++  label: 'Options',
++  menuAlignment: 'bottom-start',
++  size: 'md',
++  tooltipAlignment: 'top',
++};
++
++const tooltipAlignmentOptions = [
++  'top',
++  'top-start',
++  'top-end',
++  'bottom',
++  'bottom-start',
++  'bottom-end',
++  'left',
++  'left-start',
++  'left-end',
++  'right',
++  'right-start',
++  'right-end',
++];
++
++const argTypes = {
++  autoAlign: {
++    control: { type: 'boolean' },
++  },
++  label: {
++    control: { type: 'text' },
++  },
++  menuAlignment: {
++    options: ['bottom-start', 'bottom-end', 'top-start', 'top-end'],
++    control: { type: 'select' },
++    description:
++      'Specify how the menu should align with the button element `bottom-start` `bottom-end` `top-start` `top-end`',
++  },
++  size: {
++    options: ['xs', 'sm', 'md', 'lg'],
++    control: { type: 'select' },
++  },
++  tooltipAlignment: {
++    options: tooltipAlignmentOptions,
++    control: { type: 'select' },
++  },
++};
++
+ export default {
+   title: 'Components/OverflowMenu/Feature Flag',
+   component: OverflowMenu,
+@@ -35,9 +81,16 @@ export default {
+       </WithFeatureFlags>
+     ),
+   ],
++  args,
++  argTypes,
++  parameters: {
++    controls: {
++      exclude: ['renderIcon', 'menuTarget'],
++    },
++  },
+ };
+ 
+-export const AutoAlign = () => {
++export const AutoAlign = (args) => {
+   const ref = useRef();
+ 
+   useEffect(() => {
+@@ -53,7 +106,7 @@ export const AutoAlign = () => {
+           left: '2450px',
+         }}
+         ref={ref}>
+-        <OverflowMenu autoAlign={true}>
++        <OverflowMenu {...args}>
+           <MenuItem label="Stop app" />
+           <MenuItem label="Restart app" />
+           <MenuItem label="Rename app" />
+@@ -66,14 +119,18 @@ export const AutoAlign = () => {
+   );
+ };
+ 
+-export const Nested = () => {
++AutoAlign.args = {
++  autoAlign: true,
++};
++
++export const Nested = (args) => {
+   return (
+     <FeatureFlags
+       flags={{
+         'enable-v12-overflowmenu': true,
+         'enable-v12-dynamic-floating-styles': false,
+       }}>
+-      <OverflowMenu>
++      <OverflowMenu {...args}>
+         <MenuItem label="Level 1" />
+         <MenuItem label="Level 1" />
+         <MenuItem label="Level 1">
+@@ -93,10 +150,13 @@ export const Nested = () => {
+ };
+ 
+ export const WithMenuAlignment = (args) => {
++  const { autoAlign, label, size } = args;
++  const menuArgs = { autoAlign, label, size };
++
+   return (
+     <>
+       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+-        <OverflowMenu {...args} menuAlignment="bottom-start">
++        <OverflowMenu {...menuArgs} menuAlignment="bottom-start">
+           <MenuItem label="Stop app" />
+           <MenuItem label="Restart app" />
+           <MenuItem label="Rename app" />
+@@ -105,7 +165,7 @@ export const WithMenuAlignment = (args) => {
+           <MenuItem label="Delete app" kind="danger" />
+         </OverflowMenu>
+ 
+-        <OverflowMenu {...args} menuAlignment="bottom-end">
++        <OverflowMenu {...menuArgs} menuAlignment="bottom-end">
+           <MenuItem label="Stop app" />
+           <MenuItem label="Restart app" />
+           <MenuItem label="Rename app" />
+@@ -122,7 +182,7 @@ export const WithMenuAlignment = (args) => {
+           justifyContent: 'space-between',
+         }}>
+         <OverflowMenu
+-          {...args}
++          {...menuArgs}
+           menuAlignment="top-start"
+           tooltipAlignment="bottom">
+           <MenuItem label="Stop app" />
+@@ -134,7 +194,7 @@ export const WithMenuAlignment = (args) => {
+         </OverflowMenu>
+ 
+         <OverflowMenu
+-          {...args}
++          {...menuArgs}
+           menuAlignment="top-end"
+           tooltipAlignment="bottom">
+           <MenuItem label="Stop app" />
+@@ -149,10 +209,16 @@ export const WithMenuAlignment = (args) => {
+   );
+ };
+ 
+-export const FloatingStyles = () => {
++WithMenuAlignment.parameters = {
++  controls: {
++    include: ['autoAlign', 'label', 'size'],
++  },
++};
++
++export const FloatingStyles = (args) => {
+   return (
+     <div>
+-      <OverflowMenu>
++      <OverflowMenu {...args}>
+         <MenuItem label="Stop app" />
+         <MenuItem label="Restart app" />
+         <MenuItem label="Rename app" />
+@@ -176,22 +242,3 @@ export const Default = (args) => {
+     </OverflowMenu>
+   );
+ };
+-
+-Default.args = {
+-  label: 'Options',
+-};
+-
+-Default.parameters = {
+-  controls: {
+-    exclude: ['renderIcon', 'menuTarget'],
+-  },
+-};
+-Default.argTypes = {
+-  menuAlignment: {
+-    options: ['bottom-start', 'bottom-end', 'top-start', 'top-end'],
+-    control: { type: 'select' },
+-    description:
+-      'Specify how the menu should align with the button element `bottom-start` `bottom-end` `top-start` `top-end`',
+-    default: 'bottom-start',
+-  },
+-};
+
+diff --git a/packages/react/src/components/OverflowMenu/OverflowMenu.stories.js b/packages/react/src/components/OverflowMenu/OverflowMenu.stories.js
+--- a/packages/react/src/components/OverflowMenu/OverflowMenu.stories.js
++++ b/packages/react/src/components/OverflowMenu/OverflowMenu.stories.js
+@@ -11,99 +11,92 @@ import { default as OverflowMenuItem } from '../OverflowMenuItem';
+ import { Filter } from '@carbon/icons-react';
+ import mdx from './OverflowMenu.mdx';
+ 
+-export default {
+-  title: 'Components/OverflowMenu',
+-  component: OverflowMenu,
+-  subcomponents: {
+-    OverflowMenuItem,
+-  },
+-  parameters: {
+-    docs: {
+-      page: mdx,
+-    },
+-  },
+-};
+-
+-export const RenderCustomIcon = () => {
+-  return (
+-    <OverflowMenu flipped={document?.dir === 'rtl'} renderIcon={Filter}>
+-      <OverflowMenuItem itemText="Filter A" />
+-      <OverflowMenuItem itemText="Filter B" />
+-    </OverflowMenu>
+-  );
+-};
+-export const Default = (args) => (
+-  <OverflowMenu aria-label="overflow-menu" {...args}>
+-    <OverflowMenuItem itemText="Stop app" />
+-    <OverflowMenuItem itemText="Restart app" />
+-    <OverflowMenuItem itemText="Rename app" />
+-    <OverflowMenuItem itemText="Clone and move app" disabled requireTitle />
+-    <OverflowMenuItem itemText="Edit routes and access" requireTitle />
+-    <OverflowMenuItem hasDivider isDelete itemText="Delete app" />
+-  </OverflowMenu>
+-);
+-
+-Default.args = {
++const args = {
+   flipped: document?.dir === 'rtl',
+   focusTrap: false,
++  iconDescription: 'Options',
+   open: false,
++  size: 'md',
+ };
+ 
+-Default.argTypes = {
++const argTypes = {
+   align: {
+     options: [
+       'top',
+       'top-start',
+       'top-end',
+-
+       'bottom',
+       'bottom-start',
+       'bottom-end',
+-
+       'left',
+       'left-end',
+       'left-start',
+-
+       'right',
+       'right-end',
+       'right-start',
+     ],
++    control: { type: 'select' },
+   },
+   flipped: {
+-    control: {
+-      type: 'boolean',
+-    },
++    control: { type: 'boolean' },
+   },
+   focusTrap: {
+-    control: {
+-      type: 'boolean',
+-    },
++    control: { type: 'boolean' },
+   },
+   iconDescription: {
+     control: { type: 'text' },
+   },
+   open: {
+-    control: {
+-      type: 'boolean',
+-    },
++    control: { type: 'boolean' },
+   },
+   size: {
+     options: ['xs', 'sm', 'md', 'lg'],
+     control: { type: 'select' },
+   },
+ };
+ 
+-Default.parameters = {
+-  controls: {
+-    exclude: [
+-      'direction',
+-      'iconClass',
+-      'id',
+-      'light',
+-      'menuOffset',
+-      'menuOffsetFlip',
+-      'menuOptionsClass',
+-      'renderIcon',
+-    ],
++export default {
++  title: 'Components/OverflowMenu',
++  component: OverflowMenu,
++  subcomponents: {
++    OverflowMenuItem,
++  },
++  parameters: {
++    docs: {
++      page: mdx,
++    },
++    controls: {
++      exclude: [
++        'direction',
++        'iconClass',
++        'id',
++        'light',
++        'menuOffset',
++        'menuOffsetFlip',
++        'menuOptionsClass',
++        'renderIcon',
++      ],
++    },
+   },
++  args,
++  argTypes,
+ };
++
++export const RenderCustomIcon = (args) => {
++  return (
++    <OverflowMenu {...args} renderIcon={Filter}>
++      <OverflowMenuItem itemText="Filter A" />
++      <OverflowMenuItem itemText="Filter B" />
++    </OverflowMenu>
++  );
++};
++export const Default = (args) => (
++  <OverflowMenu aria-label="overflow-menu" {...args}>
++    <OverflowMenuItem itemText="Stop app" />
++    <OverflowMenuItem itemText="Restart app" />
++    <OverflowMenuItem itemText="Rename app" />
++    <OverflowMenuItem itemText="Clone and move app" disabled requireTitle />
++    <OverflowMenuItem itemText="Edit routes and access" requireTitle />
++    <OverflowMenuItem hasDivider isDelete itemText="Delete app" />
++  </OverflowMenu>
++);
+
+diff --git a/packages/web-components/src/components/overflow-menu/overflow-menu.feature-flag.stories.ts b/packages/web-components/src/components/overflow-menu/overflow-menu.feature-flag.stories.ts
+--- a/packages/web-components/src/components/overflow-menu/overflow-menu.feature-flag.stories.ts
++++ b/packages/web-components/src/components/overflow-menu/overflow-menu.feature-flag.stories.ts
+@@ -17,6 +17,7 @@ import mdx from './overflow-menu.feature-flag.mdx';
+ import '../../../.storybook/templates/with-feature-flags';
+ 
+ const args = {
++  autoAlign: false,
+   open: false,
+   label: 'Options',
+   menuAlignment: 'bottom-start',
+@@ -47,6 +48,11 @@ const tooltipAlignOptions = [
+ ];
+ 
+ const argTypes = {
++  autoAlign: {
++    control: 'boolean',
++    description:
++      'Specify whether the menu should automatically choose the best alignment.',
++  },
+   open: {
+     control: 'boolean',
+     description: '<code>true</code> if the menu should be open.',
+@@ -93,7 +99,7 @@ const renderDefaultMenu = () => html`
+ `;
+ 
+ const renderOverflowMenu = ({
+-  autoalign = false,
++  autoAlign = false,
+   label = 'Options',
+   menu = renderDefaultMenu(),
+   menuAlignment = 'bottom-start',
+@@ -102,7 +108,7 @@ const renderOverflowMenu = ({
+   align = 'top',
+ } = {}) => html`
+   <cds-overflow-menu
+-    ?autoalign=${autoalign}
++    ?autoalign=${autoAlign}
+     ?open=${open}
+     label="${label}"
+     menu-alignment="${menuAlignment}"
+@@ -113,11 +119,9 @@ const renderOverflowMenu = ({
+ `;
+ 
+ export const Default = {
+-  args,
+-  argTypes,
+   parameters: {
+     controls: {
+-      include: ['open', 'label', 'menuAlignment', 'align', 'size'],
++      include: ['autoAlign', 'open', 'label', 'menuAlignment', 'align', 'size'],
+     },
+   },
+   render: (args) => {
+@@ -133,7 +137,10 @@ export const Default = {
+ };
+ 
+ export const AutoAlign = {
+-  render: () => {
++  args: {
++    autoAlign: true,
++  },
++  render: (args) => {
+     requestAnimationFrame(() => {
+       document.querySelector('cds-overflow-menu[autoalign]')?.scrollIntoView({
+         block: 'center',
+@@ -146,7 +153,7 @@ export const AutoAlign = {
+         <feature-flags enable-v12-overflowmenu="true">
+           <div style="width: 4900px; height: 4900px; position: relative;">
+             <div style="position: absolute; top: 2450px; left: 2450px;">
+-              ${renderOverflowMenu({ autoalign: true })}
++              ${renderOverflowMenu(args)}
+             </div>
+           </div>
+         </feature-flags>
+@@ -156,25 +163,26 @@ export const AutoAlign = {
+ };
+ 
+ export const FloatingStyles = {
+-  render: () => {
++  render: (args) => {
+     return html`
+       <sb-template-feature-flags>
+         <feature-flags
+           enable-v12-overflowmenu="true"
+           enable-v12-dynamic-floating-styles="true">
+-          ${renderOverflowMenu()}
++          ${renderOverflowMenu(args)}
+         </feature-flags>
+       </sb-template-feature-flags>
+     `;
+   },
+ };
+ 
+ export const Nested = {
+-  render: () => {
++  render: (args) => {
+     return html`
+       <sb-template-feature-flags>
+         <feature-flags enable-v12-overflowmenu="true">
+           ${renderOverflowMenu({
++            ...args,
+             menu: html`
+               <cds-menu>
+                 <cds-menu-item label="Level 1"></cds-menu-item>
+@@ -206,24 +214,41 @@ export const Nested = {
+ };
+ 
+ export const WithMenuAlignment = {
+-  render: () => {
++  parameters: {
++    controls: {
++      include: ['autoAlign', 'label', 'open', 'size'],
++    },
++  },
++  render: ({ autoAlign, label, open, size }) => {
++    const menuArgs = { autoAlign, label, open, size };
+     return html`
+       <sb-template-feature-flags>
+         <feature-flags
+           enable-v12-overflowmenu="true"
+           enable-v12-dynamic-floating-styles="true">
+           <div style="display: flex; justify-content: space-between;">
+-            ${renderOverflowMenu({ menuAlignment: 'bottom-start' })}
+-            ${renderOverflowMenu({ menuAlignment: 'bottom-end' })}
++            ${renderOverflowMenu({
++              ...menuArgs,
++              menuAlignment: 'bottom-start',
++            })}
++            ${renderOverflowMenu({
++              ...menuArgs,
++              menuAlignment: 'bottom-end',
++            })}
+           </div>
+ 
+           <div
+             style="display: flex; justify-content: space-between; margin-top: 15rem;">
+             ${renderOverflowMenu({
++              ...menuArgs,
+               menuAlignment: 'top-start',
+               align: 'bottom',
+             })}
+-            ${renderOverflowMenu({ menuAlignment: 'top-end', align: 'bottom' })}
++            ${renderOverflowMenu({
++              ...menuArgs,
++              menuAlignment: 'top-end',
++              align: 'bottom',
++            })}
+           </div>
+         </feature-flags>
+       </sb-template-feature-flags>
+@@ -233,6 +258,8 @@ export const WithMenuAlignment = {
+ 
+ const meta = {
+   title: 'Components/OverflowMenu/Feature Flag',
++  args,
++  argTypes,
+   parameters: {
+     docs: {
+       page: mdx,
+
+diff --git a/packages/web-components/src/components/overflow-menu/overflow-menu.stories.ts b/packages/web-components/src/components/overflow-menu/overflow-menu.stories.ts
+--- a/packages/web-components/src/components/overflow-menu/overflow-menu.stories.ts
++++ b/packages/web-components/src/components/overflow-menu/overflow-menu.stories.ts
+@@ -56,57 +56,48 @@ const argTypes = {
+   },
+ };
+ 
++const defaultMenu = html`
++  <cds-overflow-menu-item>Stop app</cds-overflow-menu-item>
++  <cds-overflow-menu-item>Restart app</cds-overflow-menu-item>
++  <cds-overflow-menu-item>Rename app</cds-overflow-menu-item>
++  <cds-overflow-menu-item disabled>Clone and move app</cds-overflow-menu-item>
++  <cds-overflow-menu-item>Edit routes and access</cds-overflow-menu-item>
++  <cds-overflow-menu-item divider danger>Delete app</cds-overflow-menu-item>
++`;
++
++const filterMenu = html`
++  <cds-overflow-menu-item>Filter A</cds-overflow-menu-item>
++  <cds-overflow-menu-item>Filter B</cds-overflow-menu-item>
++`;
++
++const renderOverflowMenu = (args, icon, menu = defaultMenu) => {
++  const { flipped, iconDescription, open, index, size } = args ?? {};
++  return html`
++    <cds-overflow-menu ?open="${open}" size="${size}" index=${index}>
++      ${iconLoader(icon, {
++        class: `${prefix}--overflow-menu__icon`,
++        slot: 'icon',
++      })}
++      <span slot="tooltip-content"> ${iconDescription} </span>
++      <cds-overflow-menu-body ?flipped="${flipped}">
++        ${menu}
++      </cds-overflow-menu-body>
++    </cds-overflow-menu>
++  `;
++};
++
+ export const Default = {
+-  args,
+-  argTypes,
+-  render: (args) => {
+-    const { flipped, iconDescription, open, index, size } = args ?? {};
+-    return html`
+-      <cds-overflow-menu ?open="${open}" size="${size}" index=${index}>
+-        ${iconLoader(OverflowMenuVertical16, {
+-          class: `${prefix}--overflow-menu__icon`,
+-          slot: 'icon',
+-        })}
+-        <span slot="tooltip-content"> ${iconDescription} </span>
+-        <cds-overflow-menu-body ?flipped="${flipped}">
+-          <cds-overflow-menu-item>Stop app</cds-overflow-menu-item>
+-          <cds-overflow-menu-item>Restart app</cds-overflow-menu-item>
+-          <cds-overflow-menu-item>Rename app</cds-overflow-menu-item>
+-          <cds-overflow-menu-item disabled
+-            >Clone and move app</cds-overflow-menu-item
+-          >
+-          <cds-overflow-menu-item
+-            >Edit routes and access</cds-overflow-menu-item
+-          >
+-          <cds-overflow-menu-item divider danger>
+-            Delete app
+-          </cds-overflow-menu-item>
+-        </cds-overflow-menu-body>
+-      </cds-overflow-menu>
+-    `;
+-  },
++  render: (args) => renderOverflowMenu(args, OverflowMenuVertical16),
+ };
+ 
+ export const RenderCustomIcon = {
+-  render: () => {
+-    return html`
+-      <cds-overflow-menu>
+-        ${iconLoader(Filter16, {
+-          class: `${prefix}--overflow-menu__icon`,
+-          slot: 'icon',
+-        })}
+-        <span slot="tooltip-content">Options</span>
+-        <cds-overflow-menu-body>
+-          <cds-overflow-menu-item>Filter A</cds-overflow-menu-item>
+-          <cds-overflow-menu-item>Filter B</cds-overflow-menu-item>
+-        </cds-overflow-menu-body>
+-      </cds-overflow-menu>
+-    `;
+-  },
++  render: (args) => renderOverflowMenu(args, Filter16, filterMenu),
+ };
+ 
+ const meta = {
+   title: 'Components/OverflowMenu',
++  args,
++  argTypes,
+ };
+ 
+ export default meta;
