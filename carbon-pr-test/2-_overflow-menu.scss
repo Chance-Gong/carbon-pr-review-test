@@ -1,0 +1,17 @@
+// Sample from Carbon PR 22566
+// Original file: packages/styles/scss/components/overflow-menu/_overflow-menu.scss
+// Status: modified
+// Changes: +5/-0
+
+@@ -344,6 +344,11 @@
+     }
+   }
+ 
++  .#{$prefix}--overflow-menu-options__option--danger
++    .#{$prefix}--overflow-menu-options__btn:focus {
++    box-shadow: inset 0 0 0 convert.to-rem(3px) $background;
++  }
++
+   .#{$prefix}--overflow-menu-options__option--disabled:hover {
+     background-color: $layer;
+     cursor: not-allowed;
