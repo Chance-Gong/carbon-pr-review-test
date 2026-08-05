@@ -1,0 +1,382 @@
+diff --git a/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap b/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
+--- a/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
++++ b/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
+@@ -7925,6 +7925,9 @@ Map {
+       "pagesUnknown": {
+         "type": "bool",
+       },
++      "renderPageSelect": {
++        "type": "func",
++      },
+       "size": {
+         "args": [
+           [
+
+diff --git a/packages/react/src/components/Pagination/Pagination.stories.js b/packages/react/src/components/Pagination/Pagination.stories.js
+--- a/packages/react/src/components/Pagination/Pagination.stories.js
++++ b/packages/react/src/components/Pagination/Pagination.stories.js
+@@ -6,6 +6,7 @@
+  */
+ 
+ import Pagination from './Pagination';
++import { NumberInput } from '../NumberInput';
+ import React from 'react';
+ import { action } from 'storybook/actions';
+ import mdx from './Pagination.mdx';
+@@ -239,3 +240,53 @@ PaginationUnknownPages.parameters = {
+     exclude: ['pageInputDisabled', 'pagesUnknown', 'totalItems'],
+   },
+ };
++
++/**
++ * `renderPageSelect` lets you replace the default page-select control with
++ * any React node. The render function receives `{ currentPage, totalPages,
++ * currentPageSize, onSetPage }`.
++ *
++ * This story uses Carbon's `NumberInput` with `hideSteppers` to replace the
++ * default page-select `<Select>`, illustrating how any custom control can be
++ * slotted in.
++ * TODO: remove after initial review ?
++ */
++export const WithRenderPageSelect = (args) => (
++  <Pagination
++    {...props()}
++    totalItems={350}
++    pageSizes={[10, 20, 30]}
++    {...args}
++    renderPageSelect={({ currentPage, totalPages, onSetPage }) => (
++      <NumberInput
++        hideSteppers
++        id="page-select-number-input"
++        label="Page number"
++        hideLabel
++        size={args.size}
++        style={{
++          minInlineSize: 'unset',
++          paddingInline: '1rem',
++          inlineSize: `calc(${String(currentPage).length + 2}ch + 1rem)`,
++          border: '0',
++        }}
++        min={1}
++        max={totalPages}
++        value={currentPage}
++        onChange={(_e, { value }) => {
++          const next = Number(value);
++          if (next >= 1 && next <= totalPages) {
++            onSetPage(next);
++          }
++        }}
++      />
++    )}
++  />
++);
++
++WithRenderPageSelect.storyName = 'With custom page select (renderPageSelect)';
++WithRenderPageSelect.parameters = {
++  controls: {
++    exclude: ['renderPageSelect'],
++  },
++};
+
+diff --git a/packages/react/src/components/Pagination/Pagination.tsx b/packages/react/src/components/Pagination/Pagination.tsx
+--- a/packages/react/src/components/Pagination/Pagination.tsx
++++ b/packages/react/src/components/Pagination/Pagination.tsx
+@@ -116,6 +116,22 @@ export interface PaginationProps
+    */
+   pageSelectLabelText?: (total: number) => string;
+ 
++  /**
++   * Provide a custom render function for the page-selection control.
++   * When provided, the default `<Select>` is replaced with the returned node.
++   * Receives `{ currentPage, totalPages, currentPageSize, onSetPage }`.
++   */
++  renderPageSelect?: (props: {
++    /** The currently active page. */
++    currentPage: number;
++    /** Total number of pages derived from `totalItems` and `pageSize`. */
++    totalPages: number;
++    /** Current page size. */
++    currentPageSize: number;
++    /** Call this to change the active page. */
++    onSetPage: (page: number) => void;
++  }) => React.ReactNode;
++
+   /**
+    * The number dictating how many items a page contains.
+    */
+@@ -211,6 +227,7 @@ const Pagination = React.forwardRef(
+         `Page of ${total} ${total === 1 ? 'page' : 'pages'}`,
+       page: controlledPage = 1,
+       pageInputDisabled,
++      renderPageSelect,
+       pageSize: controlledPageSize,
+       pageSizeInputDisabled,
+       pageSizes: controlledPageSizes,
+@@ -269,7 +286,7 @@ const Pagination = React.forwardRef(
+       [`${prefix}--pagination__button--forward`]: true,
+       [`${prefix}--pagination__button--no-index`]: forwardButtonDisabled,
+     });
+-    const selectItems = renderSelectItems(totalPages);
++    const selectItems = renderPageSelect ? [] : renderSelectItems(totalPages);
+ 
+     const focusMap = {
+       backward: backBtnRef,
+@@ -501,18 +518,32 @@ const Pagination = React.forwardRef(
+             </span>
+           ) : (
+             <>
+-              <Select
+-                id={`${prefix}-pagination-select-${inputId}-right`}
+-                className={`${prefix}--select__page-number`}
+-                labelText={pageSelectLabelText(totalPages)}
+-                inline
+-                hideLabel
+-                onChange={handlePageInputChange}
+-                value={page}
+-                key={page}
+-                disabled={pageInputDisabled || disabled}>
+-                {selectItems}
+-              </Select>
++              {renderPageSelect ? (
++                renderPageSelect({
++                  currentPage: page,
++                  totalPages,
++                  currentPageSize: pageSize,
++                  onSetPage: (nextPage: number) => {
++                    setPage(nextPage);
++                    if (onChange) {
++                      onChange({ page: nextPage, pageSize });
++                    }
++                  },
++                })
++              ) : (
++                <Select
++                  id={`${prefix}-pagination-select-${inputId}-right`}
++                  className={`${prefix}--select__page-number`}
++                  labelText={pageSelectLabelText(totalPages)}
++                  inline
++                  hideLabel
++                  onChange={handlePageInputChange}
++                  value={page}
++                  key={page}
++                  disabled={pageInputDisabled || disabled}>
++                  {selectItems}
++                </Select>
++              )}
+               <span className={`${prefix}--pagination__text`}>
+                 {pageRangeText(page, totalPages)}
+               </span>
+@@ -643,6 +674,13 @@ Pagination.propTypes = {
+    */
+   pageSelectLabelText: PropTypes.func,
+ 
++  /**
++   * Provide a custom render function for the page-selection control.
++   * When provided, the default `<Select>` is replaced with the returned node.
++   * Receives `{ currentPage, totalPages, currentPageSize, onSetPage }`.
++   */
++  renderPageSelect: PropTypes.func,
++
+   /**
+    * The number dictating how many items a page contains.
+    */
+
+diff --git a/packages/react/src/components/Pagination/__tests__/Pagination-test.js b/packages/react/src/components/Pagination/__tests__/Pagination-test.js
+--- a/packages/react/src/components/Pagination/__tests__/Pagination-test.js
++++ b/packages/react/src/components/Pagination/__tests__/Pagination-test.js
+@@ -640,5 +640,26 @@ describe('Pagination', () => {
+ 
+       expect(nextButton.closest('.cds--popover--bottom')).toBeInTheDocument();
+     });
++
++    it('should call onChange when renderPageSelect calls onSetPage', async () => {
++      const onChange = jest.fn();
++
++      render(
++        <Pagination
++          totalItems={30}
++          pageSizes={[10]}
++          pageSize={10}
++          page={1}
++          onChange={onChange}
++          renderPageSelect={({ onSetPage }) => (
++            <button onClick={() => onSetPage(3)}>Go to 3</button>
++          )}
++        />
++      );
++
++      await userEvent.click(screen.getByText('Go to 3'));
++
++      expect(onChange).toHaveBeenCalledWith({ page: 3, pageSize: 10 });
++    });
+   });
+ });
+
+diff --git a/packages/react/src/components/Pagination/experimental/PageSelector.js b/packages/react/src/components/Pagination/experimental/PageSelector.js
+--- a/packages/react/src/components/Pagination/experimental/PageSelector.js
++++ b/packages/react/src/components/Pagination/experimental/PageSelector.js
+@@ -5,14 +5,18 @@
+  * LICENSE file in the root directory of this source tree.
+  */
+ 
+-import React from 'react';
++import React, { useEffect } from 'react';
+ import PropTypes from 'prop-types';
+ import classnames from 'classnames';
+ import { useId } from '../../../internal/useId';
+ import Select from '../../Select';
+ import SelectItem from '../../SelectItem';
+ import { usePrefix } from '../../../internal/usePrefix';
+ 
++/**
++ * @deprecated Use `Pagination` with the `renderPageSelect` prop instead.
++ * `unstable_PageSelector` / `preview_PageSelector` will be removed in v12.
++ */
+ function PageSelector({
+   className = null,
+   currentPage,
+@@ -25,6 +29,15 @@ function PageSelector({
+   const namespace = `${prefix}--unstable-pagination__page-selector`;
+   const instanceId = `${namespace}__select-${useId()}`;
+ 
++  useEffect(() => {
++    if (process.env.NODE_ENV !== 'production') {
++      console.warn(
++        '[Carbon] `unstable_PageSelector` / `preview_PageSelector` is deprecated and will be removed in v12. ' +
++          'Use `Pagination` with the `renderPageSelect` prop instead.'
++      );
++    }
++  }, []);
++
+   const renderPages = (total) => {
+     const pages = [];
+     for (let counter = 1; counter <= total; counter += 1) {
+
+diff --git a/packages/react/src/components/Pagination/experimental/Pagination-story.js b/packages/react/src/components/Pagination/experimental/Pagination-story.js
+--- a/packages/react/src/components/Pagination/experimental/Pagination-story.js
++++ b/packages/react/src/components/Pagination/experimental/Pagination-story.js
+@@ -23,7 +23,7 @@ const props = () => ({
+ });
+ 
+ export default {
+-  title: 'Preview/preview_Pagination',
++  title: 'Deprecated/preview_Pagination',
+   component: Pagination,
+   subcomponents: {
+     PageSelector,
+
+diff --git a/packages/react/src/components/Pagination/experimental/Pagination.js b/packages/react/src/components/Pagination/experimental/Pagination.js
+--- a/packages/react/src/components/Pagination/experimental/Pagination.js
++++ b/packages/react/src/components/Pagination/experimental/Pagination.js
+@@ -5,7 +5,7 @@
+  * LICENSE file in the root directory of this source tree.
+  */
+ 
+-import React, { useState } from 'react';
++import React, { useEffect, useState } from 'react';
+ import PropTypes from 'prop-types';
+ import classnames from 'classnames';
+ import { CaretRight, CaretLeft } from '@carbon/icons-react';
+@@ -14,6 +14,10 @@ import SelectItem from '../../SelectItem';
+ import { IconButton } from '../../IconButton';
+ import { usePrefix } from '../../../internal/usePrefix';
+ 
++/**
++ * @deprecated Use the stable `Pagination` component with the `renderPageSelect`
++ * prop instead. `unstable_Pagination` / `preview_Pagination` will be removed in v12.
++ */
+ function Pagination({
+   backwardText = 'Previous page',
+   children = undefined,
+@@ -38,6 +42,16 @@ function Pagination({
+   const [currentPageSize, setCurrentPageSize] = useState(pageSize);
+   const prefix = usePrefix();
+ 
++  useEffect(() => {
++    if (process.env.NODE_ENV !== 'production') {
++      console.warn(
++        '[Carbon] `unstable_Pagination` / `preview_Pagination` is deprecated and will be removed in v12. ' +
++          'Use the stable `Pagination` component with the `renderPageSelect` prop instead.'
++      );
++    }
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, []);
++
+   const totalPages = totalItems
+     ? Math.max(Math.ceil(totalItems / currentPageSize), 1)
+     : undefined;
+
+diff --git a/packages/react/src/components/Pagination/experimental/__tests__/Pagination-test.js b/packages/react/src/components/Pagination/experimental/__tests__/Pagination-test.js
+--- a/packages/react/src/components/Pagination/experimental/__tests__/Pagination-test.js
++++ b/packages/react/src/components/Pagination/experimental/__tests__/Pagination-test.js
+@@ -1,5 +1,5 @@
+ /**
+- * Copyright IBM Corp. 2024
++ * Copyright IBM Corp. 2024, 2026
+  *
+  * This source code is licensed under the Apache-2.0 license found in the
+  * LICENSE file in the root directory of this source tree.
+@@ -9,8 +9,20 @@ import React from 'react';
+ import userEvent from '@testing-library/user-event';
+ import { render, screen } from '@testing-library/react';
+ import Pagination from '../Pagination';
++import PageSelector from '../PageSelector';
+ 
+ describe('Preview Pagination', () => {
++  let consoleWarnSpy;
++
++  beforeEach(() => {
++    // Suppress expected deprecation warnings from unstable_Pagination
++    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
++  });
++
++  afterEach(() => {
++    consoleWarnSpy.mockRestore();
++  });
++
+   describe('renders as expected - Component API', () => {
+     it('should spread extra props onto outermost element', () => {
+       const { container } = render(
+@@ -102,3 +114,28 @@ describe('Preview Pagination', () => {
+     });
+   });
+ });
++
++describe('PageSelector', () => {
++  let consoleWarnSpy;
++
++  beforeEach(() => {
++    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
++  });
++
++  afterEach(() => {
++    consoleWarnSpy.mockRestore();
++  });
++
++  it('should emit a deprecation warning on mount in non-production', () => {
++    const originalEnv = process.env.NODE_ENV;
++    process.env.NODE_ENV = 'development';
++
++    render(<PageSelector currentPage={1} totalPages={2} />);
++
++    expect(consoleWarnSpy).toHaveBeenCalledWith(
++      expect.stringContaining('renderPageSelect')
++    );
++
++    process.env.NODE_ENV = originalEnv;
++  });
++});
+
+diff --git a/packages/react/src/index.ts b/packages/react/src/index.ts
+--- a/packages/react/src/index.ts
++++ b/packages/react/src/index.ts
+@@ -224,6 +224,9 @@ export {
+   OverflowMenuV2 as unstable_OverflowMenuV2,
+   OverflowMenuV2 as preview_OverflowMenuV2,
+ } from './components/OverflowMenuV2';
++// unstable_Pagination / preview_Pagination are deprecated. Use the stable
++// `Pagination` component with the `pageSelectRenderer` prop instead.
++// TODO: These exports will be removed in v12.
+ export {
+   PageSelector as unstable_PageSelector,
+   Pagination as unstable_Pagination,
