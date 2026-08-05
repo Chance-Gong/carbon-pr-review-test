@@ -1,0 +1,2776 @@
+diff --git a/.github/workflows/deploy-v12-storybooks.yml b/.github/workflows/deploy-v12-storybooks.yml
+new file mode 100644
+index 000000000000..0a0dfa1ef3db
+--- /dev/null
++++ b/.github/workflows/deploy-v12-storybooks.yml
+@@ -0,0 +1,59 @@
++name: Deploy v12 storybooks to GH pages
++
++on:
++  workflow_dispatch:
++  push:
++    branches:
++      - main
++
++concurrency:
++  group: ${{ github.workflow }}-${{ github.ref }}
++  cancel-in-progress: true
++
++jobs:
++  build-and-deploy:
++    runs-on: ubuntu-latest-larger-disk
++    strategy:
++      fail-fast: false
++      matrix:
++        include:
++          - package: react
++            name: React
++            destination: v12-react-storybook
++            cname: v2-react.carbondesignsystem.com
++          - package: web-components
++            name: Web Components
++            destination: v12-web-components-storybook
++            cname: v3-web-components.carbondesignsystem.com
++    steps:
++      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
++
++      - name: Use Node.js version from .nvmrc
++        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
++        with:
++          node-version-file: '.nvmrc'
++      - name: Install dependencies
++        run: yarn install --immutable
++      - name: Build project
++        run: yarn build
++      - name: Build static ${{ matrix.name }} v12 storybook
++        run: |
++          cd packages/${{ matrix.package }}
++          yarn storybook:v12:build
++      - name: Prepare static output
++        run: |
++          touch packages/${{ matrix.package }}/storybook-static-v12/.nojekyll
++          touch packages/${{ matrix.package }}/storybook-static-v12/CNAME
++          echo "${{ matrix.cname }}" > packages/${{ matrix.package }}/storybook-static-v12/CNAME
++      - name: Push ${{ matrix.name }} v12 storybook
++        uses: cpina/github-action-push-to-another-repository@55306faa4ed53b815ae49e564af8cfb359d32ae2 # v1.7.3
++        env:
++          API_TOKEN_GITHUB: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
++        with:
++          source-directory: 'packages/${{ matrix.package }}/storybook-static-v12'
++          destination-github-username: 'carbon-design-system'
++          destination-repository-name: ${{ matrix.destination }}
++          user-name: carbon-bot
++          user-email: carbon@us.ibm.com
++          target-branch: main
++          commit-message: 'chore(website): update v12 storybook'
+diff --git a/docs/feature-flags.md b/docs/feature-flags.md
+index 0199e7f59200..995b8c698fa5 100644
+--- a/docs/feature-flags.md
++++ b/docs/feature-flags.md
+@@ -21,6 +21,7 @@ but can change based on your feedback.
+ 
+ Flags prefixed with `enable-v12-*` are stable and won't change. They will be
+ marked as `true` or "on" by default in the next major version, v12.
++Use `enable-v12-release` to enable all `enable-v12-*` flags.
+ 
+ For more details on this naming convention, see the
+ [section below](#feature-flag-naming-convention).
+@@ -37,6 +38,7 @@ Unless otherwise specified, flags are `false` by default.
+ | `enable-treeview-controllable`                     | Enable the new TreeView controllable API                                             | React        |                                                                                                                                                                |
+ | `enable-v12-dynamic-floating-styles`               | Enable dynamic setting of floating styles for components like Popover, Tooltip, etc. | React        |                                                                                                                                                                |
+ | `enable-v12-overflowmenu`                          | Enable the use of the v12 OverflowMenu leveraging the Menu subcomponents             | React        | [enable-v12-overflowmenu](https://github.com/carbon-design-system/carbon/tree/main/packages/upgrade#enable-v12-overflowmenu)                                   |
++| `enable-v12-release`                               | Enable all v12 feature flags                                                         | React, Sass, Web components |                                                                                                                                                      |
+ | `enable-v12-structured-list-visible-icons`         | Enable icon components within StructuredList to always be visible                    | Sass         | [enable-v12-structured-list-visible-icons](https://github.com/carbon-design-system/carbon/tree/main/packages/upgrade#enable-v12-structured-list-visible-icons) |
+ | `enable-v12-tile-default-icons`                    | Enable default icons for Tile components                                             | React        | [enable-v12-tile-default-icons](https://github.com/carbon-design-system/carbon/tree/main/packages/upgrade#enable-v12-tile-default-icons)                       |
+ | `enable-v12-tile-radio-icons`                      | Enable rendering of updated radio icon in the tile components                        | React, Sass  | [enable-v12-tile-radio-icons](https://github.com/carbon-design-system/carbon/tree/main/packages/upgrade#enable-v12-tile-radio-icons)                           |
+diff --git a/docs/working-with-v12.md b/docs/working-with-v12.md
+new file mode 100644
+index 000000000000..968dec647625
+--- /dev/null
++++ b/docs/working-with-v12.md
+@@ -0,0 +1,314 @@
++# Working with v12
++
++This guide is for contributors working on the v12 preview surface in this
++repository. v12 work is still developed from within the v11 codebase, so the
++important rule is to keep the preview explicit: v11 remains the default
++experience, and v12 behavior is enabled through the v12 release flag in the v12
++Storybook environment.
++
++## v12 Storybooks
++
++The v12 storybooks are ran separately from the existing ones and use different
++ports so they can be open at the same time.
++
++```sh
++cd packages/react
++yarn storybook:v12
++```
++
++```sh
++cd packages/web-components
++yarn storybook:v12
++```
++
++|                         | v11     | v12     |
++| ----------------------- | ------- | ------- |
++| packages/react          | `:3011` | `:3012` |
++| packages/web-components | `:6011` | `:6012` |
++
++## The v12 release flag
++
++The root v12 flag is `enable-v12-release`. It is defined in
++`packages/feature-flags/feature-flags.yml` and defaults to `false` so normal v11
++usage stays unchanged.
++
++When `enable-v12-release` is enabled, every other flag whose name starts with
++`enable-v12-` is treated as enabled. That override lives in the shared feature
++flag package, not in one component or Storybook layer, because the behavior has
++to be consistent across JavaScript scopes and Sass:
++
++- `packages/feature-flags/src/FeatureFlagScope.ts` handles runtime flag checks.
++- `packages/feature-flags/index.scss` handles Sass `enabled(...)` checks.
++- `packages/react/src/components/FeatureFlags/index.tsx` exposes
++  `enableV12Release` for React trees.
++- `packages/web-components/src/components/feature-flags/index.ts` recognizes the
++  `enable-v12-release` attribute for Web Components.
++
++Prefer enabling `enable-v12-release` when you want the v12 preview as a whole.
++Use individual `enable-v12-*` flags only when a story, test, or migration path
++needs to isolate one behavior.
++
++## React usage
++
++The React v12 storybook has the `enable-v12-release` flag turned on globally for
++every story.
++
++A global decorator is configured in `.storybook-v12/preview.js` that wraps every
++story with `<FeatureFlags enableV12Release>`. That file also calls
++`enable('enable-v12-release')` so direct calls to the shared feature flag scope
++see the same v12 state.
++
++<!-- prettier-ignore-start -->
++
++> [!IMPORTANT]
++> You do not need to wrap stories with `<FeatureFlags enableV12Release>`
++>
++> Component-level `<FeatureFlag>` wrappers are still useful though, especially
++> when a story demonstrates a non-v12 flag or a focused migration case.
++
++<!-- prettier-ignore-end -->
++
++## Web Components usage
++
++The Web Components v12 storybook has the `enable-v12-release` flag turned on
++globally for every story.
++
++A global decorator is configured in `.storybook-v12/preview.js` that wraps every
++story with `<feature-flags enable-v12-release>`. That file also calls
++`enable('enable-v12-release')` so direct calls to the shared feature flag scope
++see the same v12 state.
++
++<!-- prettier-ignore-start -->
++
++> [!IMPORTANT]
++> You do not need to wrap stories with `<feature-flags enable-v12-release>`
++>
++> Component-level `<feature-flags>` wrappers are still useful though, especially
++> when a story demonstrates a non-v12 flag or a focused migration case.
++
++<!-- prettier-ignore-end -->
++
++Some Web Components Sass is selected through attributes on the component itself,
++for example `cds-toggle[enable-v12-toggle-reduced-label-spacing]`. The
++`feature-flags` element syncs enabled related flags onto nested components so a
++root v12 decorator is enough for those styles to apply. Keep that mapping in
++`FeatureFlagsElement.flagComponentMap` up to date when adding attribute-driven
++Web Components flags.
++
++## Sass usage
++
++For v12 Storybook builds, the `.storybook-v12/main.ts` files add this Sass
++configuration through Vite:
++
++```scss
++@use '@carbon/styles/scss/feature-flags' with (
++  $feature-flags: (
++    'enable-v12-release': true,
++  )
++);
++```
++
++That means component styles compiled in the v12 Storybook see all `enable-v12-*`
++Sass flags as enabled. Keep this at the Storybook config level instead of
++sprinkling v12 Sass setup through individual stories; the goal is for v12
++Storybook to behave like the future default build.
++
++Avoid configuring the same Sass module more than once in one compilation unit.
++If a story needs one-off Sass to demonstrate a flag, check whether it still
++makes sense after `enable-v12-release` is already on by default.
++
++## Feature flag stories in v12 Storybook
++
++The v12 Storybooks do not show separate `Feature Flag` sections for stories that
++are already committed to the next major. Instead, `enable-v12-*` feature flag
++stories are merged into the normal component story section.
++
++Feature flag stories for non-v12 flags are intentionally left in their
++`Feature Flag` sections. Those flags are still experimental or opt-in in v12, so
++the v12 Storybook should not make them look like defaults.
++
++This is generated by `tasks/prepare-v12-storybook.mjs`, which runs before v12
++Storybook dev and build commands. The script:
++
++- finds React `*.featureflag.stories.*` files and Web Components
++  `*.feature-flag.stories.*` files in `src/` and `.storybook-v12/stories/`;
++- only promotes `src/` feature-flag stories that reference an `enable-v12-*`
++  flag;
++- pairs them with the matching base `*.stories.*` file when one exists;
++- replaces matching base story exports with the feature-flag export;
++- keeps base-only stories unchanged;
++- moves feature-only stories into the normal component section;
++- prefixes feature-only story names with `🚀`;
++- preserves feature-story decorators and parameters for moved stories.
++
++The generated files live under `.storybook-v12/generated/` and are intentionally
++ignored by Git. Do not edit them. Change the original story files or the
++generator instead.
++
++When the generator runs, it prints the generated wrapper directory relative to
++the package command and then lists the story names grouped under each generated
++wrapper file. That output is the quickest way to check whether a new story was
++promoted or intentionally left in its feature flag section.
++
++The merge is export-name based. If a feature story is intended to replace an
++existing story, use the same export name in both files. If the export name is
++different, the v12 Storybook treats it as an additional story and marks it with
++`🚀`.
++
++## Authoring stories for v11, v12, or both
++
++Most stories should continue to live in the normal `*.stories.*` file. Reach for
++a feature-flag story file only when the v12 version needs different markup,
++different args, a different wrapper, or a story that should not appear in the
++v11 Storybook.
++
++### Stories for both v11 and v12
++
++Add the story to the normal component story file:
++
++- React: `Component.stories.js`
++- Web Components: `component.stories.ts`
++
++Use this when the story should appear in both Storybooks and the v12 release
++flag does not require a different example. In the v12 Storybook, the root v12
++decorator and Sass setup will still be active, so the same story may render with
++v12 behavior without needing a duplicate story.
++
++### v11-only stories
++
++Add the story only to the normal component story file. Do not add a matching
++export to the feature-flag story file.
++
++This keeps the story in v11 and, by default, also keeps it in v12. If the story
++should truly disappear from v12, it needs to be replaced by a feature-flag story
++with the same export name that represents the v12 default. Prefer replacement
++over hiding; v12 Storybook should show the future default surface, not a
++manually curated subset.
++
++### v12 replacements for existing v11 stories
++
++Add the v12 version to the matching feature-flag story file and use the same
++export name as the v11 story. The story file must reference an `enable-v12-*`
++flag for the v12 generator to promote it into the normal component section.
++
++For example, if the v11 file exports `Default`, the feature-flag file should
++also export `Default`. The v12 Storybook generator will use the feature-flag
++`Default` in place of the base `Default`, while the v11 Storybook continues to
++use the original story.
++
++Use this when a v12 flag changes the recommended default markup, args, expected
++interaction, or visual treatment. Keeping the export name the same is the signal
++that this is a replacement, not a new story.
++
++Do not use this path for non-v12 flags. A story for a flag such as
++`enable-whatever-flag` should stay in the `Feature Flag` section in both v11 and
++v12 because that behavior is still opt-in.
++
++### v12-only stories
++
++Add the story to a feature-flag story file under `.storybook-v12/stories/` and
++use a new export name that does not exist in a base story file.
++
++The v12 Storybook generator will move it into the normal component section and
++prefix the display name with `🚀`. This is for examples that are genuinely new
++in v12, such as a new component state, API shape, or migration-specific example
++that has no v11 equivalent.
++
++Use the `src/` feature-flag story files for stories that should still be visible
++in the v11 feature flag sections and are backed by an `enable-v12-*` flag. Use
++`.storybook-v12/stories/` when the story should only exist in the v12 Storybook
++or when there is no `src/` feature-flag story to promote.
++
++Do not rely on the JavaScript export name to include the emoji. The generator
++sets the display name through Storybook story metadata so the source remains a
++valid, normal export.
++
++#### A note on VRT
++
++The v12 Storybooks are preview environments. They are not currently enabled for
++Chromatic VRT. Keep visual checks focused on the existing default Storybooks
++until v12 ships and these v12 Storybooks become the default package Storybooks;
++at that point they should take over the normal Chromatic coverage.
++
++### Deprecated stories
++
++Inherited v11 stories whose top-level title is `Deprecated` are filtered out of
++the v12 Storybooks. Those stories describe APIs that are deprecated before v12,
++so carrying them forward would make the v12 surface look older than it is.
++
++The v12 Storybooks can still have a `Deprecated` section for APIs that are
++introduced in, or still present in, v12 and planned for removal later. Put those
++stories under `.storybook-v12/deprecated/` and use a `Deprecated/...` title. The
++inherited-story filter intentionally does not apply to local `.storybook-v12`
++stories.
++
++## Sidebar order
++
++The v12 Storybooks keep the same top-level sidebar order as v11:
++
++1. Getting Started
++2. Components
++3. Deprecated
++4. Elements
++5. Helpers
++6. Hooks
++7. Layout
++8. Preview
++
++For example, the current `Elements/Motion` placeholder is authored under
++`.storybook-v12/stories/` so it only appears in the v12 Storybooks and can
++validate the `🚀` prefix behavior under the Elements section.
++
++## Storybook identity
++
++The v12 Storybooks use hardcoded package next-version titles in
++`packages/*/.storybook-v12/theme.js` and the manager head files:
++
++- `@carbon/react v2.x`
++- `@carbon/web-components v3.x`
++
++They also add a toolbar item named `🚀 enable-v12-release` with the flag icon.
++The toolbar item is only a visual indicator; the actual flag state comes from
++the v12 preview decorator and Sass setup.
++
++Keep that indicator non-interactive unless there is a clear need to support
++toggling v12 off inside the v12 Storybook. The main reason it exists is to make
++parallel v11 and v12 Storybook windows hard to confuse.
++
++The v12 welcome pages are package-specific and use the React Storybook welcome
++layout. Web Components keeps its longer introductory content in
++`Getting Started/Getting started` so `Getting Started/Welcome` can stay a quick
++package/version landing page.
++
++## Publishing
++
++`.github/workflows/deploy-v12-storybooks.yml` publishes the v12 Storybooks on
++every push to `main` and can also be run manually. It follows the existing Web
++Components Storybook publish flow:
++
++1. install dependencies;
++2. build the project;
++3. build the package v12 Storybook;
++4. add `.nojekyll`;
++5. push the static output to a separate repository.
++
++The workflow only publishes static Storybook output. GitHub Pages repository
++settings are intentionally not handled here.
++
++## Things to watch out for
++
++- Do not turn `enable-v12-release` on by default in the root YAML until v12 is
++  actually the default release behavior.
++- Do not duplicate v12 defaults in every component story. Use the root v12
++  Storybook decorator and Sass setup.
++- Do not commit `.storybook-v12/generated/` output.
++- Do not remove feature-story decorators blindly. Some feature-flag stories
++  still enable non-v12 flags or carry documentation-specific parameters.
++- Keep Web Components attribute syncing in mind for Sass selectors that depend
++  on host attributes.
++- Do not treat the v12 Storybooks as VRT coverage yet. They are intentionally
++  outside Chromatic until they replace the current default Storybooks for v12.
++- When adding a new `enable-v12-*` flag, make sure it is represented anywhere
++  the package needs it: root YAML, React props if applicable, Web Components
++  attributes if applicable, Sass defaults if applicable, docs, telemetry, and
++  tests.
+diff --git a/packages/feature-flags/__tests__/scss-test.js b/packages/feature-flags/__tests__/scss-test.js
+index 20415b539094..4beb62631b73 100644
+--- a/packages/feature-flags/__tests__/scss-test.js
++++ b/packages/feature-flags/__tests__/scss-test.js
+@@ -88,6 +88,41 @@ describe('@carbon/feature-flags', () => {
+       // flag-b
+       expect(getValue(1)).toBe(false);
+     });
++
++    it('should enable v12 flags when the v12 release flag is enabled', async () => {
++      const { getValue } = await render(`
++        @use '../index.scss' as feature-flags with (
++          $feature-flags: (
++            'enable-v12-release': true,
++            'enable-v12-example': false,
++            'enable-not-v12-example': false,
++          )
++        );
++
++        $_: get-value(feature-flags.enabled('enable-v12-example'));
++        $_: get-value(feature-flags.enabled('enable-not-v12-example'));
++      `);
++
++      // enable-v12-example
++      expect(getValue(0)).toBe(true);
++      // enable-not-v12-example
++      expect(getValue(1)).toBe(false);
++    });
++
++    it('should allow v12 flags to be enabled independently of the v12 release flag', async () => {
++      const { getValue } = await render(`
++        @use '../index.scss' as feature-flags with (
++          $feature-flags: (
++            'enable-v12-release': false,
++            'enable-v12-example': true,
++          )
++        );
++
++        $_: get-value(feature-flags.enabled('enable-v12-example'));
++      `);
++
++      expect(getValue(0)).toBe(true);
++    });
+   });
+ 
+   describe('merge', () => {
+diff --git a/packages/feature-flags/feature-flags.yml b/packages/feature-flags/feature-flags.yml
+index 16e09a7da628..de38731cacea 100644
+--- a/packages/feature-flags/feature-flags.yml
++++ b/packages/feature-flags/feature-flags.yml
+@@ -17,6 +17,10 @@ feature-flags:
+     description: >
+       Enable the features and functionality for the v11 Release
+     enabled: true
++  - name: enable-v12-release
++    description: >
++      Enable the features and functionality for the v12 Release
++    enabled: false
+   - name: enable-experimental-tile-contrast
+     description: >
+       Deprecated, use enable-tile-contrast instead
+diff --git a/packages/feature-flags/index.scss b/packages/feature-flags/index.scss
+index dca276edd809..7a76ae9b973a 100644
+--- a/packages/feature-flags/index.scss
++++ b/packages/feature-flags/index.scss
+@@ -6,8 +6,12 @@
+ //
+ 
+ @use 'sass:map';
++@use 'sass:string';
+ @use 'scss/generated/feature-flags';
+ 
++$v12-release-flag: 'enable-v12-release';
++$v12-flag-prefix: 'enable-v12-';
++
+ $feature-flags: () !default;
+ $feature-flags: map.merge(
+   feature-flags.$generated-feature-flags,
+@@ -21,6 +25,12 @@ $feature-flags: map.merge(
+   @error 'Unable to find a feature flag named: #{$name}';
+ }
+ 
++@function enabled-by-v12-release($name) {
++  @return $name != $v12-release-flag and
++    string.index($name, $v12-flag-prefix) == 1 and
++    map.get($feature-flags, $v12-release-flag) == true;
++}
++
+ @mixin add($name, $enabled: false) {
+   @if map.has-key($feature-flags, $name) == true {
+     @error 'A feature flag named #{$name} already exists';
+@@ -50,6 +60,10 @@ $feature-flags: map.merge(
+ /// @returns {Boolean}
+ @function enabled($name) {
+   @if check-for-flag($name) == true {
++    @if enabled-by-v12-release($name) {
++      @return true;
++    }
++
+     @return map.get($feature-flags, $name);
+   }
+ }
+diff --git a/packages/feature-flags/src/FeatureFlagScope.ts b/packages/feature-flags/src/FeatureFlagScope.ts
+index 275a8917455d..42ba4dc64603 100644
+--- a/packages/feature-flags/src/FeatureFlagScope.ts
++++ b/packages/feature-flags/src/FeatureFlagScope.ts
+@@ -10,6 +10,9 @@ export type FeatureFlagRecord = Record<string, boolean>;
+ /** @deprecated Use `FeatureFlagRecord` instead. */
+ export type FeatureFlags = FeatureFlagRecord;
+ 
++const v12ReleaseFlag = 'enable-v12-release';
++const v12FlagPrefix = 'enable-v12-';
++
+ export class FeatureFlagScope {
+   flags: Map<string, boolean>;
+ 
+@@ -85,6 +88,14 @@ export class FeatureFlagScope {
+   enabled(name: string) {
+     this.checkForFlag(name);
+ 
++    if (
++      name !== v12ReleaseFlag &&
++      name.startsWith(v12FlagPrefix) &&
++      this.flags.get(v12ReleaseFlag) === true
++    ) {
++      return true;
++    }
++
+     return this.flags.get(name) ?? false;
+   }
+ }
+diff --git a/packages/feature-flags/src/__tests__/feature-flags-test.js b/packages/feature-flags/src/__tests__/feature-flags-test.js
+index 21f8735007e9..47e2b7081dca 100644
+--- a/packages/feature-flags/src/__tests__/feature-flags-test.js
++++ b/packages/feature-flags/src/__tests__/feature-flags-test.js
+@@ -72,6 +72,26 @@ describe('@carbon/feature-flags', () => {
+       expect(FeatureFlags.enabled('flag-b')).toBe(false);
+     });
+ 
++    it('should enable v12 flags when the v12 release flag is enabled', () => {
++      FeatureFlags.merge({
++        'enable-v12-release': true,
++        'enable-v12-example': false,
++        'enable-not-v12-example': false,
++      });
++
++      expect(FeatureFlags.enabled('enable-v12-example')).toBe(true);
++      expect(FeatureFlags.enabled('enable-not-v12-example')).toBe(false);
++    });
++
++    it('should allow v12 flags to be enabled independently of the v12 release flag', () => {
++      FeatureFlags.merge({
++        'enable-v12-release': false,
++        'enable-v12-example': true,
++      });
++
++      expect(FeatureFlags.enabled('enable-v12-example')).toBe(true);
++    });
++
+     it('should throw if the given flag does not exist', () => {
+       expect(() => {
+         FeatureFlags.enabled('flag-a');
+diff --git a/packages/react/.storybook-v12/.gitignore b/packages/react/.storybook-v12/.gitignore
+new file mode 100644
+index 000000000000..9e0adcc107c6
+--- /dev/null
++++ b/packages/react/.storybook-v12/.gitignore
+@@ -0,0 +1 @@
++/generated/
+diff --git a/packages/react/.storybook-v12/Welcome/Welcome.js b/packages/react/.storybook-v12/Welcome/Welcome.js
+new file mode 100644
+index 000000000000..a7a71774e82f
+--- /dev/null
++++ b/packages/react/.storybook-v12/Welcome/Welcome.js
+@@ -0,0 +1,56 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React from 'react';
++import './welcome.scss';
++import Link from '../../src/components/Link';
++import { ArrowRight } from '@carbon/icons-react';
++import { Stack } from '../../src/components/Stack';
++import { Callout } from '../../src/components/Notification';
++
++export const Welcome = () => {
++  return (
++    <div className="welcome__container">
++      <h2 className="welcome__heading">@carbon/react</h2>
++      <h4 className="welcome__heading welcome__heading--subtitle">v2.x</h4>
++      <Callout
++        className="v12-callout"
++        lowContrast
++        statusIconDescription="notification"
++        subtitle="Every story has the enable-v12-release flag set to true. Stories
++with 🚀 are v12-specific stories not present in the v11 storybook."
++        title="This storybook reflects work in progress for v12"
++      />
++      <Stack className="welcome__links" gap={5}>
++        <Link
++          href="https://carbondesignsystem.com/"
++          className="welcome__link"
++          renderIcon={ArrowRight}>
++          Website
++        </Link>
++        <Link
++          href="https://github.com/carbon-design-system/carbon/tree/main/packages/react"
++          className="welcome__link"
++          renderIcon={ArrowRight}>
++          GitHub repo
++        </Link>
++        <Link
++          href="https://github.com/carbon-design-system/carbon/blob/main/docs/release-schedule.md"
++          className="welcome__link"
++          renderIcon={ArrowRight}>
++          Release schedule
++        </Link>
++        <Link
++          href="https://github.com/carbon-design-system/carbon/blob/main/SECURITY.md"
++          className="welcome__link"
++          renderIcon={ArrowRight}>
++          Security policy
++        </Link>
++      </Stack>
++    </div>
++  );
++};
+diff --git a/packages/react/.storybook-v12/Welcome/Welcome.mdx b/packages/react/.storybook-v12/Welcome/Welcome.mdx
+new file mode 100644
+index 000000000000..e186e0d8e857
+--- /dev/null
++++ b/packages/react/.storybook-v12/Welcome/Welcome.mdx
+@@ -0,0 +1,8 @@
++import { Welcome as Intro } from './Welcome';
++import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
++
++<Meta title="Getting Started/Welcome" name="Welcome" />
++
++<Unstyled>
++  <Intro />
++</Unstyled>
+diff --git a/packages/react/.storybook-v12/Welcome/welcome.scss b/packages/react/.storybook-v12/Welcome/welcome.scss
+new file mode 100644
+index 000000000000..f502ed4cc59f
+--- /dev/null
++++ b/packages/react/.storybook-v12/Welcome/welcome.scss
+@@ -0,0 +1,46 @@
++//
++// Copyright IBM Corp. 2026
++//
++// This source code is licensed under the Apache-2.0 license found in the
++// LICENSE file in the root directory of this source tree.
++//
++
++@use '@carbon/styles/scss/type';
++@use '@carbon/styles/scss/colors';
++@use '@carbon/styles/scss/spacing';
++
++.welcome__container {
++  position: fixed;
++  padding: spacing.$spacing-09;
++  background: url('../../.storybook/Welcome/carbon_bg.png') no-repeat center
++    center fixed;
++  background-size: cover;
++  block-size: 100vh;
++  inline-size: 100vw;
++  inset-block-start: 0;
++  inset-inline-start: 0;
++}
++
++.welcome__heading {
++  @include type.type-style('productive-heading-07');
++
++  color: colors.$white;
++}
++
++.welcome__heading--subtitle {
++  font-weight: 600;
++}
++
++.welcome__link,
++.welcome__link:hover,
++.welcome__link.cds--link:visited {
++  color: colors.$blue-40;
++}
++
++.welcome__links {
++  margin-block-start: spacing.$spacing-07;
++}
++
++.v12-callout {
++  margin-block-start: spacing.$spacing-06;
++}
+diff --git a/packages/react/.storybook-v12/main.ts b/packages/react/.storybook-v12/main.ts
+new file mode 100644
+index 000000000000..de2f6a9a194b
+--- /dev/null
++++ b/packages/react/.storybook-v12/main.ts
+@@ -0,0 +1,121 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import fs from 'node:fs';
++import path from 'node:path';
++import { fileURLToPath } from 'node:url';
++
++import type { StorybookConfig } from '@storybook/react-vite';
++import { mergeConfig } from 'vite';
++
++import baseConfig from '../.storybook/main.ts';
++
++const configDir = fileURLToPath(new URL('.', import.meta.url));
++const manifestPath = path.join(configDir, 'generated', 'manifest.json');
++const manifest = fs.existsSync(manifestPath)
++  ? JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
++  : { replacedStories: [] };
++const deprecatedStoriesDir = path.join(configDir, 'deprecated');
++const replacedStories = new Set(manifest.replacedStories);
++const replacedDocs = new Set(
++  manifest.replacedStories.map((story: string) => {
++    return story.replace(/\.stories\.[^.]+$/, '.mdx');
++  })
++);
++const v12FeatureFlags = `@use '@carbon/styles/scss/feature-flags' with ($feature-flags: ('enable-v12-release': true));\n`;
++const v12FeatureFlagPattern = /\benable-v12-[a-z0-9-]+\b/;
++const titlePatterns = {
++  Deprecated: /(?:title:\s*['"`]|<Meta\s+title=["'])Deprecated(?:\/|['"`])/,
++};
++
++function isFeatureFlagStory(story: string) {
++  return (
++    story.includes('.featureflag.') ||
++    story.includes('.feature-flag.') ||
++    story.includes('/Feature Flag')
++  );
++}
++
++function isV12FeatureFlagStory(story: string) {
++  if (!isFeatureFlagStory(story) || story.startsWith('./')) {
++    return false;
++  }
++
++  try {
++    const source = fs.readFileSync(path.resolve(configDir, story), 'utf8');
++    return v12FeatureFlagPattern.test(source);
++  } catch {
++    return false;
++  }
++}
++
++function hasTopLevelTitle(story: string, title: keyof typeof titlePatterns) {
++  if (story.startsWith('./')) {
++    return false;
++  }
++
++  try {
++    const source = fs.readFileSync(path.resolve(configDir, story), 'utf8');
++    return titlePatterns[title].test(source);
++  } catch {
++    return false;
++  }
++}
++
++function getV12StoryPath(
++  story: NonNullable<StorybookConfig['stories']>[number]
++) {
++  if (story === './Welcome/Welcome.mdx') {
++    return story;
++  }
++
++  if (typeof story === 'string' && story.startsWith('./')) {
++    return `../.storybook/${story.slice(2)}`;
++  }
++
++  return story;
++}
++
++const stories = (baseConfig.stories ?? [])
++  .map(getV12StoryPath)
++  .filter((story) => {
++    return (
++      typeof story !== 'string' ||
++      (!isV12FeatureFlagStory(story) &&
++        !hasTopLevelTitle(story, 'Deprecated') &&
++        !replacedStories.has(story) &&
++        !replacedDocs.has(story))
++    );
++  })
++  .concat(
++    ...(fs.existsSync(deprecatedStoriesDir)
++      ? ['./deprecated/**/*.mdx', './deprecated/**/*.stories.@(js|jsx|ts|tsx)']
++      : []),
++    './generated/**/*.stories.@(js|jsx|ts|tsx)'
++  );
++
++const config: StorybookConfig = {
++  ...baseConfig,
++  stories,
++  async viteFinal(viteConfig, options) {
++    const baseViteConfig = baseConfig.viteFinal
++      ? await baseConfig.viteFinal(viteConfig, options)
++      : viteConfig;
++
++    return mergeConfig(baseViteConfig, {
++      css: {
++        preprocessorOptions: {
++          scss: {
++            additionalData: v12FeatureFlags,
++          },
++        },
++      },
++    });
++  },
++};
++
++export default config;
+diff --git a/packages/react/.storybook-v12/manager-head.html b/packages/react/.storybook-v12/manager-head.html
+new file mode 100644
+index 000000000000..d7d7c1781b4a
+--- /dev/null
++++ b/packages/react/.storybook-v12/manager-head.html
+@@ -0,0 +1,16 @@
++<script>
++  setTimeout(function () {
++    document.title = 'Carbon React v2.x Storybook';
++  }, 1000);
++</script>
++
++<link
++  rel="stylesheet"
++  href="https://1.www.s81c.com/common/carbon/plex/sans.css" />
++
++<style>
++  body {
++    font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
++    color-scheme: light dark;
++  }
++</style>
+diff --git a/packages/react/.storybook-v12/manager.js b/packages/react/.storybook-v12/manager.js
+new file mode 100644
+index 000000000000..9d3bdab407fd
+--- /dev/null
++++ b/packages/react/.storybook-v12/manager.js
+@@ -0,0 +1,16 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { addons } from 'storybook/manager-api';
++import theme from './theme';
++
++addons.setConfig({
++  theme,
++});
++
++localStorage.removeItem('@storybook/ui/store');
++localStorage.removeItem('storybook-layout');
+diff --git a/packages/react/.storybook-v12/preview-head.html b/packages/react/.storybook-v12/preview-head.html
+new file mode 100644
+index 000000000000..a63712b85b14
+--- /dev/null
++++ b/packages/react/.storybook-v12/preview-head.html
+@@ -0,0 +1,13 @@
++<style>
++  .sb-show-main.sb-main-padded {
++    display: flex;
++    flex-direction: column;
++    align-items: center;
++    padding: 42px;
++    transition: initial;
++  }
++
++  body #storybook-root {
++    width: 100%;
++  }
++</style>
+diff --git a/packages/react/.storybook-v12/preview.js b/packages/react/.storybook-v12/preview.js
+new file mode 100644
+index 000000000000..53de9d71d39b
+--- /dev/null
++++ b/packages/react/.storybook-v12/preview.js
+@@ -0,0 +1,83 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { enable } from '@carbon/feature-flags';
++import React from 'react';
++
++import basePreview, { argTypesEnhancers } from '../.storybook/preview';
++import { FeatureFlags } from '../src/components/FeatureFlags';
++
++enable('enable-v12-release');
++
++const v12ReleaseToolbar = {
++  name: '🚀 enable-v12-release',
++  description: 'Visual indicator for the v12 Storybook',
++  defaultValue: true,
++  toolbar: {
++    icon: 'flag',
++    title: '🚀 enable-v12-release',
++    items: [
++      {
++        value: true,
++        title: 'This storybook reflects work in progress for v12.',
++      },
++    ],
++    dynamicTitle: false,
++  },
++};
++
++const withV12Release = (Story, context) => (
++  <FeatureFlags enableV12Release>
++    <Story {...context} />
++  </FeatureFlags>
++);
++
++const { options: baseOptions = {}, ...baseParameters } =
++  basePreview.parameters ?? {};
++const baseOptionsWithoutStorySort = { ...baseOptions };
++delete baseOptionsWithoutStorySort.storySort;
++
++export const parameters = {
++  ...baseParameters,
++  options: {
++    ...baseOptionsWithoutStorySort,
++    storySort: {
++      method: 'alphabetical',
++      order: [
++        'Getting Started',
++        [
++          'Welcome',
++          'Getting started',
++          'Feature Flags',
++          'Custom styles',
++          'Carbon CDN style helpers',
++          'Form participation',
++        ],
++        'Components',
++        'Deprecated',
++        'Elements',
++        'Helpers',
++        'Hooks',
++        'Layout',
++        'Preview',
++      ],
++    },
++  },
++};
++
++const preview = {
++  ...basePreview,
++  parameters,
++  globalTypes: {
++    ...basePreview.globalTypes,
++    v12Release: v12ReleaseToolbar,
++  },
++  decorators: [withV12Release, ...(basePreview.decorators ?? [])],
++};
++
++export { argTypesEnhancers };
++export default preview;
+diff --git a/packages/react/.storybook-v12/stories/Motion/Motion.featureflag.stories.js b/packages/react/.storybook-v12/stories/Motion/Motion.featureflag.stories.js
+new file mode 100644
+index 000000000000..2c8f2bbc2441
+--- /dev/null
++++ b/packages/react/.storybook-v12/stories/Motion/Motion.featureflag.stories.js
+@@ -0,0 +1,18 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++import React from 'react';
++
++export default {
++  title: 'Elements/Motion',
++};
++
++export const TBD = {
++  name: '🚀 TBD',
++  render: () => {
++    return <p>Motion guidance for v12 is TBD.</p>;
++  },
++};
+diff --git a/packages/react/.storybook-v12/theme.js b/packages/react/.storybook-v12/theme.js
+new file mode 100644
+index 000000000000..91b25d5b7f3e
+--- /dev/null
++++ b/packages/react/.storybook-v12/theme.js
+@@ -0,0 +1,17 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { create } from 'storybook/theming';
++
++export default create({
++  fontBase: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif",
++  fontCode:
++    "'IBM Plex Mono', Menlo, 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace",
++  brandTitle: '🚀 @carbon/react v2.x',
++  brandUrl:
++    'https://github.com/carbon-design-system/carbon/tree/main/packages/react',
++});
+diff --git a/packages/react/.storybook/main.ts b/packages/react/.storybook/main.ts
+index bfb86f620dfa..78ea278c7e71 100644
+--- a/packages/react/.storybook/main.ts
++++ b/packages/react/.storybook/main.ts
+@@ -75,11 +75,6 @@ const config: StorybookConfig = {
+   },
+   async viteFinal(config) {
+     return mergeConfig(config, {
+-      esbuild: {
+-        include: /\.[jt]sx?$/,
+-        exclude: [],
+-        loader: 'tsx',
+-      },
+       css: {
+         preprocessorOptions: {
+           scss: {
+@@ -98,8 +93,8 @@ const config: StorybookConfig = {
+         },
+       },
+       optimizeDeps: {
+-        esbuildOptions: {
+-          loader: {
++        rolldownOptions: {
++          moduleTypes: {
+             '.js': 'jsx',
+           },
+         },
+diff --git a/packages/react/package.json b/packages/react/package.json
+index f8ac712bf905..94aa813fce67 100644
+--- a/packages/react/package.json
++++ b/packages/react/package.json
+@@ -38,10 +38,13 @@
+   },
+   "scripts": {
+     "build": "yarn clean && node tasks/build-styles.js && node tasks/build.js",
+-    "clean": "rimraf es lib icons/index.js icons/index.d.ts icons/index.esm.js storybook-static",
++    "clean": "rimraf es lib icons/index.js icons/index.d.ts icons/index.esm.js storybook-static storybook-static-v12 .storybook-v12/generated",
+     "postinstall": "ibmtelemetry --config=telemetry.yml",
+-    "storybook": "storybook dev -p 3000",
++    "storybook": "storybook dev -p 3011",
+     "storybook:build": "storybook build",
++    "storybook:v12": "yarn storybook:v12:prepare && storybook dev -p 3012 --config-dir .storybook-v12",
++    "storybook:v12:build": "yarn storybook:v12:prepare && storybook build --config-dir .storybook-v12 --output-dir storybook-static-v12",
++    "storybook:v12:prepare": "node ../../tasks/prepare-v12-storybook.mjs .",
+     "telemetry:config": "npx -y @ibm/telemetry-js-config-generator generate --id fd89d12b-6a39-48b4-adf4-30c94dc0dddd --endpoint https://www-api.ibm.com/ibm-telemetry/v1/metrics --files ./src/components/**/*.(tsx|js|jsx)"
+   },
+   "peerDependencies": {
+diff --git a/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js b/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js
+index b33dd78d5bef..68ca9aba5e4d 100644
+--- a/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js
++++ b/packages/react/src/components/FeatureFlags/__tests__/FeatureFlags-test.js
+@@ -117,6 +117,97 @@ describe('FeatureFlags', () => {
+     });
+   });
+ 
++  it('should enable v12 flags with the v12 release flag', () => {
++    const checkFlags = jest.fn();
++    const checkFlag = jest.fn();
++
++    function TestComponent() {
++      const featureFlags = useFeatureFlags();
++      const enableV12Release = useFeatureFlag('enable-v12-release');
++      const enableV12Overflowmenu = useFeatureFlag('enable-v12-overflowmenu');
++      const enableTreeviewControllable = useFeatureFlag(
++        'enable-treeview-controllable'
++      );
++
++      checkFlags({
++        enableV12Release: featureFlags.enabled('enable-v12-release'),
++        enableV12Overflowmenu: featureFlags.enabled('enable-v12-overflowmenu'),
++        enableTreeviewControllable: featureFlags.enabled(
++          'enable-treeview-controllable'
++        ),
++      });
++
++      checkFlag({
++        enableV12Release,
++        enableV12Overflowmenu,
++        enableTreeviewControllable,
++      });
++
++      return null;
++    }
++
++    render(
++      <FeatureFlags enableV12Release>
++        <TestComponent />
++      </FeatureFlags>
++    );
++
++    expect(checkFlags).toHaveBeenLastCalledWith({
++      enableV12Release: true,
++      enableV12Overflowmenu: true,
++      enableTreeviewControllable: false,
++    });
++    expect(checkFlag).toHaveBeenLastCalledWith({
++      enableV12Release: true,
++      enableV12Overflowmenu: true,
++      enableTreeviewControllable: false,
++    });
++  });
++
++  it('should inherit the v12 release flag through nested scopes', () => {
++    const checkFlag = jest.fn();
++
++    function TestComponent() {
++      const enableV12Overflowmenu = useFeatureFlag('enable-v12-overflowmenu');
++
++      checkFlag(enableV12Overflowmenu);
++
++      return null;
++    }
++
++    render(
++      <FeatureFlags enableV12Release>
++        <FeatureFlags enableV12Overflowmenu={false}>
++          <TestComponent />
++        </FeatureFlags>
++      </FeatureFlags>
++    );
++
++    expect(checkFlag).toHaveBeenLastCalledWith(true);
++  });
++
++  it('should allow nested scopes to disable the v12 release flag', () => {
++    const checkFlag = jest.fn();
++
++    function TestComponent() {
++      const enableV12Overflowmenu = useFeatureFlag('enable-v12-overflowmenu');
++
++      checkFlag(enableV12Overflowmenu);
++
++      return null;
++    }
++
++    render(
++      <FeatureFlags enableV12Release>
++        <FeatureFlags enableV12Release={false}>
++          <TestComponent />
++        </FeatureFlags>
++      </FeatureFlags>
++    );
++
++    expect(checkFlag).toHaveBeenLastCalledWith(false);
++  });
++
+   it('should re-render when flags change', () => {
+     const checkFlags = jest.fn();
+     const checkFlag = jest.fn();
+@@ -355,6 +446,56 @@ describe('FeatureFlags', () => {
+   });
+ 
+   describe('should support a prop for each feature flag', () => {
++    it('enable-v12-release - enableV12Release', () => {
++      const checkFlags = jest.fn();
++      const checkFlag = jest.fn();
++
++      function TestComponent() {
++        const featureFlags = useFeatureFlags();
++        const enableV12Release = useFeatureFlag('enable-v12-release');
++
++        checkFlags({
++          enableV12Release: featureFlags.enabled('enable-v12-release'),
++        });
++
++        checkFlag({
++          enableV12Release,
++        });
++
++        return null;
++      }
++
++      // Render the default
++      const { rerender } = render(
++        <FeatureFlags>
++          <TestComponent />
++        </FeatureFlags>
++      );
++
++      // Ensure the default value is as defined and as expected
++      expect(checkFlags).toHaveBeenLastCalledWith({
++        enableV12Release: false,
++      });
++      expect(checkFlag).toHaveBeenLastCalledWith({
++        enableV12Release: false,
++      });
++
++      // Enable the flag
++      rerender(
++        <FeatureFlags enableV12Release>
++          <TestComponent />
++        </FeatureFlags>
++      );
++
++      // Ensure that when enabled, this flag does not error
++      expect(checkFlags).toHaveBeenLastCalledWith({
++        enableV12Release: true,
++      });
++      expect(checkFlag).toHaveBeenLastCalledWith({
++        enableV12Release: true,
++      });
++    });
++
+     it('enable-v12-tile-default-icons - enableV12TileDefaultIcons', () => {
+       const checkFlags = jest.fn();
+       const checkFlag = jest.fn();
+diff --git a/packages/react/src/components/FeatureFlags/index.tsx b/packages/react/src/components/FeatureFlags/index.tsx
+index 65733107576a..135b79be6781 100644
+--- a/packages/react/src/components/FeatureFlags/index.tsx
++++ b/packages/react/src/components/FeatureFlags/index.tsx
+@@ -21,6 +21,7 @@ import { deprecate } from '../../prop-types/deprecate';
+ export interface FeatureFlagsProps {
+   children?: ReactNode;
+   flags?: Record<string, boolean>;
++  enableV12Release?: boolean;
+   enableV12TileDefaultIcons?: boolean;
+   enableV12TileRadioIcons?: boolean;
+   enableV12Overflowmenu?: boolean;
+@@ -52,6 +53,7 @@ const FeatureFlagContext = createContext<FeatureFlagScope>(GlobalFeatureFlags);
+ export const FeatureFlags = ({
+   children,
+   flags = {},
++  enableV12Release,
+   enableV12TileDefaultIcons = false,
+   enableV12TileRadioIcons = false,
+   enableV12Overflowmenu = false,
+@@ -67,6 +69,9 @@ export const FeatureFlags = ({
+ 
+   const scope = useMemo(() => {
+     const combinedFlags = {
++      ...(enableV12Release !== undefined
++        ? { 'enable-v12-release': enableV12Release }
++        : {}),
+       'enable-v12-tile-default-icons': enableV12TileDefaultIcons,
+       'enable-v12-tile-radio-icons': enableV12TileRadioIcons,
+       'enable-v12-overflowmenu': enableV12Overflowmenu,
+@@ -85,6 +90,7 @@ export const FeatureFlags = ({
+     scope.mergeWithScope(parentScope);
+     return scope;
+   }, [
++    enableV12Release,
+     enableV12TileDefaultIcons,
+     enableV12TileRadioIcons,
+     enableV12Overflowmenu,
+@@ -117,6 +123,7 @@ FeatureFlags.propTypes = {
+       'been deprecated. Please run the `featureflag-deprecate-flags-prop` codemod to migrate to individual boolean props.' +
+       `npx @carbon/upgrade migrate featureflag-deprecate-flags-prop --write`
+   ),
++  enableV12Release: PropTypes.bool,
+   enableV12TileDefaultIcons: PropTypes.bool,
+   enableV12TileRadioIcons: PropTypes.bool,
+   enableV12Overflowmenu: PropTypes.bool,
+diff --git a/packages/react/src/feature-flags.js b/packages/react/src/feature-flags.js
+index e3bfa827bd9c..10cd0eb020f8 100644
+--- a/packages/react/src/feature-flags.js
++++ b/packages/react/src/feature-flags.js
+@@ -11,6 +11,7 @@ merge({
+   'enable-css-custom-properties': true,
+   'enable-css-grid': true,
+   'enable-v11-release': true,
++  'enable-v12-release': false,
+   'enable-experimental-tile-contrast': false,
+   'enable-tile-contrast': false,
+   'enable-v12-tile-radio-icons': false,
+diff --git a/packages/react/telemetry.yml b/packages/react/telemetry.yml
+index 7eae477a180b..2e7c0d71475b 100644
+--- a/packages/react/telemetry.yml
++++ b/packages/react/telemetry.yml
+@@ -358,6 +358,7 @@ collect:
+         - enableTreeviewControllable
+         - enableV12DynamicFloatingStyles
+         - enableV12Overflowmenu
++        - enableV12Release
+         - enableV12TileDefaultIcons
+         - enableV12TileRadioIcons
+         - flags
+diff --git a/packages/styles/scss/_feature-flags.scss b/packages/styles/scss/_feature-flags.scss
+index 0280c1d3c136..7f136ac58a6b 100644
+--- a/packages/styles/scss/_feature-flags.scss
++++ b/packages/styles/scss/_feature-flags.scss
+@@ -10,6 +10,7 @@
+     'enable-css-custom-properties': true,
+     'enable-css-grid': true,
+     'enable-v11-release': true,
++    'enable-v12-release': false,
+     'enable-experimental-tile-contrast': false,
+     'enable-tile-contrast': false,
+     'enable-v12-tile-radio-icons': false,
+diff --git a/packages/styles/scss/components/structured-list/_structured-list.scss b/packages/styles/scss/components/structured-list/_structured-list.scss
+index 601cdc97a4d6..d253fc6088fd 100644
+--- a/packages/styles/scss/components/structured-list/_structured-list.scss
++++ b/packages/styles/scss/components/structured-list/_structured-list.scss
+@@ -200,7 +200,7 @@
+   }
+ 
+   @if not(
+-    enabled('enable-v12-structured-list-visible-icons') and
++    enabled('enable-v12-structured-list-visible-icons') or
+       $enable-v12-structured-list-visible-icons
+   )
+   {
+diff --git a/packages/web-components/.storybook-v12/.gitignore b/packages/web-components/.storybook-v12/.gitignore
+new file mode 100644
+index 000000000000..9e0adcc107c6
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/.gitignore
+@@ -0,0 +1 @@
++/generated/
+diff --git a/packages/web-components/.storybook-v12/CarbonCDNStyleHelpers.mdx b/packages/web-components/.storybook-v12/CarbonCDNStyleHelpers.mdx
+new file mode 100644
+index 000000000000..5ac66f902d33
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/CarbonCDNStyleHelpers.mdx
+@@ -0,0 +1,11 @@
++import { Markdown, Meta } from '@storybook/addon-docs/blocks';
++import Source from '../docs/carbon-cdn-style-helpers.mdx?raw';
++
++export const content = Source.replace(
++  /import\s+\{[^}]+\}\s+from\s+['"]@storybook\/addon-docs\/blocks['"];\n\n<Meta[^>]+>\n\n/,
++  ''
++);
++
++<Meta title="Getting Started/Carbon CDN style helpers" />
++
++<Markdown>{content}</Markdown>
+diff --git a/packages/web-components/.storybook-v12/CustomStyles.mdx b/packages/web-components/.storybook-v12/CustomStyles.mdx
+new file mode 100644
+index 000000000000..1bd5f624251f
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/CustomStyles.mdx
+@@ -0,0 +1,11 @@
++import { Markdown, Meta } from '@storybook/addon-docs/blocks';
++import Source from '../docs/styling.mdx?raw';
++
++export const content = Source.replace(
++  /import\s+\{[^}]+\}\s+from\s+['"]@storybook\/addon-docs\/blocks['"];\n\n<Meta[^>]+>\n\n/,
++  ''
++);
++
++<Meta title="Getting Started/Custom styles" />
++
++<Markdown>{content}</Markdown>
+diff --git a/packages/web-components/.storybook-v12/FormParticipation.mdx b/packages/web-components/.storybook-v12/FormParticipation.mdx
+new file mode 100644
+index 000000000000..210204feec28
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/FormParticipation.mdx
+@@ -0,0 +1,11 @@
++import { Markdown, Meta } from '@storybook/addon-docs/blocks';
++import Source from '../docs/form.mdx?raw';
++
++export const content = Source.replace(
++  /import\s+\{[^}]+\}\s+from\s+['"]@storybook\/addon-docs\/blocks['"];\n\n<Meta[^>]+>\n\n/,
++  ''
++);
++
++<Meta title="Getting Started/Form participation" />
++
++<Markdown>{content}</Markdown>
+diff --git a/packages/web-components/.storybook-v12/GettingStarted.mdx b/packages/web-components/.storybook-v12/GettingStarted.mdx
+new file mode 100644
+index 000000000000..48e14af29e30
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/GettingStarted.mdx
+@@ -0,0 +1,136 @@
++import { Meta } from '@storybook/addon-docs/blocks';
++
++<Meta title="Getting Started/Getting started" />
++
++A Carbon Design System variant that's as easy to use as native HTML elements,
++with no framework tax, no framework silo.
++
++<p align="center">
++  <a href="https://www.carbondesignsystem.com">
++    <img
++      alt="Carbon Design System"
++      src="https://user-images.githubusercontent.com/3901764/57545698-ce5f2380-7320-11e9-8682-903df232d7b0.png"
++      width="100%"
++    />
++  </a>
++</p>
++
++> Carbon is an open-source design system built by IBM. With the IBM Design
++> Language as its foundation, the system consists of working code, design tools
++> and resources, human interface guidelines, and a vibrant community of
++> contributors.
++
++<p align="center">
++  <a href="https://github.com/carbon-design-system/carbon/blob/main/LICENSE">
++    <img
++      src="https://img.shields.io/badge/license-Apache--2.0-blue.svg"
++      alt="Carbon is released under the Apache-2.0 license"
++    />
++  </a>
++</p>
++
++# `@carbon/web-components`
++
++`@carbon/web-components` is a variant of Carbon Design System with Custom
++Elements v1 and Shadow DOM v1 specs.
++
++The effort stems from
++https://github.com/carbon-design-system/issue-tracking/issues/121.
++
++## Getting started
++
++To install `@carbon/web-components` in your project, you will need to run the
++following command using [npm](https://www.npmjs.com/):
++
++```bash
++npm install --save @carbon/web-components
++```
++
++If you prefer [Yarn](https://yarnpkg.com/en/), use the following command
++instead:
++
++```bash
++yarn add @carbon/web-components
++```
++
++### Basic usage
++
++Our example at
++[Stackblitz](https://stackblitz.com/github/carbon-design-system/carbon/tree/main/packages/web-components/examples/components/dropdown)
++shows the most basic usage:
++
++The first thing you need is **setting up a module bundler** to resolve
++ECMAScript `import`s. The above example uses [Vite JS](https://vite.dev/), but
++you can use any modern ESM-capable bundler.
++
++Once you set up a module bundler, you can start importing our component modules,
++for example:
++
++```javascript
++import '@carbon/web-components/es/components/dropdown/dropdown.js';
++import '@carbon/web-components/es/components/dropdown/dropdown-item.js';
++```
++
++Once you've imported the component modules, you can use our components in the
++same manner as native HTML tags, for example:
++
++```html
++<cds-dropdown trigger-content="Select an item">
++  <cds-dropdown-item value="all">Option 1</cds-dropdown-item>
++  <cds-dropdown-item value="cloudFoundry">Option 2</cds-dropdown-item>
++  <cds-dropdown-item value="staging">Option 3</cds-dropdown-item>
++  <cds-dropdown-item value="dea">Option 4</cds-dropdown-item>
++  <cds-dropdown-item value="router">Option 5</cds-dropdown-item>
++</cds-dropdown>
++```
++
++An alternative to using a bundler are CDN artifacts which can be added client
++side in your html files. With CDNs, you can import the components in
++`<script type="module">`:
++
++```html
++<!doctype html>
++<html>
++  <head>
++    <script
++      type="module"
++      src="https://1.www.s81c.com/common/carbon/web-components/tag/v2/latest/dropdown.min.js"></script>
++    <style type="text/css">
++      #app {
++        font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
++        width: 300px;
++        margin: 2rem;
++      }
++
++      cds-dropdown:not(:defined),
++      cds-dropdown-item:not(:defined) {
++        visibility: hidden;
++      }
++    </style>
++  </head>
++  <body>
++    <div id="app">
++      <cds-dropdown trigger-content="Select an item">
++        <cds-dropdown-item value="all">Option 1</cds-dropdown-item>
++        <cds-dropdown-item value="cloudFoundry">Option 2</cds-dropdown-item>
++        <cds-dropdown-item value="staging">Option 3</cds-dropdown-item>
++        <cds-dropdown-item value="dea">Option 4</cds-dropdown-item>
++        <cds-dropdown-item value="router">Option 5</cds-dropdown-item>
++      </cds-dropdown>
++    </div>
++  </body>
++</html>
++```
++
++### JavaScript framework integration
++
++This package can also be used within other JavaScript frameworks such as Angular
++and Vue. This is achievable since web components are the modern browser
++standard, and work well with other front-end frameworks that exist in the
++application. In turn, this also comes with the benefits of encapsulation within
++the Shadow DOM.
++
++### Other usage guides
++
++- [Having components participate in form](/?path=/docs/introduction-form-paticipation--page)
++- [Using custom styles in components](/?path=/docs/introduction-custom-styles--page)
+diff --git a/packages/web-components/.storybook-v12/Welcome/Welcome.js b/packages/web-components/.storybook-v12/Welcome/Welcome.js
+new file mode 100644
+index 000000000000..e821b863f00e
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/Welcome/Welcome.js
+@@ -0,0 +1,75 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React from 'react';
++import './welcome.scss';
++import '../../src/components/link/index';
++import '../../src/components/notification/index';
++
++const links = [
++  {
++    href: 'https://carbondesignsystem.com/',
++    label: 'Website',
++  },
++  {
++    href: 'https://github.com/carbon-design-system/carbon/tree/main/packages/web-components',
++    label: 'GitHub repo',
++  },
++  {
++    href: 'https://github.com/carbon-design-system/carbon/blob/main/docs/release-schedule.md',
++    label: 'Release schedule',
++  },
++  {
++    href: 'https://github.com/carbon-design-system/carbon/blob/main/SECURITY.md',
++    label: 'Security policy',
++  },
++];
++
++export const Welcome = () => {
++  return React.createElement(
++    'div',
++    { className: 'welcome__container' },
++    React.createElement(
++      'h2',
++      { className: 'welcome__heading' },
++      '@carbon/web-components'
++    ),
++    React.createElement(
++      'h4',
++      { className: 'welcome__heading welcome__heading--subtitle' },
++      'v3.x'
++    ),
++    React.createElement('cds-callout-notification', {
++      className: 'v12-callout',
++      'low-contrast': true,
++      'status-icon-description': 'notification',
++      subtitle:
++        'Every story has the enable-v12-release flag set to true. Stories with 🚀 are v12-specific stories not present in the v11 storybook.',
++      title: 'This storybook reflects work in progress for v12',
++    }),
++    React.createElement(
++      'div',
++      { className: 'welcome__links' },
++      links.map((link) => {
++        return React.createElement(
++          'cds-link',
++          { className: 'welcome__link', href: link.href, key: link.href },
++          link.label,
++          React.createElement(
++            'span',
++            {
++              className: 'welcome__link-icon',
++              slot: 'icon',
++              'aria-hidden': 'true',
++            },
++            '→'
++          )
++        );
++      })
++    )
++  );
++};
+diff --git a/packages/web-components/.storybook-v12/Welcome/Welcome.mdx b/packages/web-components/.storybook-v12/Welcome/Welcome.mdx
+new file mode 100644
+index 000000000000..e186e0d8e857
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/Welcome/Welcome.mdx
+@@ -0,0 +1,8 @@
++import { Welcome as Intro } from './Welcome';
++import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
++
++<Meta title="Getting Started/Welcome" name="Welcome" />
++
++<Unstyled>
++  <Intro />
++</Unstyled>
+diff --git a/packages/web-components/.storybook-v12/Welcome/welcome.scss b/packages/web-components/.storybook-v12/Welcome/welcome.scss
+new file mode 100644
+index 000000000000..000bde9a6c88
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/Welcome/welcome.scss
+@@ -0,0 +1,53 @@
++//
++// Copyright IBM Corp. 2026
++//
++// This source code is licensed under the Apache-2.0 license found in the
++// LICENSE file in the root directory of this source tree.
++//
++
++@use '@carbon/styles/scss/type';
++@use '@carbon/styles/scss/colors';
++@use '@carbon/styles/scss/config' as *;
++@use '@carbon/styles/scss/spacing';
++
++.welcome__container {
++  position: fixed;
++  padding: spacing.$spacing-09;
++  background: url('../../../react/.storybook/Welcome/carbon_bg.png') no-repeat
++    center center fixed;
++  background-size: cover;
++  block-size: 100vh;
++  inline-size: 100vw;
++  inset-block-start: 0;
++  inset-inline-start: 0;
++}
++
++.welcome__heading {
++  @include type.type-style('productive-heading-07');
++
++  color: colors.$white;
++}
++
++.welcome__heading--subtitle {
++  font-weight: 600;
++}
++
++.welcome__links {
++  display: flex;
++  flex-direction: column;
++  gap: 1rem;
++  margin-block-start: spacing.$spacing-07;
++}
++
++.welcome__link {
++  --#{$prefix}-link-text-color: #{colors.$blue-40};
++  --#{$prefix}-link-hover-text-color: #{colors.$blue-40};
++}
++
++.welcome__link-icon {
++  line-height: 1;
++}
++
++.v12-callout {
++  margin-block-start: spacing.$spacing-06;
++}
+diff --git a/packages/web-components/.storybook-v12/main.ts b/packages/web-components/.storybook-v12/main.ts
+new file mode 100644
+index 000000000000..341f8183d6d3
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/main.ts
+@@ -0,0 +1,132 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import fs from 'node:fs';
++import path from 'node:path';
++import { fileURLToPath } from 'node:url';
++
++import type { StorybookConfig } from '@storybook/web-components-vite';
++import { mergeConfig } from 'vite';
++
++import baseConfig from '../.storybook/main.ts';
++
++const configDir = fileURLToPath(new URL('.', import.meta.url));
++const manifestPath = path.join(configDir, 'generated', 'manifest.json');
++const manifest = fs.existsSync(manifestPath)
++  ? JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
++  : { replacedStories: [] };
++const deprecatedStoriesDir = path.join(configDir, 'deprecated');
++const replacedStories = new Set(manifest.replacedStories);
++const replacedDocs = new Set(
++  manifest.replacedStories.map((story: string) => {
++    return story.replace(/\.stories\.[^.]+$/, '.mdx');
++  })
++);
++const v12FeatureFlags = `@use '@carbon/styles/scss/feature-flags' with ($feature-flags: ('enable-v12-release': true));\n`;
++const v12FeatureFlagPattern = /\benable-v12-[a-z0-9-]+\b/;
++const titlePatterns = {
++  Deprecated: /(?:title:\s*['"`]|<Meta\s+title=["'])Deprecated(?:\/|['"`])/,
++};
++
++function isFeatureFlagStory(story: string) {
++  return (
++    story.includes('.featureflag.') ||
++    story.includes('.feature-flag.') ||
++    story.includes('/Feature Flag')
++  );
++}
++
++function isV12FeatureFlagStory(story: string) {
++  if (!isFeatureFlagStory(story) || story.startsWith('./')) {
++    return false;
++  }
++
++  try {
++    const source = fs.readFileSync(path.resolve(configDir, story), 'utf8');
++    return v12FeatureFlagPattern.test(source);
++  } catch {
++    return false;
++  }
++}
++
++function isV12ExcludedStory(story: string) {
++  return [
++    '../docs/welcome.mdx',
++    '../docs/styling.mdx',
++    '../docs/carbon-cdn-style-helpers.mdx',
++    '../docs/form.mdx',
++  ].includes(story);
++}
++
++function hasTopLevelTitle(story: string, title: keyof typeof titlePatterns) {
++  if (story.startsWith('./')) {
++    return false;
++  }
++
++  try {
++    const source = fs.readFileSync(path.resolve(configDir, story), 'utf8');
++    return titlePatterns[title].test(source);
++  } catch {
++    return false;
++  }
++}
++
++function getV12StoryPath(
++  story: NonNullable<StorybookConfig['stories']>[number]
++) {
++  if (typeof story === 'string' && story.startsWith('./')) {
++    return `../.storybook/${story.slice(2)}`;
++  }
++
++  return story;
++}
++
++const stories = (baseConfig.stories ?? [])
++  .map(getV12StoryPath)
++  .filter((story) => {
++    return (
++      typeof story !== 'string' ||
++      (!isV12ExcludedStory(story) &&
++        !isV12FeatureFlagStory(story) &&
++        !hasTopLevelTitle(story, 'Deprecated') &&
++        !replacedStories.has(story) &&
++        !replacedDocs.has(story))
++    );
++  })
++  .concat(
++    './Welcome/Welcome.mdx',
++    './GettingStarted.mdx',
++    './CustomStyles.mdx',
++    './CarbonCDNStyleHelpers.mdx',
++    './FormParticipation.mdx',
++    ...(fs.existsSync(deprecatedStoriesDir)
++      ? ['./deprecated/**/*.mdx', './deprecated/**/*.stories.@(js|jsx|ts|tsx)']
++      : []),
++    './generated/**/*.stories.@(js|jsx|ts|tsx)'
++  );
++
++const config: StorybookConfig = {
++  ...baseConfig,
++  stories,
++  async viteFinal(viteConfig, options) {
++    const baseViteConfig = baseConfig.viteFinal
++      ? await baseConfig.viteFinal(viteConfig, options)
++      : viteConfig;
++
++    return mergeConfig(baseViteConfig, {
++      css: {
++        preprocessorOptions: {
++          scss: {
++            additionalData: v12FeatureFlags,
++          },
++        },
++      },
++    });
++  },
++};
++
++export default config;
+diff --git a/packages/web-components/.storybook-v12/manager-head.html b/packages/web-components/.storybook-v12/manager-head.html
+new file mode 100644
+index 000000000000..cef85bb551ce
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/manager-head.html
+@@ -0,0 +1,11 @@
++<script>
++  setTimeout(function () {
++    document.title = 'Carbon Web Components v3.x Storybook';
++  }, 1000);
++</script>
++
++<style type="text/css">
++  body {
++    color-scheme: light dark;
++  }
++</style>
+diff --git a/packages/web-components/.storybook-v12/manager.js b/packages/web-components/.storybook-v12/manager.js
+new file mode 100644
+index 000000000000..9d3bdab407fd
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/manager.js
+@@ -0,0 +1,16 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { addons } from 'storybook/manager-api';
++import theme from './theme';
++
++addons.setConfig({
++  theme,
++});
++
++localStorage.removeItem('@storybook/ui/store');
++localStorage.removeItem('storybook-layout');
+diff --git a/packages/web-components/.storybook-v12/preview-head.html b/packages/web-components/.storybook-v12/preview-head.html
+new file mode 100644
+index 000000000000..07c6cce8f273
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/preview-head.html
+@@ -0,0 +1,34 @@
++<script type="text/javascript">
++  window.ShadyDOM = {
++    force: false, // Set true to test ShadyDOM in Chrome
++  };
++
++  document.documentElement.setAttribute('lang', 'en');
++</script>
++<style type="text/css">
++  body {
++    color-scheme: light dark;
++  }
++
++  .cds-ce-doc--demo-iframe {
++    width: 100%;
++    height: 120px;
++    border: 1px solid var(--cds-ui-03, #e0e0e0);
++  }
++
++  .sb-show-main.sb-main-padded {
++    display: flex;
++    flex-direction: column;
++    align-items: center;
++    padding: 42px;
++    transition: initial;
++  }
++
++  body #storybook-root {
++    width: 100%;
++  }
++</style>
++
++<link
++  rel="stylesheet"
++  href="https://1.www.s81c.com/common/carbon-for-ibm-dotcom/tag/v1/latest/plex.css" />
+diff --git a/packages/web-components/.storybook-v12/preview.js b/packages/web-components/.storybook-v12/preview.js
+new file mode 100644
+index 000000000000..a7aab5117f97
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/preview.js
+@@ -0,0 +1,79 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { enable } from '@carbon/feature-flags';
++import { html } from 'lit';
++
++import * as basePreview from '../.storybook/preview';
++import '../src/components/feature-flags/index';
++
++enable('enable-v12-release');
++
++const v12ReleaseToolbar = {
++  name: '🚀 enable-v12-release',
++  description: 'Visual indicator for the v12 Storybook',
++  defaultValue: true,
++  toolbar: {
++    icon: 'flag',
++    title: '🚀 enable-v12-release',
++    items: [
++      {
++        value: true,
++        title:
++          'This storybook reflects work in progress for v12. Every story here has the enable-v12-release flag set to true. Stories with 🚀 are v12-specific stories not present in the v11 storybook.',
++      },
++    ],
++    dynamicTitle: false,
++  },
++};
++
++const { options: baseOptions = {}, ...baseParameters } =
++  basePreview.parameters ?? {};
++const baseOptionsWithoutStorySort = { ...baseOptions };
++delete baseOptionsWithoutStorySort.storySort;
++
++export const parameters = {
++  ...baseParameters,
++  options: {
++    ...baseOptionsWithoutStorySort,
++    storySort: {
++      method: 'alphabetical',
++      order: [
++        'Getting Started',
++        [
++          'Welcome',
++          'Getting started',
++          'Feature Flags',
++          'Custom styles',
++          'Carbon CDN style helpers',
++          'Form participation',
++        ],
++        'Components',
++        'Deprecated',
++        'Elements',
++        'Helpers',
++        'Hooks',
++        'Layout',
++        'Preview',
++      ],
++    },
++  },
++};
++export const globalTypes = {
++  ...basePreview.globalTypes,
++  v12Release: v12ReleaseToolbar,
++};
++export const decorators = [
++  (story) => html`<feature-flags enable-v12-release>${story()}</feature-flags>`,
++  ...(basePreview.decorators ?? []),
++];
++export const tags = ['autodocs'];
++export const Preview = {
++  parameters,
++  globalTypes,
++  decorators,
++};
+diff --git a/packages/web-components/.storybook-v12/stories/Motion/Motion.feature-flag.stories.js b/packages/web-components/.storybook-v12/stories/Motion/Motion.feature-flag.stories.js
+new file mode 100644
+index 000000000000..65a65a169c35
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/stories/Motion/Motion.feature-flag.stories.js
+@@ -0,0 +1,16 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { html } from 'lit';
++
++export default {
++  title: 'Elements/Motion',
++};
++
++export const TBD = {
++  render: () => html`<p>Motion guidance for v12 is TBD.</p>`,
++};
+diff --git a/packages/web-components/.storybook-v12/theme.js b/packages/web-components/.storybook-v12/theme.js
+new file mode 100644
+index 000000000000..d05044c2021f
+--- /dev/null
++++ b/packages/web-components/.storybook-v12/theme.js
+@@ -0,0 +1,17 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { create } from 'storybook/theming/create';
++
++export default create({
++  fontBase: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif",
++  fontCode:
++    "'IBM Plex Mono', Menlo, 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace",
++  brandTitle: '🚀 @carbon/web-components v3.x',
++  brandUrl:
++    'https://github.com/carbon-design-system/carbon/tree/main/packages/web-components',
++});
+diff --git a/packages/web-components/package.json b/packages/web-components/package.json
+index e7a4f81ba0f9..0989b44f00f7 100644
+--- a/packages/web-components/package.json
++++ b/packages/web-components/package.json
+@@ -52,12 +52,15 @@
+     "build:dist": "node tasks/build-dist.js",
+     "build:cdn": "yarn clean && yarn build:dist",
+     "ci-check": "yarn wca && yarn typecheck",
+-    "clean": "rimraf es es-custom lib scss dist storybook-static",
++    "clean": "rimraf es es-custom lib scss dist storybook-static storybook-static-v12 .storybook-v12/generated",
+     "postinstall": "ibmtelemetry --config=telemetry.yml",
+     "serve": "node tasks/build.js --serve",
+     "start": "yarn storybook",
+-    "storybook": "storybook dev -p 6006",
++    "storybook": "storybook dev -p 6011",
+     "storybook:build": "storybook build",
++    "storybook:v12": "yarn storybook:v12:prepare && storybook dev -p 6012 --config-dir .storybook-v12",
++    "storybook:v12:build": "yarn storybook:v12:prepare && storybook build --config-dir .storybook-v12 --output-dir storybook-static-v12",
++    "storybook:v12:prepare": "node ../../tasks/prepare-v12-storybook.mjs .",
+     "test": "web-test-runner \"src/components/**/__tests__/**/*.js\" --node-resolve --concurrency=1",
+     "test:updateSnapshots": "yarn test --update-snapshots",
+     "typecheck": "tsc --noEmit -p tsconfig.json",
+diff --git a/packages/web-components/src/components/feature-flags/__tests__/feature-flags-test.js b/packages/web-components/src/components/feature-flags/__tests__/feature-flags-test.js
+index 4d55da8c66bf..f8da2c427e07 100644
+--- a/packages/web-components/src/components/feature-flags/__tests__/feature-flags-test.js
++++ b/packages/web-components/src/components/feature-flags/__tests__/feature-flags-test.js
+@@ -46,6 +46,16 @@ describe('featue-flag', function () {
+     expect(isFeatureFlagEnabled('enable-dialog-element', child)).to.be.true;
+   });
+ 
++  it('should return true for boolean feature flag attributes', async () => {
++    const featureFlag = html`<feature-flags enable-dialog-element
++      ><div id="child"></div
++    ></feature-flags>`;
++    const el = await fixture(featureFlag);
++    const child = el.querySelector('#child');
++    expect(child).to.exist;
++    expect(isFeatureFlagEnabled('enable-dialog-element', child)).to.be.true;
++  });
++
+   it('should return false if feature is disabled', async () => {
+     const featureFlag = html`<feature-flags enable-dialog-element="false"
+       ><div id="child"></div
+@@ -55,6 +65,36 @@ describe('featue-flag', function () {
+     expect(isFeatureFlagEnabled('enable-dialog-element', child)).to.be.false;
+   });
+ 
++  it('should enable v12 flags with the v12 release flag', async () => {
++    const featureFlag = html`<feature-flags enable-v12-release
++      ><div id="child"></div
++    ></feature-flags>`;
++    const el = await fixture(featureFlag);
++    const child = el.querySelector('#child');
++    expect(child).to.exist;
++    expect(
++      isFeatureFlagEnabled('enable-v12-toggle-reduced-label-spacing', child)
++    ).to.be.true;
++    expect(isFeatureFlagEnabled('enable-dialog-element', child)).to.be.false;
++  });
++
++  it('should add enabled v12 release flags to child components', async () => {
++    const featureFlag = html`<feature-flags enable-v12-release>
++      <cds-toggle
++        id="child"
++        label-text="Label"
++        label-a="On"
++        label-b="Off"
++        toggled></cds-toggle>
++    </feature-flags>`;
++    const el = await fixture(featureFlag);
++    const child = el.querySelector('#child');
++    expect(child).to.have.attribute(
++      'enable-v12-toggle-reduced-label-spacing',
++      ''
++    );
++  });
++
+   it('should recognize multiple enabled flags', async () => {
+     const el = await fixture(html`
+       <feature-flags
+@@ -81,6 +121,20 @@ describe('featue-flag', function () {
+     expect(isFeatureFlagEnabled('enable-dialog-element', child)).to.be.true;
+   });
+ 
++  it('should inherit the v12 release flag from parent feature-flags', async () => {
++    const el = await fixture(html`
++      <feature-flags enable-v12-release>
++        <feature-flags enable-v12-toggle-reduced-label-spacing="false">
++          <div id="child"></div>
++        </feature-flags>
++      </feature-flags>
++    `);
++    const child = el.querySelector('#child');
++    expect(
++      isFeatureFlagEnabled('enable-v12-toggle-reduced-label-spacing', child)
++    ).to.be.true;
++  });
++
+   it('should override parent flag if child redefines it', async () => {
+     const el = await fixture(html`
+       <feature-flags enable-dialog-element="false">
+diff --git a/packages/web-components/src/components/feature-flags/index.ts b/packages/web-components/src/components/feature-flags/index.ts
+index 975036843b98..ea12ce67e907 100644
+--- a/packages/web-components/src/components/feature-flags/index.ts
++++ b/packages/web-components/src/components/feature-flags/index.ts
+@@ -50,6 +50,7 @@ class FeatureFlagsElement extends LitElement {
+    * Mapping of feature flag attributes to their related component names.
+    */
+   private static readonly flagComponentMap = {
++    'enable-v12-release': null,
+     'enable-v12-tile-default-icons': 'CDS-CLICKABLE-TILE',
+     'enable-v12-tile-radio-icons': 'CDS-TILE',
+     'enable-v12-overflowmenu': 'CDS-OVERFLOW-MENU',
+@@ -86,14 +87,44 @@ class FeatureFlagsElement extends LitElement {
+     // Set feature flag to top component level
+     const relatedComponent = hasOwn(FeatureFlagsElement.flagComponentMap, name)
+       ? FeatureFlagsElement.flagComponentMap[name]
+-      : 'unknown';
+-    if (this.firstElementChild?.tagName === relatedComponent) {
++      : null;
++    if (
++      relatedComponent &&
++      this.firstElementChild?.tagName === relatedComponent
++    ) {
+       this.firstElementChild.setAttribute(name, '');
+     }
+ 
+     this.updateScope();
+   }
+ 
++  private syncFeatureFlagAttributes() {
++    for (const [flag, relatedComponent] of Object.entries(
++      FeatureFlagsElement.flagComponentMap
++    )) {
++      if (!relatedComponent || flag === 'enable-v12-release') {
++        continue;
++      }
++
++      let isEnabled = false;
++      try {
++        isEnabled = this.scope.enabled(flag);
++      } catch {
++        isEnabled = false;
++      }
++
++      if (!isEnabled) {
++        continue;
++      }
++
++      for (const element of this.querySelectorAll(
++        relatedComponent.toLowerCase()
++      )) {
++        element.setAttribute(flag, '');
++      }
++    }
++  }
++
+   private getParentScope() {
+     let parent = this.parentNode;
+     while (parent) {
+@@ -112,6 +143,7 @@ class FeatureFlagsElement extends LitElement {
+       newScope.mergeWithScope(parentScope);
+     }
+     this.scope = newScope;
++    this.syncFeatureFlagAttributes();
+   }
+ 
+   render() {
+diff --git a/packages/web-components/src/components/notification/notification.mdx b/packages/web-components/src/components/notification/notification.mdx
+index b39053a7f38b..76244c67c843 100644
+--- a/packages/web-components/src/components/notification/notification.mdx
++++ b/packages/web-components/src/components/notification/notification.mdx
+@@ -1,6 +1,8 @@
+ import { ArgTypes, Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
+ import { cdnJs } from '../../globals/internal/storybook-cdn';
+ 
++<Meta isTemplate />
++
+ # Notification
+ 
+ [Source code](https://github.com/carbon-design-system/carbon/tree/main/packages/web-components/src/components/notification)
+diff --git a/tasks/prepare-v12-storybook.mjs b/tasks/prepare-v12-storybook.mjs
+new file mode 100644
+index 000000000000..b45f892a8e26
+--- /dev/null
++++ b/tasks/prepare-v12-storybook.mjs
+@@ -0,0 +1,559 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import fs from 'node:fs/promises';
++import path from 'node:path';
++
++const packageArg = process.argv[2] ?? '.';
++const packageDir = path.resolve(process.cwd(), packageArg);
++const sourceDir = path.join(packageDir, 'src');
++const storybookDir = path.join(packageDir, '.storybook-v12');
++const storybookStoriesDir = path.join(storybookDir, 'stories');
++const generatedDir = path.join(storybookDir, 'generated');
++const manifestPath = path.join(generatedDir, 'manifest.json');
++
++const storyExportRegex =
++  /^export\s+(?:const|function)\s+([A-Za-z_$][\w$]*)\b/gm;
++const v12FeatureFlagRegex = /\benable-v12-[a-z0-9-]+\b/;
++
++/**
++ * Storybook config prefers POSIX-style paths even when the script runs on a
++ * platform with different path separators.
++ *
++ * @param {string} value
++ * @returns {string}
++ */
++function toPosixPath(value) {
++  return value.split(path.sep).join('/');
++}
++
++/**
++ * Build an import specifier from one generated wrapper file to one source story
++ * file. The result is always relative because generated files are not part of a
++ * package export surface.
++ *
++ * @param {string} fromFile
++ * @param {string} targetFile
++ * @returns {string}
++ */
++function toImportPath(fromFile, targetFile) {
++  const relativePath = toPosixPath(
++    path.relative(path.dirname(fromFile), targetFile)
++  );
++  return relativePath.startsWith('.') ? relativePath : `./${relativePath}`;
++}
++
++/**
++ * Convert an absolute file path to the path format stored in the v12 manifest.
++ * These paths are relative to `.storybook-v12` because `.storybook-v12/main.ts`
++ * compares them against its configured story paths.
++ *
++ * @param {string} file
++ * @returns {string}
++ */
++function toStoryPath(file) {
++  return toPosixPath(path.relative(storybookDir, file));
++}
++
++/**
++ * Format paths for terminal output relative to the command's current working
++ * directory. This keeps package-local commands readable, e.g.
++ * `./.storybook-v12/generated`.
++ *
++ * @param {string} file
++ * @returns {string}
++ */
++function toDisplayPath(file) {
++  const relativePath = toPosixPath(path.relative(process.cwd(), file));
++
++  if (relativePath === '') {
++    return '.';
++  }
++
++  if (relativePath.startsWith('../') || relativePath.startsWith('./')) {
++    return relativePath;
++  }
++
++  return `./${relativePath}`;
++}
++
++/**
++ * The repo has used both `.featureflag` and `.feature-flag` naming. Treat both
++ * as feature-flag stories so older and newer component files are handled
++ * consistently.
++ *
++ * @param {string} file
++ * @returns {boolean}
++ */
++function isFeatureFlagStory(file) {
++  return (
++    file.includes('.featureflag.stories.') ||
++    file.includes('.feature-flag.stories.')
++  );
++}
++
++/**
++ * Stories under `.storybook-v12/stories` are authored only for v12, so they do
++ * not need to reference an `enable-v12-*` flag to be promoted.
++ *
++ * @param {string} file
++ * @returns {boolean}
++ */
++function isLocalV12Story(file) {
++  return file.startsWith(`${storybookStoriesDir}${path.sep}`);
++}
++
++/**
++ * Only `enable-v12-*` flags are committed to become v12 defaults. Other feature
++ * flags should remain in their Feature Flag sidebar sections.
++ *
++ * @param {string} source
++ * @returns {boolean}
++ */
++function hasV12FeatureFlag(source) {
++  return v12FeatureFlagRegex.test(source);
++}
++
++/**
++ * Feature-flag stories conventionally sit next to a base story file with the
++ * feature-flag marker removed from the filename. If a base story exists, the
++ * generated wrapper can replace or merge its exports.
++ *
++ * @param {string} featureStoryFile
++ * @returns {string | undefined}
++ */
++function getBaseStoryFile(featureStoryFile) {
++  const candidates = [
++    featureStoryFile.replace('.featureflag.stories.', '.stories.'),
++    featureStoryFile.replace('.feature-flag.stories.', '.stories.'),
++  ];
++
++  return candidates.find((candidate) => candidate !== featureStoryFile);
++}
++
++/**
++ * Convert a `.../Feature Flag` title back to the normal component section.
++ * Local v12-only stories may not have a matching base file, so the fallback
++ * derives a component-ish title from the file location.
++ *
++ * @param {string | undefined} title
++ * @param {string} featureStoryFile
++ * @returns {string}
++ */
++function stripFeatureFlagTitle(title, featureStoryFile) {
++  if (title) {
++    return title.replace(/\/Feature Flags?$/i, '');
++  }
++
++  const componentName = path.basename(
++    path.dirname(
++      featureStoryFile.replace(`${path.sep}stories${path.sep}`, path.sep)
++    )
++  );
++  return `Components/${componentName}`;
++}
++
++/**
++ * Extract simple CSF default-export titles. The generator only needs the
++ * static title strings used by the existing Storybook files.
++ *
++ * @param {string} source
++ * @returns {string | undefined}
++ */
++function getTitle(source) {
++  return source.match(/title:\s*['"]([^'"]+)['"]/)?.[1];
++}
++
++/**
++ * Collect named story exports from a CSF file while preserving declaration
++ * order. This intentionally ignores re-exports and dynamic patterns because the
++ * existing feature-flag stories use direct `export const` / `export function`
++ * declarations.
++ *
++ * @param {string} source
++ * @returns {string[]}
++ */
++function getStoryExports(source) {
++  const exports = [];
++  for (const match of source.matchAll(storyExportRegex)) {
++    if (!exports.includes(match[1])) {
++      exports.push(match[1]);
++    }
++  }
++  return exports;
++}
++
++/**
++ * Mirror Storybook's readable-name fallback for an export name.
++ *
++ * @param {string} exportName
++ * @returns {string}
++ */
++function getStoryName(exportName) {
++  return exportName
++    .replace(/^_+/, '')
++    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
++    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
++}
++
++/**
++ * Create stable generated wrapper filenames from source story paths. The source
++ * path is encoded into the filename to avoid collisions between components with
++ * similarly named feature-flag files.
++ *
++ * @param {string} featureStoryFile
++ * @returns {string}
++ */
++function getGeneratedFileName(featureStoryFile) {
++  const relativePath = toPosixPath(path.relative(packageDir, featureStoryFile));
++  return `${relativePath.replace(/[^A-Za-z0-9_$]+/g, '__')}.stories.js`;
++}
++
++/**
++ * Small access helper for optional base stories and optional local v12 story
++ * directories.
++ *
++ * @param {string} file
++ * @returns {Promise<boolean>}
++ */
++async function fileExists(file) {
++  try {
++    await fs.access(file);
++    return true;
++  } catch {
++    return false;
++  }
++}
++
++/**
++ * Resolve a file while tolerating case-only filename differences. Some existing
++ * story files vary by component casing, and generated imports need the actual
++ * on-disk filename.
++ *
++ * @param {string} file
++ * @returns {Promise<string | null>}
++ */
++async function resolveExistingFile(file) {
++  try {
++    const directory = path.dirname(file);
++    const basename = path.basename(file).toLowerCase();
++    const entries = await fs.readdir(directory, { withFileTypes: true });
++    const entry = entries.find((entry) => {
++      return entry.isFile() && entry.name.toLowerCase() === basename;
++    });
++
++    if (entry) {
++      return path.join(directory, entry.name);
++    }
++
++    return (await fileExists(file)) ? file : null;
++  } catch {
++    return (await fileExists(file)) ? file : null;
++  }
++}
++
++/**
++ * Recursively list files below a directory. The story globs are simple enough
++ * that walking once is easier to reason about than coordinating multiple glob
++ * patterns.
++ *
++ * @param {string} directory
++ * @returns {Promise<string[]>}
++ */
++async function findFiles(directory) {
++  const entries = await fs.readdir(directory, { withFileTypes: true });
++  const files = [];
++
++  for (const entry of entries) {
++    const entryPath = path.join(directory, entry.name);
++    if (entry.isDirectory()) {
++      files.push(...(await findFiles(entryPath)));
++      continue;
++    }
++    files.push(entryPath);
++  }
++
++  return files;
++}
++
++/**
++ * Generate a wrapper CSF file that presents v12 feature-flag stories as normal
++ * v12 Storybook stories.
++ *
++ * Export names are the merge contract:
++ * - matching base and feature exports become replacements;
++ * - base-only exports stay unchanged;
++ * - feature-only exports are new v12 stories and receive the `🚀` label.
++ *
++ * @param {object} options
++ * @param {string | null} options.baseStoryFile
++ * @param {string[]} options.baseStoryExports
++ * @param {string} options.featureStoryFile
++ * @param {string[]} options.featureStoryExports
++ * @param {string} options.outputFile
++ * @param {string} options.title
++ * @returns {string}
++ */
++function createGeneratedStory({
++  baseStoryFile,
++  baseStoryExports,
++  featureStoryFile,
++  featureStoryExports,
++  outputFile,
++  title,
++}) {
++  const baseExportSet = new Set(baseStoryExports);
++  const featureExportSet = new Set(featureStoryExports);
++
++  // Preserve the base story order first, then append new v12-only stories.
++  // That keeps the v12 sidebar familiar while still surfacing new examples.
++  const storyExports = [
++    ...baseStoryExports.map((name) => ({
++      name,
++      source: featureExportSet.has(name) ? 'featureStories' : 'baseStories',
++      isNew: false,
++    })),
++    ...featureStoryExports
++      .filter((name) => !baseExportSet.has(name))
++      .map((name) => ({
++        name,
++        source: 'featureStories',
++        isNew: true,
++      })),
++  ];
++
++  const imports = [
++    baseStoryFile
++      ? `import * as baseStories from '${toImportPath(outputFile, baseStoryFile)}';`
++      : 'const baseStories = {};',
++    `import * as featureStories from '${toImportPath(
++      outputFile,
++      featureStoryFile
++    )}';`,
++  ].join('\n');
++
++  const exports = storyExports
++    .map(({ name, source, isNew }) => {
++      const story =
++        source === 'featureStories'
++          ? `withFeatureMeta(${source}.${name})`
++          : `${source}.${name}`;
++      const annotation = isNew ? `markNewStory(${story}, '${name}')` : story;
++      const storyExport = `export const ${name} = ${annotation};`;
++
++      if (!isNew) {
++        return storyExport;
++      }
++
++      // Storybook's indexer reads static storyName assignments. The runtime
++      // helper alone is not enough to keep the marker in the sidebar.
++      return `${storyExport}\n${name}.storyName = '🚀 ${getStoryName(name)}';`;
++    })
++    .join('\n');
++
++  return `/**
++ * Code generated by tasks/prepare-v12-storybook.mjs. DO NOT EDIT.
++ */
++
++${imports}
++
++const baseMeta = baseStories.default ?? {};
++const featureMeta = featureStories.default ?? {};
++const featureMetaDecorators = featureMeta.decorators ?? [];
++const featureMetaParameters = featureMeta.parameters ?? {};
++
++function getStoryName(exportName) {
++  return exportName
++    .replace(/^_+/, '')
++    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
++    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
++}
++
++function getNewStoryName(storyName) {
++  return storyName.startsWith('🚀 ') ? storyName : '🚀 ' + storyName;
++}
++
++// Preserve feature story decorators/parameters because many feature-flag stories
++// carry docs pages, wrappers, or component-specific controls.
++function markNewStory(story, exportName) {
++  if (typeof story === 'function') {
++    story.storyName = getNewStoryName(
++      story.storyName ?? getStoryName(exportName)
++    );
++    return story;
++  }
++
++  return {
++    ...story,
++    name: getNewStoryName(story?.name ?? getStoryName(exportName)),
++  };
++}
++
++function withFeatureMeta(story) {
++  if (typeof story === 'function') {
++    story.decorators = [...(story.decorators ?? []), ...featureMetaDecorators];
++    story.parameters = {
++      ...featureMetaParameters,
++      ...(story.parameters ?? {}),
++    };
++    return story;
++  }
++
++  return {
++    ...story,
++    decorators: [...(story?.decorators ?? []), ...featureMetaDecorators],
++    parameters: {
++      ...featureMetaParameters,
++      ...(story?.parameters ?? {}),
++    },
++  };
++}
++
++// Prefer base metadata when it exists so generated wrappers keep the normal
++// component docs settings. The generated title deliberately drops Feature Flag.
++export default {
++  ...featureMeta,
++  ...baseMeta,
++  title: '${title}',
++  decorators: baseMeta.decorators,
++};
++
++${exports}
++`;
++}
++
++/**
++ * Build the generated v12 wrapper directory and manifest for one package.
++ */
++async function main() {
++  console.log(`\n┌  tasks/prepare-v12-storybook.mjs
++│
++│  Generating v12 wrapper storybook stories into ./.storybook-v12/generated
++│
++●  Starting...`);
++
++  const allFiles = [
++    ...(await findFiles(sourceDir)),
++    ...((await fileExists(storybookStoriesDir))
++      ? await findFiles(storybookStoriesDir)
++      : []),
++  ];
++  const featureStoryFiles = allFiles
++    .filter((file) => isFeatureFlagStory(file))
++    .sort();
++
++  // Recreate the generated directory on every run so deleted or renamed source
++  // stories do not leave stale wrappers behind.
++  await fs.rm(generatedDir, { recursive: true, force: true });
++  await fs.mkdir(generatedDir, { recursive: true });
++
++  const replacedStories = new Set();
++  const generatedStories = [];
++
++  for (const featureStoryFile of featureStoryFiles) {
++    const featureStorySource = await fs.readFile(featureStoryFile, 'utf8');
++
++    // Source feature-flag stories are only v12 defaults when they reference an
++    // `enable-v12-*` flag. Other feature-flag stories remain opt-in in v12.
++    if (
++      !isLocalV12Story(featureStoryFile) &&
++      !hasV12FeatureFlag(featureStorySource)
++    ) {
++      continue;
++    }
++
++    const featureStoryExports = getStoryExports(featureStorySource);
++    if (featureStoryExports.length === 0) {
++      continue;
++    }
++
++    const baseStoryCandidate = getBaseStoryFile(featureStoryFile);
++    const baseStoryFile = baseStoryCandidate
++      ? await resolveExistingFile(baseStoryCandidate)
++      : null;
++    const baseStorySource = baseStoryFile
++      ? await fs.readFile(baseStoryFile, 'utf8')
++      : '';
++    const baseStoryExports = baseStoryFile
++      ? getStoryExports(baseStorySource)
++      : [];
++
++    if (baseStoryFile) {
++      // The v12 Storybook removes the original base story entry when a generated
++      // wrapper replaces it, avoiding duplicate story IDs.
++      replacedStories.add(toStoryPath(baseStoryFile));
++    }
++
++    const title = stripFeatureFlagTitle(
++      getTitle(baseStorySource) ?? getTitle(featureStorySource),
++      featureStoryFile
++    );
++    const outputFile = path.join(
++      generatedDir,
++      getGeneratedFileName(featureStoryFile)
++    );
++    const generatedStory = createGeneratedStory({
++      baseStoryFile,
++      baseStoryExports,
++      featureStoryFile,
++      featureStoryExports,
++      outputFile,
++      title,
++    });
++
++    await fs.writeFile(outputFile, generatedStory);
++    generatedStories.push({
++      path: toStoryPath(outputFile),
++      displayPath: toDisplayPath(outputFile),
++      stories: [
++        ...baseStoryExports.map((name) => ({
++          name: getStoryName(name),
++        })),
++        ...featureStoryExports
++          .filter((name) => !baseStoryExports.includes(name))
++          .map((name) => ({
++            name: `🚀 ${getStoryName(name)}`,
++          })),
++      ],
++    });
++  }
++
++  await fs.writeFile(
++    manifestPath,
++    `${JSON.stringify(
++      {
++        generatedStories: generatedStories.map((story) => story.path),
++        replacedStories: [...replacedStories].sort(),
++      },
++      null,
++      2
++    )}\n`
++  );
++
++  for (const generatedStory of generatedStories) {
++    console.log(`│\n◇  ${generatedStory.displayPath}`);
++    for (const story of generatedStory.stories) {
++      console.log(`│    - ${story.name}`);
++    }
++  }
++
++  console.log(`|\n●  Done!
++│  Generated ${generatedStories.length} v12 Storybook wrapper stories in ${toDisplayPath(
++    generatedDir
++  )}
++|\n▲  Do not edit ./.storybook-v12/generated
++|\n▲  All v12-specific stories are flagged with 🚀
++|\n└  Exiting tasks/prepare-v12-storybook.mjs
++`);
++}
++
++main().catch((error) => {
++  console.log(`│
++└  tasks/prepare-v12-storybook.mjs exiting with an error...`);
++  console.error(error);
++  process.exit(1);
++});
