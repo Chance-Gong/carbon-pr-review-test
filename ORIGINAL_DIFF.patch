@@ -1,0 +1,4557 @@
+diff --git a/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap b/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
+--- a/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
++++ b/packages/react/__tests__/__snapshots__/PublicAPI-test.js.snap
+@@ -745,6 +745,379 @@ Map {
+       },
+     },
+   },
++  "Card" => {
++    "$$typeof": Symbol(react.forward_ref),
++    "Action": {
++      "displayName": "Card.Action",
++      "propTypes": {
++        "children": {
++          "type": "node",
++        },
++        "className": {
++          "type": "string",
++        },
++        "label": {
++          "type": "string",
++        },
++      },
++    },
++    "Actions": {
++      "displayName": "Card.Actions",
++      "propTypes": {
++        "children": {
++          "type": "node",
++        },
++        "className": {
++          "type": "string",
++        },
++        "overflowMenuLabel": {
++          "type": "string",
++        },
++      },
++    },
++    "Body": {
++      "$$typeof": Symbol(react.forward_ref),
++      "propTypes": {
++        "children": {
++          "type": "node",
++        },
++        "className": {
++          "type": "string",
++        },
++      },
++      "render": [Function],
++    },
++    "Footer": {
++      "$$typeof": Symbol(react.forward_ref),
++      "propTypes": {
++        "children": {
++          "type": "node",
++        },
++        "className": {
++          "type": "string",
++        },
++      },
++      "render": [Function],
++    },
++    "Header": {
++      "$$typeof": Symbol(react.forward_ref),
++      "propTypes": {
++        "children": {
++          "type": "node",
++        },
++        "className": {
++          "type": "string",
++        },
++      },
++      "render": [Function],
++    },
++    "HeaderMedia": {
++      "displayName": "Card.HeaderMedia",
++      "propTypes": {
++        "children": {
++          "type": "node",
++        },
++        "className": {
++          "type": "string",
++        },
++      },
++    },
++    "Media": {
++      "displayName": "Card.Media",
++      "propTypes": {
++        "children": {
++          "type": "node",
++        },
++        "className": {
++          "type": "string",
++        },
++        "mediaWidth": {
++          "type": "string",
++        },
++      },
++    },
++    "Title": {
++      "$$typeof": Symbol(react.forward_ref),
++      "propTypes": {
++        "children": {
++          "type": "node",
++        },
++        "className": {
++          "type": "string",
++        },
++        "description": {
++          "type": "node",
++        },
++        "descriptionTruncate": {
++          "args": [
++            [
++              {
++                "type": "bool",
++              },
++              {
++                "type": "number",
++              },
++            ],
++          ],
++          "type": "oneOfType",
++        },
++        "label": {
++          "type": "node",
++        },
++        "labelTruncate": {
++          "args": [
++            [
++              {
++                "type": "bool",
++              },
++              {
++                "type": "number",
++              },
++            ],
++          ],
++          "type": "oneOfType",
++        },
++        "maxWidth": {
++          "type": "string",
++        },
++        "titleEnd": {
++          "type": "node",
++        },
++        "titleStart": {
++          "type": "node",
++        },
++        "titleTruncate": {
++          "args": [
++            [
++              {
++                "type": "bool",
++              },
++              {
++                "type": "number",
++              },
++            ],
++          ],
++          "type": "oneOfType",
++        },
++      },
++      "render": [Function],
++    },
++    "TitleMedia": {
++      "$$typeof": Symbol(react.forward_ref),
++      "propTypes": {
++        "children": {
++          "type": "node",
++        },
++        "className": {
++          "type": "string",
++        },
++      },
++      "render": [Function],
++    },
++    "propTypes": {
++      "children": {
++        "type": "node",
++      },
++      "className": {
++        "type": "string",
++      },
++      "clickable": {
++        "type": "bool",
++      },
++      "decorator": {
++        "type": "node",
++      },
++      "density": {
++        "args": [
++          [
++            "productive",
++            "expressive",
++          ],
++        ],
++        "type": "oneOf",
++      },
++      "disabled": {
++        "type": "bool",
++      },
++      "horizontal": {
++        "type": "bool",
++      },
++      "onClick": {
++        "type": "func",
++      },
++      "onKeyDown": {
++        "type": "func",
++      },
++    },
++    "render": [Function],
++  },
++  "CardAction" => {
++    "displayName": "Card.Action",
++    "propTypes": {
++      "children": {
++        "type": "node",
++      },
++      "className": {
++        "type": "string",
++      },
++      "label": {
++        "type": "string",
++      },
++    },
++  },
++  "CardActions" => {
++    "displayName": "Card.Actions",
++    "propTypes": {
++      "children": {
++        "type": "node",
++      },
++      "className": {
++        "type": "string",
++      },
++      "overflowMenuLabel": {
++        "type": "string",
++      },
++    },
++  },
++  "CardBody" => {
++    "$$typeof": Symbol(react.forward_ref),
++    "propTypes": {
++      "children": {
++        "type": "node",
++      },
++      "className": {
++        "type": "string",
++      },
++    },
++    "render": [Function],
++  },
++  "CardFooter" => {
++    "$$typeof": Symbol(react.forward_ref),
++    "propTypes": {
++      "children": {
++        "type": "node",
++      },
++      "className": {
++        "type": "string",
++      },
++    },
++    "render": [Function],
++  },
++  "CardHeader" => {
++    "$$typeof": Symbol(react.forward_ref),
++    "propTypes": {
++      "children": {
++        "type": "node",
++      },
++      "className": {
++        "type": "string",
++      },
++    },
++    "render": [Function],
++  },
++  "CardHeaderMedia" => {
++    "displayName": "Card.HeaderMedia",
++    "propTypes": {
++      "children": {
++        "type": "node",
++      },
++      "className": {
++        "type": "string",
++      },
++    },
++  },
++  "CardMedia" => {
++    "displayName": "Card.Media",
++    "propTypes": {
++      "children": {
++        "type": "node",
++      },
++      "className": {
++        "type": "string",
++      },
++      "mediaWidth": {
++        "type": "string",
++      },
++    },
++  },
++  "CardTitle" => {
++    "$$typeof": Symbol(react.forward_ref),
++    "propTypes": {
++      "children": {
++        "type": "node",
++      },
++      "className": {
++        "type": "string",
++      },
++      "description": {
++        "type": "node",
++      },
++      "descriptionTruncate": {
++        "args": [
++          [
++            {
++              "type": "bool",
++            },
++            {
++              "type": "number",
++            },
++          ],
++        ],
++        "type": "oneOfType",
++      },
++      "label": {
++        "type": "node",
++      },
++      "labelTruncate": {
++        "args": [
++          [
++            {
++              "type": "bool",
++            },
++            {
++              "type": "number",
++            },
++          ],
++        ],
++        "type": "oneOfType",
++      },
++      "maxWidth": {
++        "type": "string",
++      },
++      "titleEnd": {
++        "type": "node",
++      },
++      "titleStart": {
++        "type": "node",
++      },
++      "titleTruncate": {
++        "args": [
++          [
++            {
++              "type": "bool",
++            },
++            {
++              "type": "number",
++            },
++          ],
++        ],
++        "type": "oneOfType",
++      },
++    },
++    "render": [Function],
++  },
++  "CardTitleMedia" => {
++    "$$typeof": Symbol(react.forward_ref),
++    "propTypes": {
++      "children": {
++        "type": "node",
++      },
++      "className": {
++        "type": "string",
++      },
++    },
++    "render": [Function],
++  },
+   "Checkbox" => {
+     "$$typeof": Symbol(react.forward_ref),
+     "propTypes": {
+
+diff --git a/packages/react/src/__tests__/index-test.js b/packages/react/src/__tests__/index-test.js
+--- a/packages/react/src/__tests__/index-test.js
++++ b/packages/react/src/__tests__/index-test.js
+@@ -37,6 +37,16 @@ describe('Carbon Components React', () => {
+         "ButtonTooltipAlignments",
+         "ButtonTooltipPositions",
+         "Callout",
++        "Card",
++        "CardAction",
++        "CardActions",
++        "CardBody",
++        "CardFooter",
++        "CardHeader",
++        "CardHeaderMedia",
++        "CardMedia",
++        "CardTitle",
++        "CardTitleMedia",
+         "Checkbox",
+         "CheckboxGroup",
+         "CheckboxSkeleton",
+
+diff --git a/packages/react/src/components/Card/Card.mdx b/packages/react/src/components/Card/Card.mdx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/Card.mdx
+@@ -0,0 +1,146 @@
++import { ArgTypes, Meta, Canvas } from '@storybook/addon-docs/blocks';
++import * as CardStories from './Card.stories';
++
++<Meta isTemplate />
++
++# Card
++
++[Source code](https://github.com/carbon-design-system/carbon/tree/main/packages/react/src/components/Card)
++&nbsp;
++
++{/* <!-- START doctoc generated TOC please keep comment here to allow auto update --> <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE --> */}
++
++## Table of Contents
++
++- [Overview](#overview)
++- [Subcomponents](#subcomponents)
++- [Density](#density)
++- [Clickable cards](#clickable-cards)
++- [Disabled state](#disabled-state)
++- [Media](#media)
++- [Header actions](#header-actions)
++- [AI label](#ai-label)
++- [Horizontal layout](#horizontal-layout)
++- [Component API](#component-api)
++- [Feedback](#feedback)
++
++{/* <!-- END doctoc generated TOC please keep comment here to allow auto update --> */}
++
++## Overview
++
++The `Card` component is a flexible container for displaying related content and
++actions. Cards are composed from a set of subcomponents — `Card.Header`,
++`Card.Body`, `Card.Footer`, `Card.Media`, and more — that slot into a structured
++layout.
++
++```jsx
++import { Card } from '@carbon/react';
++
++function Example() {
++  return (
++    <Card>
++      <Card.Header>
++        <Card.Title>Card title</Card.Title>
++      </Card.Header>
++      <Card.Body>
++        <p>Card body content.</p>
++      </Card.Body>
++      <Card.Footer>
++        <Button kind="tertiary" size="md">
++          Action
++        </Button>
++      </Card.Footer>
++    </Card>
++  );
++}
++```
++
++<Canvas of={CardStories.Minimal} />
++
++## Subcomponents
++
++| Subcomponent      | Alias              | Purpose                                                                    |
++| ----------------- | ------------------ | -------------------------------------------------------------------------- |
++| `CardHeader`      | `Card.Header`      | Contains title, media, and actions                                         |
++| `CardBody`        | `Card.Body`        | Primary content area                                                       |
++| `CardFooter`      | `Card.Footer`      | Bottom action bar                                                          |
++| `CardMedia`       | `Card.Media`       | Image/video slot (aspect ratio wrapper)                                    |
++| `CardHeaderMedia` | `Card.HeaderMedia` | Icon/image slot spanning the full header width above the title             |
++| `CardTitleMedia`  | `Card.TitleMedia`  | Media slot to the left of the title                                        |
++| `CardTitle`       | `Card.Title`       | Primary heading text; accepts `label` and `description` props for sub-text |
++| `CardActions`     | `Card.Actions`     | Action button group in the header                                          |
++| `CardAction`      | `Card.Action`      | Individual action wrapper (footer or header)                               |
++
++## Density
++
++Cards support two density variants via the `density` prop:
++
++- **`productive`** (default) — uses `$heading-compact-02` for a compact layout
++- **`expressive`** — uses `$heading-03` for a more spacious layout
++
++<Canvas of={CardStories.ProductiveAndExpressive} />
++
++## Clickable cards
++
++Pass `clickable` and `onClick` to make the entire card interactive. The card
++renders as a `<button>` and gains focus/hover styles. Interactive elements
++inside a clickable card should call `e.stopPropagation()` to prevent the card
++click from firing.
++
++```jsx
++<Card clickable onClick={() => navigate('/detail')}>
++  <Card.Body>Content</Card.Body>
++</Card>
++```
++
++## Disabled state
++
++Pass `disabled` to mute the card visually and prevent all interaction. Manually
++pass `disabled` to any interactive elements inside the card (buttons, inputs)
++since the card itself does not propagate the disabled state.
++
++<Canvas of={CardStories.Disabled} />
++
++## Media
++
++Use `Card.Media` with a `ratio` prop to render an aspect-ratio-constrained media
++slot. Supported ratios are those accepted by the Carbon `AspectRatio` component
++(`16x9`, `9x16`, `2x1`, `1x2`, `4x3`, `3x4`, `1x1`).
++
++Place `Card.Media` inside `Card.Header` for a top-positioned image, or as a
++direct child of `Card` with the `horizontal` prop for a side-by-side layout.
++
++<Canvas of={CardStories.WithMedia} />
++
++## Header actions
++
++Place `Card.Actions` inside `Card.Header` to add icon or text buttons
++right-aligned in the header row.
++
++<Canvas of={CardStories.WithHeaderActions} />
++
++## AI label
++
++Pass an `AILabel` to the `decorator` prop to render an AI label in the top-right
++corner of the card with a gradient border treatment.
++
++<Canvas of={CardStories.WithAILabel} />
++
++## Horizontal layout
++
++Pass `horizontal` to the `Card` to render media and content side-by-side.
++`Card.Media` must be a direct child of `Card` (not nested in `Card.Header`). Use
++`mediaWidth` on `Card.Media` to control the media column width (default:
++`33.33%`).
++
++<Canvas of={CardStories.WithHorizontalMedia} />
++
++## Component API
++
++<ArgTypes />
++
++## Feedback
++
++Help us improve this component by providing feedback, asking questions on Slack,
++or updating this file on
++[GitHub](https://github.com/carbon-design-system/carbon/edit/main/packages/react/src/components/Card/Card.mdx).
+
+diff --git a/packages/react/src/components/Card/Card.stories.js b/packages/react/src/components/Card/Card.stories.js
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/Card.stories.js
+@@ -0,0 +1,1301 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React from 'react';
++import { Card } from './Card';
++import { Button } from '../Button';
++import { IconButton } from '../IconButton';
++import { Grid, Column } from '../Grid';
++import { Tag } from '../Tag';
++import { AILabel, AILabelContent } from '../AILabel';
++import { IconIndicator } from '../IconIndicator';
++import {
++  Edit,
++  TrashCan,
++  Analytics,
++  Favorite,
++  Bee as BeeIcon,
++  Share,
++  Download,
++  Settings,
++  Notification,
++  View,
++  Copy,
++  ArrowRight,
++  DirectionFork,
++  Time,
++} from '@carbon/icons-react';
++import illustration1 from './_story-assets/illustration-img-1.png';
++import placeholder16x9 from './_story-assets/placeholder-16x9.png';
++import placeholder1x1 from './_story-assets/placeholder-1x1.png';
++import rebusClassic from './_story-assets/classic-rebus.png';
++import './card-story.scss';
++import mdx from './Card.mdx';
++
++export default {
++  title: 'Preview/Card',
++  component: Card,
++  subcomponents: {
++    CardHeader: Card.Header,
++    CardBody: Card.Body,
++    CardFooter: Card.Footer,
++    CardHeaderMedia: Card.HeaderMedia,
++    CardMedia: Card.Media,
++    CardTitle: Card.Title,
++    CardTitleMedia: Card.TitleMedia,
++    CardActions: Card.Actions,
++    CardAction: Card.Action,
++  },
++  tags: ['autodocs'],
++  parameters: {
++    layout: 'fullscreen',
++    docs: {
++      page: mdx,
++    },
++  },
++  argTypes: {
++    density: {
++      control: { type: 'select' },
++      options: ['productive', 'expressive'],
++      description:
++        'Density variant: productive uses heading-compact-02, expressive uses heading-03',
++    },
++    clickable: {
++      control: { type: 'boolean' },
++      description: 'Makes the entire card clickable',
++    },
++    disabled: {
++      control: { type: 'boolean' },
++      description: 'Disables the card and all interactive elements',
++    },
++  },
++};
++
++export const Minimal = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Body>
++          <p>A minimal card with just body content.</p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title>Card Title</Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            This is the card body content. It can contain any custom content you
++            need.
++          </p>
++        </Card.Body>
++        <Card.Footer>
++          <Button kind="tertiary" size="md">
++            Action
++          </Button>
++        </Card.Footer>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const Disabled = () => {
++  const [disabled, setDisabled] = React.useState(true);
++  return (
++    <Grid withRowGap>
++      <Column lg={4} md={4} sm={4}>
++        <Card disabled={disabled}>
++          <Card.Header>
++            <Card.Title>Card Title</Card.Title>
++          </Card.Header>
++          <Card.Body>
++            <p>
++              When the card is disabled, pass the same state to all interactive
++              elements inside — buttons, inputs, toggles, etc.
++            </p>
++          </Card.Body>
++          <Card.Footer>
++            <Card.Action>
++              <Button kind="ghost" size="md" disabled={disabled}>
++                Action
++              </Button>
++            </Card.Action>
++            <Card.Action>
++              <IconButton
++                label="Download"
++                kind="ghost"
++                size="md"
++                disabled={disabled}>
++                <Download />
++              </IconButton>
++            </Card.Action>
++          </Card.Footer>
++        </Card>
++      </Column>
++      <Column lg={4} md={4} sm={4} className="card-story-disabled-toggle">
++        <Button
++          kind="tertiary"
++          size="sm"
++          onClick={() => setDisabled((d) => !d)}>
++          {!disabled ? 'Disable Card' : 'Enable Card'}
++        </Button>
++      </Column>
++    </Grid>
++  );
++};
++
++export const ProductiveAndExpressive = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title label="Category" description="Uses heading-compact-02">
++            Productive Card
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            Productive density uses compact headings (heading-compact-02) for a
++            more condensed layout.
++          </p>
++        </Card.Body>
++        <Card.Footer>
++          <Card.Action>
++            <Button kind="ghost" size="md">
++              View details
++            </Button>
++          </Card.Action>
++        </Card.Footer>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card density="expressive">
++        <Card.Header>
++          <Card.Title label="Category" description="Uses heading-03">
++            Expressive Card
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            Expressive density uses larger headings (heading-03) for a more
++            spacious layout.
++          </p>
++        </Card.Body>
++        <Card.Footer>
++          <IconIndicator kind="succeeded" size={16} label="Succeeded" />
++        </Card.Footer>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const WithIcon = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.HeaderMedia>
++            <Analytics />
++          </Card.HeaderMedia>
++          <Card.Title description="Real-time metrics">
++            Analytics Dashboard
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>This card includes a small icon (16px) alongside the title.</p>
++        </Card.Body>
++        <Card.Footer>
++          <Card.Action>
++            <Button kind="ghost" size="md">
++              View report
++            </Button>
++          </Card.Action>
++          <Card.Action>
++            <Button
++              kind="ghost"
++              label="View report"
++              size="md"
++              renderIcon={Share}
++              hasIconOnly></Button>
++          </Card.Action>
++          <Card.Action>
++            <IconButton
++              label="View"
++              kind="ghost"
++              size="md"
++              onClick={(e) => {
++                e.stopPropagation();
++                console.log('View clicked');
++              }}>
++              <View />
++            </IconButton>
++          </Card.Action>
++          <Card.Action>
++            <IconButton
++              label="Download"
++              kind="ghost"
++              size="md"
++              onClick={(e) => {
++                e.stopPropagation();
++                console.log('Download clicked');
++              }}>
++              <Download />
++            </IconButton>
++          </Card.Action>
++        </Card.Footer>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.HeaderMedia>
++            <Favorite size="32" />
++          </Card.HeaderMedia>
++          <Card.Title description="Your saved content">
++            Favorite Items
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>This card includes a larger icon (32px) for more prominence.</p>
++        </Card.Body>
++        <Card.Footer>
++          <Button kind="tertiary" size="md">
++            Learn more
++          </Button>
++        </Card.Footer>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const WithMedia = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Media ratio="16x9">
++          <img
++            src={placeholder16x9}
++            alt="Placeholder 16:9 ratio"
++            width="100%"
++          />
++        </Card.Media>
++        <Card.Header>
++          <Card.Title label="Featured" description="Join us for the big reveal">
++            Product Launch Event
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>This card features a 16:9 aspect ratio media slot at the top.</p>
++        </Card.Body>
++        <Card.Footer>
++          <div style={{ padding: '0 1rem' }}>
++            <IconIndicator kind="in-progress" size={16} label="In progress" />
++          </div>
++          <Card.Action>
++            <Button
++              kind="ghost"
++              label="View report"
++              size="md"
++              renderIcon={Share}
++              hasIconOnly></Button>
++          </Card.Action>
++        </Card.Footer>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Media ratio="1x1">
++          <img src={placeholder1x1} alt="Placeholder 1:1 ratio" width="100%" />
++        </Card.Media>
++        <Card.Header>
++          <Card.Title description="Perfect for profile images">
++            Square Format
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>This card uses a 1:1 (square) aspect ratio for the media.</p>
++        </Card.Body>
++        <Card.Footer>
++          <Card.Action>
++            <Button kind="ghost" size="md">
++              Cancel
++            </Button>
++          </Card.Action>
++          <Card.Action>
++            <Button kind="secondary" size="md" renderIcon={ArrowRight}>
++              Confirm
++            </Button>
++          </Card.Action>
++        </Card.Footer>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const WithHeaderActions = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card onClick={() => console.log('Card clicked')}>
++        <Card.Header>
++          <Card.Title label="Project" description="Due in 3 days">
++            Website Redesign
++          </Card.Title>
++          <Card.Actions>
++            <Card.Action>
++              <IconButton
++                label="Edit"
++                kind="ghost"
++                size="sm"
++                onClick={(e) => {
++                  e.stopPropagation();
++                  console.log('Edit clicked');
++                }}>
++                <Edit />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton
++                label="Delete"
++                kind="ghost"
++                size="sm"
++                onClick={(e) => {
++                  e.stopPropagation();
++                  console.log('Delete clicked');
++                }}>
++                <TrashCan />
++              </IconButton>
++            </Card.Action>
++          </Card.Actions>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            This clickable card has action buttons in the header that prevent
++            click propagation.
++          </p>
++        </Card.Body>
++        <Card.Footer>
++          <Card.Action>
++            <Button kind="ghost" size="md">
++              View report
++            </Button>
++          </Card.Action>
++          <Card.Action>
++            <IconButton label="Share" kind="ghost" size="md">
++              <Share />
++            </IconButton>
++          </Card.Action>
++          <Card.Action>
++            <IconButton label="Download" kind="ghost" size="md">
++              <Download />
++            </IconButton>
++          </Card.Action>
++        </Card.Footer>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title label="Category" description="Last updated 2 hours ago">
++            Project dashboard
++          </Card.Title>
++          <Card.Actions>
++            <Card.Action>
++              <IconButton kind="ghost" label="Edit" size="sm">
++                <Edit />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton kind="ghost" label="Favorite" size="sm">
++                <Favorite />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton kind="ghost" label="Analytics" size="sm">
++                <Analytics />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton kind="ghost" label="Share" size="sm">
++                <Share />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton kind="ghost" label="Download" size="sm">
++                <Download />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton kind="ghost" label="Settings" size="sm">
++                <Settings />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton kind="ghost" label="Notification" size="sm">
++                <Notification />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton kind="ghost" label="View" size="sm">
++                <View />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton kind="ghost" label="Copy" size="sm">
++                <Copy />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton kind="ghost" label="Delete" size="sm">
++                <TrashCan />
++              </IconButton>
++            </Card.Action>
++          </Card.Actions>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            Multiple action buttons can be placed in the header alongside label,
++            title, and description. Actions are right-aligned and maintain
++            proper spacing.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title>Usage metrics</Card.Title>
++          <Card.Actions>
++            <Card.Action>
++              <Button kind="tertiary" size="sm">
++                Action
++              </Button>
++            </Card.Action>
++          </Card.Actions>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            Text actions use Carbon&apos;s small ghost button for actions that
++            require text labels instead of icons.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title>Usage metrics</Card.Title>
++          <Card.Actions>
++            <Card.Action>
++              <Button kind="tertiary" size="sm">
++                Export
++              </Button>
++            </Card.Action>
++            <Card.Action>
++              <Button kind="tertiary" size="sm">
++                Share
++              </Button>
++            </Card.Action>
++            <Card.Action>
++              <Button kind="tertiary" size="sm">
++                View report
++              </Button>
++            </Card.Action>
++          </Card.Actions>
++        </Card.Header>
++        <Card.Body>
++          <p>Multiple text actions in the header.</p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title
++            label="Category"
++            labelTruncate
++            description="This is a lengthy description that will be clamped to exactly two lines using multi-line truncation so you can see how it interacts with the action buttons above"
++            descriptionTruncate
++            titleTruncate={2}>
++            This is a very long card title that wraps across multiple lines in a
++            narrow container
++          </Card.Title>
++          <Card.Actions>
++            <Card.Action>
++              <IconButton kind="ghost" label="Edit" size="sm">
++                <Edit />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton kind="ghost" label="Favorite" size="sm">
++                <Favorite />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton kind="ghost" label="Share" size="sm">
++                <Share />
++              </IconButton>
++            </Card.Action>
++          </Card.Actions>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            Truncated label (single line ellipsis), long wrapping title, and
++            description clamped to 2 lines — all alongside header actions.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const WithHeaderMedia = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.HeaderMedia>
++            <Analytics />
++          </Card.HeaderMedia>
++          <Card.Actions>
++            <Card.Action>
++              <IconButton
++                label="Edit"
++                kind="ghost"
++                size="sm"
++                onClick={(e) => {
++                  e.stopPropagation();
++                  console.log('Edit clicked');
++                }}>
++                <Edit />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton
++                label="Delete"
++                kind="ghost"
++                size="sm"
++                onClick={(e) => {
++                  e.stopPropagation();
++                  console.log('Delete clicked');
++                }}>
++                <TrashCan />
++              </IconButton>
++            </Card.Action>
++          </Card.Actions>
++          <Card.Title description="Real-time metrics">
++            Analytics Dashboard
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            This card demonstrates the icon slot (first child) with action
++            buttons on the right.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.HeaderMedia>
++            <img
++              src={illustration1}
++              alt="A sample illustration"
++              style={{ width: '48px', height: '48px', borderRadius: '4px' }}
++            />
++          </Card.HeaderMedia>
++          <Card.Title>Card with Image</Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>The icon slot can contain an image element.</p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.HeaderMedia>
++            <Tag type="blue">New</Tag>
++          </Card.HeaderMedia>
++          <Card.Title>Card with Tag</Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>The icon slot can contain a Tag component.</p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.HeaderMedia>
++            <IconIndicator kind="succeeded" size={16} label="Succeeded" />
++          </Card.HeaderMedia>
++          <Card.Title>Card with Status</Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>The icon slot can contain an IconIndicator component.</p>
++        </Card.Body>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const WithTruncatedTitle = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title
++            titleTruncate
++            description="Single-line truncation example">
++            This is a very long title that will be truncated with an ellipsis
++            when it exceeds the maximum width
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>The title is truncated to a single line with an ellipsis.</p>
++        </Card.Body>
++        <Card.Footer>
++          <Card.Action>
++            <IconButton label="Share" kind="ghost" size="md">
++              <Share />
++            </IconButton>
++          </Card.Action>
++          <Card.Action>
++            <IconButton label="Download" kind="ghost" size="md">
++              <Download />
++            </IconButton>
++          </Card.Action>
++        </Card.Footer>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title
++            titleTruncate={3}
++            description="Multi-line truncation example">
++            This is a very long title that will be truncated after three lines.
++            It demonstrates the multi-line truncation feature using WebKit line
++            clamp. Any content beyond three lines will be hidden with an
++            ellipsis.
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>The title is truncated to three lines with an ellipsis.</p>
++        </Card.Body>
++        <Card.Footer>
++          <div style={{ padding: '0 1rem' }}>
++            <IconIndicator kind="failed" size={16} label="Failed" />
++          </div>
++          <Card.Action>
++            <IconButton label="Retry" kind="ghost" size="md">
++              <View />
++            </IconButton>
++          </Card.Action>
++        </Card.Footer>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const WithAILabel = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card
++        decorator={
++          <AILabel align="bottom" size="xs">
++            <AILabelContent>
++              <div>
++                <p className="secondary">AI Explained</p>
++                <h1>84%</h1>
++                <p className="secondary bold">Confidence score</p>
++                <p className="secondary">
++                  This content was generated using IBM AI services with high
++                  confidence based on historical data patterns.
++                </p>
++                <hr />
++                <p className="secondary">Model type</p>
++                <p className="bold">Foundation model</p>
++              </div>
++            </AILabelContent>
++          </AILabel>
++        }>
++        <Card.Header>
++          <Card.Title label="AI-powered" description="Generated by AI">
++            Usage Analytics
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            This card demonstrates the AI label feature with a blue gradient
++            border indicating AI-generated content.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card
++        decorator={
++          <AILabel align="bottom" size="xs">
++            <AILabelContent>
++              <div>
++                <p className="secondary">AI Explained</p>
++                <h1>92%</h1>
++                <p className="secondary bold">Confidence score</p>
++                <p className="secondary">
++                  Performance insights generated by AI analysis of system
++                  metrics and user behavior patterns.
++                </p>
++                <hr />
++                <p className="secondary">Model type</p>
++                <p className="bold">Analytics model</p>
++              </div>
++            </AILabelContent>
++          </AILabel>
++        }>
++        <Card.Header>
++          <Card.HeaderMedia>
++            <Analytics />
++          </Card.HeaderMedia>
++          <Card.Title description="AI-generated summary">
++            Performance Insights
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>Card with AI label and header media slot (icon).</p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card
++        decorator={
++          <AILabel align="bottom" size="xs">
++            <AILabelContent>
++              <div>
++                <p className="secondary">AI Explained</p>
++                <h1>88%</h1>
++                <p className="secondary bold">Confidence score</p>
++                <p className="secondary">
++                  Smart recommendations powered by AI learning from user
++                  preferences and behavior.
++                </p>
++                <hr />
++                <p className="secondary">Model type</p>
++                <p className="bold">Recommendation engine</p>
++              </div>
++            </AILabelContent>
++          </AILabel>
++        }>
++        <Card.Header>
++          <Card.Title>Smart Recommendations Long title</Card.Title>
++          <Card.Actions>
++            <Card.Action>
++              <IconButton
++                label="Edit"
++                kind="ghost"
++                size="sm"
++                onClick={(e) => {
++                  e.stopPropagation();
++                  console.log('Edit clicked');
++                }}>
++                <Edit />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton
++                label="Delete"
++                kind="ghost"
++                size="sm"
++                onClick={(e) => {
++                  e.stopPropagation();
++                  console.log('Delete clicked');
++                }}>
++                <TrashCan />
++              </IconButton>
++            </Card.Action>
++          </Card.Actions>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            Card with AI label and actions. Note how the actions are positioned
++            to the left of the AI label with proper spacing.
++          </p>
++        </Card.Body>
++        <Card.Footer>
++          <Button size="sm" kind="tertiary">
++            View Details
++          </Button>
++        </Card.Footer>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const WithTitleMedia = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.TitleMedia>
++            <img
++              src={rebusClassic}
++              alt="IBM Classic Rebus logo"
++              width={48}
++              height={48}
++            />
++          </Card.TitleMedia>
++          <Card.Title
++            label="Label"
++            description="The title media slot positions an icon to the left of the title text">
++            Card with title icon
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            CardTitleMedia provides a media slot positioned to the left of the
++            card title. The media adapts to the heading area height (min 48px,
++            max 64px).
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.TitleMedia>
++            <img
++              src={rebusClassic}
++              alt="IBM Classic Rebus logo"
++              width={64}
++              height={64}
++            />
++          </Card.TitleMedia>
++          <Card.Title
++            label="Label"
++            description="The title media slot positions an icon to the left of the title text">
++            Card with title icon
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            CardTitleMedia provides a media slot positioned to the left of the
++            card title. The media adapts to the heading area height (min 48px,
++            max 64px).
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.TitleMedia>
++            <img
++              src={rebusClassic}
++              alt="IBM Classic Rebus logo"
++              width={48}
++              height={48}
++            />
++          </Card.TitleMedia>
++          <Card.Title
++            label="Label"
++            description="The title media slot positions an icon to the left of the title text">
++            Card with title icon
++          </Card.Title>
++          <Card.Actions>
++            <Card.Action>
++              <IconButton
++                label="Edit"
++                kind="ghost"
++                size="sm"
++                onClick={(e) => {
++                  e.stopPropagation();
++                  console.log('Edit clicked');
++                }}>
++                <Edit />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton
++                label="Delete"
++                kind="ghost"
++                size="sm"
++                onClick={(e) => {
++                  e.stopPropagation();
++                  console.log('Delete clicked');
++                }}>
++                <TrashCan />
++              </IconButton>
++            </Card.Action>
++          </Card.Actions>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            CardTitleMedia provides a media slot positioned to the left of the
++            card title. The media adapts to the heading area height (min 48px,
++            max 64px).
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Media ratio="16x9">
++          <img
++            src={placeholder16x9}
++            alt="Placeholder 16:9 ratio"
++            width="100%"
++          />
++        </Card.Media>
++        <Card.Header>
++          <Card.HeaderMedia>
++            <IconIndicator kind="succeeded" size={16} label="Succeeded" />
++          </Card.HeaderMedia>
++          <Card.TitleMedia>
++            <img
++              src={rebusClassic}
++              alt="IBM Classic Rebus logo"
++              width={48}
++              height={48}
++            />
++          </Card.TitleMedia>
++          <Card.Title
++            label="Label"
++            description="The title media slot positions an icon to the left of the title text">
++            Card with title icon
++          </Card.Title>
++          <Card.Actions>
++            <Card.Action>
++              <IconButton
++                label="Edit"
++                kind="ghost"
++                size="sm"
++                onClick={(e) => {
++                  e.stopPropagation();
++                  console.log('Edit clicked');
++                }}>
++                <Edit />
++              </IconButton>
++            </Card.Action>
++            <Card.Action>
++              <IconButton
++                label="Delete"
++                kind="ghost"
++                size="sm"
++                onClick={(e) => {
++                  e.stopPropagation();
++                  console.log('Delete clicked');
++                }}>
++                <TrashCan />
++              </IconButton>
++            </Card.Action>
++          </Card.Actions>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            CardTitleMedia provides a media slot positioned to the left of the
++            card title. The media adapts to the heading area height (min 48px,
++            max 64px).
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const WithTitleLeadingIcon = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title titleStart={<BeeIcon size={16} />}>
++            Analytics dashboard
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            The leading icon adapts to the title size. In productive density,
++            use 16px icons.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card density="expressive">
++        <Card.Header>
++          <Card.Title titleStart={<BeeIcon size={24} />}>
++            Analytics dashboard
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            The leading icon adapts to the title size. In expressive density,
++            use 24px icons.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title titleStart={<BeeIcon size={16} />} titleTruncate={2}>
++            Example of long title text that wraps onto two lines
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            When the title wraps to multiple lines, the icon stays top-aligned
++            with 2px padding to center with the first line.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const WithTitleTrailingIcon = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title titleEnd={<BeeIcon size={16} />}>
++            Analytics dashboard
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            The trailing icon adapts to the title size. In productive density,
++            use 16px icons.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card density="expressive">
++        <Card.Header>
++          <Card.Title titleEnd={<BeeIcon size={24} />}>
++            Analytics dashboard
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            The trailing icon adapts to the title size. In expressive density,
++            use 24px icons.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title titleEnd={<BeeIcon size={16} />} titleTruncate={2}>
++            Example of long title text that wraps into three lines with icon
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            When the title wraps to multiple lines, the icon stays inline with
++            the text on the last line with 8px gap.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const WithVideo = () => (
++  <Grid withRowGap>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Header>
++          <Card.Title description="Watch our latest feature walkthrough">
++            Product demo video
++          </Card.Title>
++        </Card.Header>
++        <Card.Media ratio="16x9">
++          <video
++            controls
++            style={{
++              width: '100%',
++              height: '100%',
++              objectFit: 'cover',
++              position: 'absolute',
++            }}>
++            <source
++              src="https://www.youtube.com/watch?v=Veg7njIKUm4"
++              type="video/mp4"
++            />
++            <track kind="captions" />
++            Your browser does not support the video tag.
++          </video>
++        </Card.Media>
++        <Card.Body>
++          <p style={{ marginBlockStart: 'revert' }}>
++            Video content fills the AspectRatio container and maintains the 16:9
++            aspect ratio.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Media ratio="16x9">
++          <iframe
++            width="100%"
++            height="100%"
++            style={{ position: 'absolute' }}
++            src="https://www.youtube.com/embed/Veg7njIKUm4?si=B9yWeUzcFHI4ITD1&amp;controls=0"
++            title="YouTube video player"
++            frameBorder="0"
++            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
++            referrerPolicy="strict-origin-when-cross-origin"></iframe>
++        </Card.Media>
++        <Card.Header>
++          <Card.Title description="Getting started guide">
++            Tutorial series
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            Videos can include a poster image that displays before playback
++            starts.
++          </p>
++        </Card.Body>
++      </Card>
++    </Column>
++    <Column lg={4} md={4} sm={4}>
++      <Card>
++        <Card.Media ratio="16x9">
++          <iframe
++            width={'100%'}
++            height={'100%'}
++            style={{ position: 'absolute' }}
++            src="https://www.youtube.com/embed/Veg7njIKUm4?si=B9yWeUzcFHI4ITD1&amp;controls=0"
++            title="YouTube video player"
++            frameBorder="0"
++            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
++            referrerPolicy="strict-origin-when-cross-origin"></iframe>
++        </Card.Media>
++      </Card>
++    </Column>
++  </Grid>
++);
++
++export const WithHorizontalMedia = () => (
++  <Grid withRowGap>
++    <Column lg={8} md={4} sm={4}>
++      <Card horizontal>
++        <Card.Media>
++          <img
++            src={placeholder1x1}
++            alt="Placeholder"
++            style={{ width: '100%', height: '100%' }}
++          />
++        </Card.Media>
++        <Card.Header>
++          <Card.Title label="Get started">
++            Generate synthetic tabular data
++          </Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            Prepare your data and generate synthetic tabular data using
++            AI-assisted tooling.
++          </p>
++        </Card.Body>
++        <Card.Footer>
++          <Button kind="tertiary" size="md" renderIcon={ArrowRight}>
++            Start
++          </Button>
++        </Card.Footer>
++      </Card>
++    </Column>
++    <Column lg={8} md={4} sm={4}>
++      <Card horizontal>
++        <Card.Media mediaWidth="50%">
++          <img
++            src={placeholder16x9}
++            alt="Placeholder"
++            style={{ width: '100%', height: '100%' }}
++          />
++        </Card.Media>
++        <Card.Header>
++          <Card.Title>Custom media width</Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            Pass <code>mediaWidth=50%</code> to control the media column width.
++            Accepts any valid CSS value.
++          </p>
++        </Card.Body>
++        <Card.Footer>
++          <Card.Action>
++            <Button kind="ghost" size="md" renderIcon={ArrowRight}>
++              Learn more
++            </Button>
++          </Card.Action>
++        </Card.Footer>
++      </Card>
++    </Column>
++    <Column lg={8} md={4} sm={4}>
++      <Card horizontal>
++        <Card.Header>
++          <Card.Title>Content before media</Card.Title>
++        </Card.Header>
++        <Card.Body>
++          <p>
++            When Card.Media appears after the content children in JSX, it is
++            rendered on the right.
++          </p>
++        </Card.Body>
++        <Card.Footer>
++          <Card.Action>
++            <Button kind="ghost" size="md" renderIcon={ArrowRight}>
++              Learn more
++            </Button>
++          </Card.Action>
++        </Card.Footer>
++        <Card.Media>
++          <img
++            src={placeholder1x1}
++            alt="Placeholder"
++            style={{ width: '100%', height: '100%' }}
++          />
++        </Card.Media>
++      </Card>
++    </Column>
++    <Column lg={8} md={4} sm={4}>
++      <Card horizontal density="expressive">
++        <Card.Header>
++          <Card.HeaderMedia>
++            <DirectionFork size="32" />
++          </Card.HeaderMedia>
++          <Card.Title label="Prepare your data">
++            Generate synthetic tabular data
++          </Card.Title>
++        </Card.Header>
++        <Card.Footer>
++          <div className="story-time">
++            <Time /> 12:00 PM
++          </div>
++          <Card.Action>
++            <IconButton renderIcon={ArrowRight} kind="ghost" size="md" />
++          </Card.Action>
++        </Card.Footer>
++        <Card.Media>
++          <img
++            src={placeholder1x1}
++            alt="Placeholder"
++            style={{ width: '100%', height: '100%' }}
++          />
++        </Card.Media>
++      </Card>
++    </Column>
++  </Grid>
++);
+
+diff --git a/packages/react/src/components/Card/Card.tsx b/packages/react/src/components/Card/Card.tsx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/Card.tsx
+@@ -0,0 +1,281 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React, { forwardRef, isValidElement, useCallback, useMemo } from 'react';
++import PropTypes from 'prop-types';
++import cx from 'classnames';
++import { AILabel } from '../AILabel';
++import { CardProps } from './Card.types';
++import { CardContext } from './CardContext';
++import { usePrefix } from '../../internal/usePrefix';
++
++// Import separated child components
++import { CardHeader } from './CardHeader';
++import { CardBody } from './CardBody';
++import { CardFooter } from './CardFooter';
++
++// Import header primitive components
++import { CardHeaderMedia } from './CardHeaderMedia';
++import { CardMedia } from './CardMedia';
++import { CardTitle } from './CardTitle';
++import { CardTitleMedia } from './CardTitleMedia';
++import { CardActions } from './CardActions';
++import { CardAction } from './CardAction';
++
++const componentName = 'Card';
++
++/**
++ * Card component - Root container for composable card
++ */
++const CardComponent = forwardRef<HTMLDivElement, CardProps>(
++  (
++    {
++      clickable = false,
++      onClick,
++      onKeyDown,
++      disabled = false,
++      density = 'productive',
++      decorator,
++      horizontal = false,
++      className,
++      children,
++      ...rest
++    },
++    ref
++  ) => {
++    const prefix = usePrefix();
++    const blockClass = `${prefix}--card`;
++
++    // Detect if decorator is AILabel — used for the --has-ai-label CSS modifier.
++    const hasAILabel = useMemo(
++      () => isValidElement(decorator) && decorator.type === AILabel,
++      [decorator]
++    );
++
++    // Create context value
++    const contextValue = useMemo(
++      () => ({
++        clickable,
++        disabled,
++        decorator,
++        horizontal,
++      }),
++      [clickable, disabled, decorator, horizontal]
++    );
++
++    // Handle keyboard interaction for clickable cards
++    const handleKeyDown = useCallback(
++      (event: React.KeyboardEvent<HTMLDivElement>) => {
++        if (
++          clickable &&
++          !disabled &&
++          (event.key === 'Enter' || event.key === ' ')
++        ) {
++          event.preventDefault();
++          onClick?.(event as unknown as React.MouseEvent<HTMLDivElement>);
++        }
++        onKeyDown?.(event);
++      },
++      [clickable, disabled, onClick, onKeyDown]
++    );
++
++    // Handle click for clickable cards
++    const handleClick = useCallback(
++      (event: React.MouseEvent<HTMLDivElement>) => {
++        if (!disabled) {
++          onClick?.(event);
++        }
++      },
++      [disabled, onClick]
++    );
++
++    const cardClasses = cx(blockClass, className, {
++      [`${blockClass}--clickable`]: clickable && !disabled,
++      [`${blockClass}--disabled`]: disabled,
++      [`${blockClass}--${density}`]: density,
++      [`${blockClass}--has-ai-label`]: hasAILabel,
++      [`${blockClass}--horizontal`]: horizontal,
++    });
++
++    const cardProps = {
++      ...rest,
++      ref,
++      className: cardClasses,
++      ...(clickable && {
++        role: 'button',
++        tabIndex: disabled ? -1 : 0,
++        onClick: handleClick,
++        onKeyDown: handleKeyDown,
++        'aria-disabled': disabled,
++      }),
++    };
++
++    // In horizontal mode, split children into media and content, then order
++    // them by the position of Card.Media in the JSX — media before content
++    // children = left, media after content children = right.
++    const { mediaChildren, contentChildren, mediaIsFirst } = useMemo(() => {
++      if (!horizontal) {
++        return { mediaChildren: [], contentChildren: [], mediaIsFirst: false };
++      }
++
++      const childArray = React.Children.toArray(children);
++      const isMedia = (child: React.ReactNode) =>
++        React.isValidElement(child) && child.type === CardMedia;
++
++      const media = childArray.filter(isMedia);
++      const content = childArray.filter((c) => !isMedia(c));
++      const firstMediaIndex = childArray.findIndex(isMedia);
++      const firstContentIndex = childArray.findIndex((c) => !isMedia(c));
++
++      return {
++        mediaChildren: media,
++        contentChildren: content,
++        mediaIsFirst: firstMediaIndex < firstContentIndex,
++      };
++    }, [children, horizontal]);
++
++    let renderedChildren: React.ReactNode = children;
++    if (horizontal) {
++      const contentWrapper = (
++        <div className={`${blockClass}__content`}>{contentChildren}</div>
++      );
++      renderedChildren = mediaIsFirst ? (
++        <>
++          {mediaChildren}
++          {contentWrapper}
++        </>
++      ) : (
++        <>
++          {contentWrapper}
++          {mediaChildren}
++        </>
++      );
++    }
++
++    return (
++      <CardContext.Provider value={contextValue}>
++        <div {...cardProps}>{renderedChildren}</div>
++      </CardContext.Provider>
++    );
++  }
++);
++
++CardComponent.displayName = componentName;
++
++CardComponent.propTypes = {
++  /**
++   * Card content
++   */
++  children: PropTypes.node,
++  /**
++   * Additional CSS class names
++   */
++  className: PropTypes.string,
++  /**
++   * Makes the entire card clickable
++   */
++  clickable: PropTypes.bool,
++  /**
++   * Optional decorator component (typically AILabel from Carbon)
++   */
++  decorator: PropTypes.node,
++  /**
++   * Density variant: productive uses heading-compact-02, expressive uses heading-03
++   */
++  density: PropTypes.oneOf(['productive', 'expressive']),
++  /**
++   * Disables the card and all interactive elements
++   */
++  disabled: PropTypes.bool,
++  /**
++   * When true, renders media on the left and content (header/body/footer) on the right
++   */
++  horizontal: PropTypes.bool,
++  /**
++   * Click handler for clickable cards
++   */
++  onClick: PropTypes.func,
++  /**
++   * Keyboard event handler for clickable cards
++   */
++  onKeyDown: PropTypes.func,
++};
++
++/**
++ * -------
++ * Exports
++ * -------
++ */
++
++// Create namespaced child components
++const Header = CardHeader;
++Header.displayName = 'Card.Header';
++
++const Body = CardBody;
++Body.displayName = 'Card.Body';
++
++const Footer = CardFooter;
++Footer.displayName = 'Card.Footer';
++
++const HeaderMedia = CardHeaderMedia;
++HeaderMedia.displayName = 'Card.HeaderMedia';
++
++const Media = CardMedia;
++Media.displayName = 'Card.Media';
++
++const Title = CardTitle;
++Title.displayName = 'Card.Title';
++
++const TitleMedia = CardTitleMedia;
++TitleMedia.displayName = 'Card.TitleMedia';
++
++const Actions = CardActions;
++Actions.displayName = 'Card.Actions';
++
++const Action = CardAction;
++Action.displayName = 'Card.Action';
++
++// Attach child components to Card for namespaced usage (Card.Header, Card.Body, etc.)
++export const Card = Object.assign(CardComponent, {
++  Header,
++  Body,
++  Footer,
++  HeaderMedia,
++  Media,
++  Title,
++  TitleMedia,
++  Actions,
++  Action,
++});
++
++export {
++  Card as default,
++  CardHeader,
++  CardBody,
++  CardFooter,
++  CardHeaderMedia,
++  CardMedia,
++  CardTitle,
++  CardTitleMedia,
++  CardActions,
++  CardAction,
++};
++
++export type {
++  CardProps,
++  CardHeaderProps,
++  CardBodyProps,
++  CardFooterProps,
++} from './Card.types';
++
++// Export primitive component prop types
++export type { CardHeaderMediaProps } from './CardHeaderMedia';
++export type { CardMediaProps } from './CardMedia';
++export type { CardTitleProps } from './CardTitle';
++export type { CardTitleMediaProps } from './CardTitleMedia';
++export type { CardActionsProps } from './CardActions';
++export type { CardActionProps } from './CardAction';
+
+diff --git a/packages/react/src/components/Card/Card.types.ts b/packages/react/src/components/Card/Card.types.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/Card.types.ts
+@@ -0,0 +1,95 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { ReactNode } from 'react';
++
++/**
++ * Base props shared across card components
++ */
++export interface CardBaseProps {
++  /**
++   * Additional CSS class names
++   */
++  className?: string;
++  /**
++   * Card content
++   */
++  children?: ReactNode;
++}
++
++/**
++ * Props for the Card root component
++ */
++export interface CardProps extends CardBaseProps {
++  /**
++   * Makes the entire card clickable
++   */
++  clickable?: boolean;
++  /**
++   * Click handler for clickable cards
++   */
++  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
++  /**
++   * Keyboard event handler for clickable cards
++   */
++  onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
++  /**
++   * Disables the card and all interactive elements
++   */
++  disabled?: boolean;
++  /**
++   * Density variant: productive uses heading-compact-02, expressive uses heading-03
++   */
++  density?: 'productive' | 'expressive';
++  /**
++   * Optional decorator component (typically AILabel from Carbon).
++   * Renders in the top-right corner of the card header with a blue gradient border.
++   */
++  decorator?: ReactNode;
++  /**
++   * When true, the card renders in a horizontal layout: media on the left,
++   * header/body/footer stacked vertically on the right.
++   */
++  horizontal?: boolean;
++}
++
++/**
++ * Props for CardHeader component
++ */
++export type CardHeaderProps = CardBaseProps;
++
++/**
++ * Props for CardBody component
++ */
++export type CardBodyProps = CardBaseProps;
++
++/**
++ * Props for CardFooter component
++ */
++export type CardFooterProps = CardBaseProps;
++
++/**
++ * Context value for Card
++ */
++export interface CardContextValue {
++  /**
++   * Whether the card is clickable
++   */
++  clickable: boolean;
++  /**
++   * Whether the card is disabled
++   */
++  disabled: boolean;
++  /**
++   * Optional decorator component (typically AILabel) to be rendered by CardHeader
++   */
++  decorator?: ReactNode;
++  /**
++   * Whether the card is in horizontal layout mode
++   */
++  horizontal?: boolean;
++}
+
+diff --git a/packages/react/src/components/Card/CardAction.tsx b/packages/react/src/components/Card/CardAction.tsx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/CardAction.tsx
+@@ -0,0 +1,74 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React, { ReactNode } from 'react';
++import PropTypes from 'prop-types';
++import cx from 'classnames';
++import { usePrefix } from '../../internal/usePrefix';
++
++const componentName = 'CardAction';
++
++export interface CardActionProps {
++  /**
++   * Provide the contents of the CardAction (typically a Button or IconButton).
++   * Wrapping content in CardAction opts into action-set layout: no footer
++   * padding, automatic top border, and stretch/fixed-width button behavior.
++   */
++  children?: ReactNode;
++
++  /**
++   * Provide an optional class to be applied to the containing node.
++   */
++  className?: string;
++
++  /**
++   * Label shown in the overflow menu when this action is hidden.
++   * If not provided, CardActions will attempt to read it from the
++   * direct child's props (label, iconDescription, or children text).
++   */
++  label?: string;
++}
++
++/**
++ * CardAction is a wrapper for interactive elements in the card footer.
++ * Its presence signals action-set layout to the footer (no padding, auto
++ * border, stretch behavior).
++ *
++ * Note: do not use CardAction inside a clickable card — clickable cards
++ * should not contain interactive elements (see usage guidelines).
++ */
++export const CardAction = ({
++  children,
++  className,
++  ...rest
++}: CardActionProps) => {
++  const prefix = usePrefix();
++  return (
++    <div {...rest} className={cx(`${prefix}--card__action`, className)}>
++      {children}
++    </div>
++  );
++};
++
++CardAction.propTypes = {
++  /**
++   * Provide the contents of the CardAction.
++   */
++  children: PropTypes.node,
++
++  /**
++   * Provide an optional class to be applied to the containing node.
++   */
++  className: PropTypes.string,
++
++  /**
++   * Label shown in the overflow menu when this action is hidden.
++   */
++  label: PropTypes.string,
++};
++
++CardAction.displayName = componentName;
+
+diff --git a/packages/react/src/components/Card/CardActions.tsx b/packages/react/src/components/Card/CardActions.tsx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/CardActions.tsx
+@@ -0,0 +1,175 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React, {
++  ReactNode,
++  useEffect,
++  useMemo,
++  useRef,
++  useState,
++  Children,
++} from 'react';
++import PropTypes from 'prop-types';
++import cx from 'classnames';
++import { OverflowMenu } from '../OverflowMenu/next';
++import { MenuItem } from '../Menu';
++import { createOverflowHandler } from '@carbon/utilities';
++import { usePrefix } from '../../internal/usePrefix';
++import { CardActionProps } from './CardAction';
++
++const componentName = 'CardActions';
++
++export interface CardActionsProps {
++  /**
++   * Provide the contents of the CardActions (typically CardAction components).
++   */
++  children?: ReactNode;
++
++  /**
++   * Provide an optional class to be applied to the containing node.
++   */
++  className?: string;
++
++  /**
++   * Aria label for the overflow menu
++   */
++  overflowMenuLabel?: string;
++}
++
++interface ActionItem {
++  id: string;
++  element: React.ReactElement;
++  label?: string;
++}
++
++/**
++ * CardActions is a container for action buttons in the card header.
++ * Positioned in the top-right corner with 8px gap between actions.
++ * When actions exceed 50% of available header space, overflow menu is shown.
++ */
++export const CardActions = ({
++  children,
++  className,
++  overflowMenuLabel = 'More actions',
++  ...rest
++}: CardActionsProps) => {
++  const prefix = usePrefix();
++  const blockClass = `${prefix}--card`;
++  const containerRef = useRef<HTMLDivElement>(null);
++  const [hiddenItems, setHiddenItems] = useState<ActionItem[]>([]);
++  const classes = cx(`${blockClass}__actions`, className);
++
++  // Build action items only when children change.
++  // Label resolution order (matches source):
++  //   1. CardAction.label explicit prop
++  //   2. Direct child button props: label → iconDescription → text children
++  //   3. Fallback ordinal string
++  const actionItems = useMemo(() => {
++    const items: ActionItem[] = [];
++    Children.forEach(children, (child, index) => {
++      if (React.isValidElement(child)) {
++        const actionProps = child.props as CardActionProps;
++        const button = actionProps.children;
++        type ButtonLikeProps = {
++          label?: string;
++          iconDescription?: string;
++          children?: React.ReactNode;
++        };
++        const buttonProps = React.isValidElement(button)
++          ? (button.props as ButtonLikeProps)
++          : null;
++
++        const label =
++          actionProps.label ??
++          buttonProps?.label ??
++          buttonProps?.iconDescription ??
++          (typeof buttonProps?.children === 'string'
++            ? buttonProps.children
++            : `Action ${index + 1}`);
++
++        const id = `${label}-${index}`;
++        items.push({ id, element: child, label });
++      }
++    });
++    return items;
++  }, [children]);
++
++  useEffect(() => {
++    if (!containerRef.current || actionItems.length === 0) {
++      return;
++    }
++
++    const handler = createOverflowHandler({
++      container: containerRef.current,
++      onChange: (_visible, hidden) => {
++        const hiddenIds = hidden.map((el) => el.dataset.id);
++        setHiddenItems(
++          actionItems.filter((item) => hiddenIds.includes(item.id))
++        );
++      },
++    });
++
++    return () => handler.disconnect();
++  }, [actionItems]);
++
++  return (
++    <div ref={containerRef} className={classes} {...rest}>
++      {actionItems.map((item) => (
++        <div key={item.id} data-id={item.id}>
++          {item.element}
++        </div>
++      ))}
++      <div
++        data-offset
++        data-hidden
++        data-floating-menu-container
++        style={{
++          position: 'relative',
++        }}>
++        <OverflowMenu size="sm" aria-label={overflowMenuLabel}>
++          {hiddenItems.map((item) => (
++            <MenuItem
++              key={item.id}
++              label={item.label || 'Action'}
++              onClick={() => {
++                type ClickableProps = { onClick?: () => void };
++                type ActionChildren = { children?: React.ReactNode };
++                const elementProps = item.element.props as ActionChildren;
++                const button = elementProps.children;
++                if (button && React.isValidElement(button)) {
++                  const buttonProps = button.props as ClickableProps;
++                  if (buttonProps.onClick) {
++                    buttonProps.onClick();
++                  }
++                }
++              }}
++            />
++          ))}
++        </OverflowMenu>
++      </div>
++    </div>
++  );
++};
++
++CardActions.propTypes = {
++  /**
++   * Provide the contents of the CardActions.
++   */
++  children: PropTypes.node,
++
++  /**
++   * Provide an optional class to be applied to the containing node.
++   */
++  className: PropTypes.string,
++
++  /**
++   * Aria label for the overflow menu
++   */
++  overflowMenuLabel: PropTypes.string,
++};
++
++CardActions.displayName = componentName;
+
+diff --git a/packages/react/src/components/Card/CardBody.tsx b/packages/react/src/components/Card/CardBody.tsx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/CardBody.tsx
+@@ -0,0 +1,43 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React, { forwardRef } from 'react';
++import PropTypes from 'prop-types';
++import cx from 'classnames';
++import { CardBodyProps } from './Card.types';
++import { usePrefix } from '../../internal/usePrefix';
++
++const componentName = 'CardBody';
++
++/**
++ * CardBody component - Body section of the card for free-form content
++ */
++export const CardBody = forwardRef<HTMLDivElement, CardBodyProps>(
++  ({ className, children, ...rest }, ref) => {
++    const prefix = usePrefix();
++    const bodyClasses = cx(`${prefix}--card__body`, className);
++
++    return (
++      <div {...rest} ref={ref} className={bodyClasses}>
++        {children}
++      </div>
++    );
++  }
++);
++
++CardBody.displayName = componentName;
++
++CardBody.propTypes = {
++  /**
++   * Body content
++   */
++  children: PropTypes.node,
++  /**
++   * Additional CSS class names
++   */
++  className: PropTypes.string,
++};
+
+diff --git a/packages/react/src/components/Card/CardContext.tsx b/packages/react/src/components/Card/CardContext.tsx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/CardContext.tsx
+@@ -0,0 +1,29 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import { createContext, useContext } from 'react';
++import { CardContextValue } from './Card.types';
++
++/**
++ * Context for sharing Card state with child components
++ */
++export const CardContext = createContext<CardContextValue | undefined>(
++  undefined
++);
++
++/**
++ * Hook to access Card context
++ * @returns CardContextValue
++ * @throws Error if used outside of Card component
++ */
++export const useCardContext = (): CardContextValue => {
++  const context = useContext(CardContext);
++  if (!context) {
++    throw new Error('Card subcomponents must be used within a Card component');
++  }
++  return context;
++};
+
+diff --git a/packages/react/src/components/Card/CardFooter.tsx b/packages/react/src/components/Card/CardFooter.tsx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/CardFooter.tsx
+@@ -0,0 +1,43 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React, { forwardRef } from 'react';
++import PropTypes from 'prop-types';
++import cx from 'classnames';
++import { CardFooterProps } from './Card.types';
++import { usePrefix } from '../../internal/usePrefix';
++
++const componentName = 'CardFooter';
++
++/**
++ * CardFooter component - Footer section of the card
++ */
++export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
++  ({ className, children, ...rest }, ref) => {
++    const prefix = usePrefix();
++    const footerClasses = cx(`${prefix}--card__footer`, className);
++
++    return (
++      <div {...rest} ref={ref} className={footerClasses}>
++        {children}
++      </div>
++    );
++  }
++);
++
++CardFooter.displayName = componentName;
++
++CardFooter.propTypes = {
++  /**
++   * Footer content
++   */
++  children: PropTypes.node,
++  /**
++   * Additional CSS class names
++   */
++  className: PropTypes.string,
++};
+
+diff --git a/packages/react/src/components/Card/CardHeader.tsx b/packages/react/src/components/Card/CardHeader.tsx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/CardHeader.tsx
+@@ -0,0 +1,61 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React, { forwardRef, useCallback } from 'react';
++import PropTypes from 'prop-types';
++import cx from 'classnames';
++import { CardHeaderProps } from './Card.types';
++import { useCardContext } from './CardContext';
++import { usePrefix } from '../../internal/usePrefix';
++
++const componentName = 'CardHeader';
++
++/**
++ * CardHeader — header section of the card.
++ */
++export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
++  ({ className, children, ...rest }, ref) => {
++    const prefix = usePrefix();
++    const blockClass = `${prefix}--card`;
++    const context = useCardContext();
++
++    const handleDecoratorClick = useCallback(
++      (e: React.MouseEvent) => e.stopPropagation(),
++      []
++    );
++
++    const handleDecoratorKeyDown = useCallback(
++      (e: React.KeyboardEvent) => e.stopPropagation(),
++      []
++    );
++
++    return (
++      <div
++        {...rest}
++        ref={ref}
++        className={cx(`${blockClass}__header`, className)}>
++        {children}
++        {context.decorator && (
++          <div
++            className={`${blockClass}__decorator`}
++            role="presentation"
++            onClick={handleDecoratorClick}
++            onKeyDown={handleDecoratorKeyDown}>
++            {context.decorator}
++          </div>
++        )}
++      </div>
++    );
++  }
++);
++
++CardHeader.displayName = componentName;
++
++CardHeader.propTypes = {
++  children: PropTypes.node,
++  className: PropTypes.string,
++};
+
+diff --git a/packages/react/src/components/Card/CardHeaderMedia.tsx b/packages/react/src/components/Card/CardHeaderMedia.tsx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/CardHeaderMedia.tsx
+@@ -0,0 +1,54 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React, { ReactNode } from 'react';
++import PropTypes from 'prop-types';
++import cx from 'classnames';
++import { usePrefix } from '../../internal/usePrefix';
++
++const componentName = 'CardHeaderMedia';
++
++export interface CardHeaderMediaProps {
++  /**
++   * Provide the contents of the CardHeaderMedia.
++   */
++  children?: ReactNode;
++
++  /**
++   * Provide an optional class to be applied to the containing node.
++   */
++  className?: string;
++}
++
++export const CardHeaderMedia = ({
++  children,
++  className,
++  ...rest
++}: CardHeaderMediaProps) => {
++  const prefix = usePrefix();
++  const classes = cx(`${prefix}--card__header-media`, className);
++
++  return (
++    <div {...rest} className={classes}>
++      {children}
++    </div>
++  );
++};
++
++CardHeaderMedia.propTypes = {
++  /**
++   * Provide the contents of the CardHeaderMedia.
++   */
++  children: PropTypes.node,
++
++  /**
++   * Provide an optional class to be applied to the containing node.
++   */
++  className: PropTypes.string,
++};
++
++CardHeaderMedia.displayName = componentName;
+
+diff --git a/packages/react/src/components/Card/CardMedia.tsx b/packages/react/src/components/Card/CardMedia.tsx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/CardMedia.tsx
+@@ -0,0 +1,84 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React from 'react';
++import PropTypes from 'prop-types';
++import cx from 'classnames';
++import { AspectRatio } from '../AspectRatio';
++import { type AspectRatioProps } from '../AspectRatio/AspectRatio';
++import { usePrefix } from '../../internal/usePrefix';
++import { useCardContext } from './CardContext';
++
++const componentName = 'CardMedia';
++
++export interface CardMediaProps extends Omit<AspectRatioProps, 'className'> {
++  /**
++   * Provide the contents of the CardMedia.
++   */
++  children?: React.ReactNode;
++
++  /**
++   * Provide an optional class to be applied to the containing node.
++   */
++  className?: string;
++
++  /**
++   * Width of the media column when the card is in horizontal layout.
++   * Accepts any valid CSS width value (e.g. '200px', '40%').
++   * Defaults to '33.33%'. Has no effect in vertical (default) layout.
++   */
++  mediaWidth?: string;
++}
++
++/**
++ * CardMedia is a media slot component that maintains aspect ratio.
++ *
++ * In vertical (default) mode it delegates to Carbon's AspectRatio.
++ * In horizontal mode it renders a plain div sized to `mediaWidth` (default
++ * 33.33%) that stretches to the full card height — no aspect-ratio math needed.
++ */
++export const CardMedia = ({
++  children,
++  className,
++  ratio,
++  mediaWidth = '33.33%',
++  ...rest
++}: CardMediaProps) => {
++  const prefix = usePrefix();
++  const blockClass = `${prefix}--card`;
++  const { horizontal } = useCardContext();
++  const classes = cx(`${blockClass}__media`, className);
++
++  if (horizontal) {
++    return (
++      <div
++        className={`${blockClass}__media ${blockClass}__media--horizontal`}
++        style={
++          {
++            [`--${prefix}--card--media-width`]: mediaWidth,
++          } as React.CSSProperties
++        }>
++        {children}
++      </div>
++    );
++  }
++
++  return (
++    <AspectRatio ratio={ratio} {...rest} className={classes}>
++      {children}
++    </AspectRatio>
++  );
++};
++
++CardMedia.propTypes = {
++  children: PropTypes.node,
++  className: PropTypes.string,
++  /** Width of the media column in horizontal layout. Any valid CSS width value. */
++  mediaWidth: PropTypes.string,
++};
++
++CardMedia.displayName = componentName;
+
+diff --git a/packages/react/src/components/Card/CardTitle.tsx b/packages/react/src/components/Card/CardTitle.tsx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/CardTitle.tsx
+@@ -0,0 +1,199 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React, { forwardRef, ReactNode } from 'react';
++import PropTypes from 'prop-types';
++import cx from 'classnames';
++import { usePrefix } from '../../internal/usePrefix';
++
++const componentName = 'CardTitle';
++
++export interface CardTitleProps {
++  /**
++   * Provide the contents of the CardTitle.
++   */
++  children?: ReactNode;
++
++  /**
++   * Provide an optional class to be applied to the containing node.
++   */
++  className?: string;
++
++  /**
++   * Enable text truncation with ellipsis on the title text row.
++   * - `true`: Single line truncation
++   * - `number`: Multi-line truncation (line clamp)
++   * @default false
++   */
++  titleTruncate?: boolean | number;
++
++  /**
++   * Maximum width applied to the title text row when truncation is active.
++   * @default '100%'
++   */
++  maxWidth?: string;
++
++  /**
++   * Optional leading icon or content to display before the title text.
++   * - Productive density: 16px icon recommended
++   * - Expressive density: 24px icon recommended
++   */
++  titleStart?: ReactNode;
++
++  /**
++   * Optional trailing icon or content to display after the title text.
++   * - Productive density: 16px icon recommended
++   * - Expressive density: 24px icon recommended
++   */
++  titleEnd?: ReactNode;
++
++  /**
++   * Optional label rendered above the title text.
++   * Uses $label-01 typography and $text-secondary color.
++   */
++  label?: ReactNode;
++
++  /**
++   * Enable truncation on the label text.
++   * - `true`: Single line truncation
++   * - `number`: Multi-line truncation (line clamp)
++   * @default false
++   */
++  labelTruncate?: boolean | number;
++
++  /**
++   * Optional description rendered below the title text.
++   * Uses $label-01 typography and $text-secondary color.
++   */
++  description?: ReactNode;
++
++  /**
++   * Enable truncation on the description text.
++   * - `true`: Single line truncation
++   * - `number`: Multi-line truncation (line clamp)
++   * @default false
++   */
++  descriptionTruncate?: boolean | number;
++}
++
++/**
++ * CardTitle displays the main title text in the card header.
++ * Typography is driven by density on the parent Card:
++ * - Productive: $heading-compact-02 (16px/22px)
++ * - Expressive: $heading-03 (20px/28px)
++ */
++export const CardTitle = forwardRef<HTMLDivElement, CardTitleProps>(
++  (
++    {
++      children,
++      className,
++      titleTruncate = false,
++      maxWidth = '100%',
++      titleStart,
++      titleEnd,
++      label,
++      labelTruncate = false,
++      description,
++      descriptionTruncate = false,
++      ...rest
++    },
++    ref
++  ) => {
++    const prefix = usePrefix();
++    const blockClass = `${prefix}--card`;
++
++    const isTitleMulti = typeof titleTruncate === 'number';
++    const isLabelMulti = typeof labelTruncate === 'number';
++    const isDescMulti = typeof descriptionTruncate === 'number';
++
++    const containerClasses = cx(`${blockClass}__title`, className);
++
++    // Truncation and icon classes live on the inner text-row so they never
++    // override the outer container's display:flex flex-direction:column,
++    // which keeps the label and description visible.
++    const textRowClasses = cx(`${blockClass}__title-text-row`, {
++      [`${blockClass}__title-text-row--truncate`]: titleTruncate === true,
++      [`${blockClass}__title-text-row--truncate-multi`]: isTitleMulti,
++      [`${blockClass}__title-text-row--with-start-icon`]: titleStart,
++      [`${blockClass}__title-text-row--with-end-icon`]: titleEnd,
++    });
++
++    // Dynamic values passed as CSS custom properties so SCSS rules can read
++    // them via var(). Avoids encoding presentation logic in inline styles.
++    const titleVars =
++      titleTruncate !== false
++        ? {
++            [`--${prefix}--card--title-max-width`]: maxWidth,
++            ...(isTitleMulti && {
++              [`--${prefix}--card--title-line-clamp`]: titleTruncate,
++            }),
++          }
++        : undefined;
++
++    const labelVars = isLabelMulti
++      ? { [`--${prefix}--card--label-line-clamp`]: labelTruncate }
++      : undefined;
++
++    const descVars = isDescMulti
++      ? { [`--${prefix}--card--description-line-clamp`]: descriptionTruncate }
++      : undefined;
++
++    return (
++      <div {...rest} ref={ref} className={containerClasses}>
++        {label && (
++          <div
++            className={cx(`${blockClass}__label`, {
++              [`${blockClass}__label--truncate`]: labelTruncate === true,
++              [`${blockClass}__label--truncate-multi`]: isLabelMulti,
++            })}
++            style={labelVars as React.CSSProperties}>
++            {label}
++          </div>
++        )}
++        <span
++          className={textRowClasses}
++          style={titleVars as React.CSSProperties}>
++          {titleStart && (
++            <span className={`${blockClass}__title-start-icon`}>
++              {titleStart}
++            </span>
++          )}
++          {children}
++          {titleEnd && (
++            <span className={`${blockClass}__title-end-icon`}>{titleEnd}</span>
++          )}
++        </span>
++        {description && (
++          <div
++            className={cx(`${blockClass}__description`, {
++              [`${blockClass}__description--truncate`]:
++                descriptionTruncate === true,
++              [`${blockClass}__description--truncate-multi`]: isDescMulti,
++            })}
++            style={descVars as React.CSSProperties}>
++            {description}
++          </div>
++        )}
++      </div>
++    );
++  }
++);
++
++CardTitle.propTypes = {
++  children: PropTypes.node,
++  className: PropTypes.string,
++  description: PropTypes.node,
++  descriptionTruncate: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
++  label: PropTypes.node,
++  labelTruncate: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
++  maxWidth: PropTypes.string,
++  titleEnd: PropTypes.node,
++  titleStart: PropTypes.node,
++  titleTruncate: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
++};
++
++CardTitle.displayName = componentName;
+
+diff --git a/packages/react/src/components/Card/CardTitleMedia.tsx b/packages/react/src/components/Card/CardTitleMedia.tsx
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/CardTitleMedia.tsx
+@@ -0,0 +1,57 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React, { forwardRef, ReactNode } from 'react';
++import PropTypes from 'prop-types';
++import cx from 'classnames';
++import { usePrefix } from '../../internal/usePrefix';
++
++const componentName = 'CardTitleMedia';
++
++export interface CardTitleMediaProps {
++  /**
++   * Content to be rendered in the title media slot (typically an icon or small image)
++   */
++  children?: ReactNode;
++
++  /**
++   * Optional class name for custom styling
++   */
++  className?: string;
++}
++
++/**
++ * CardTitleMedia provides a media slot positioned to the left of the card title.
++ * The media slot adapts to the heading area height (min 48px, max 64px) and stays
++ * top-aligned when the title wraps to multiple lines.
++ */
++export const CardTitleMedia = forwardRef<HTMLDivElement, CardTitleMediaProps>(
++  ({ className, children, ...rest }, ref) => {
++    const prefix = usePrefix();
++    const titleMediaClasses = cx(`${prefix}--card__title-media`, className);
++
++    return (
++      <div {...rest} ref={ref} className={titleMediaClasses}>
++        {children}
++      </div>
++    );
++  }
++);
++
++CardTitleMedia.displayName = componentName;
++
++CardTitleMedia.propTypes = {
++  /**
++   * Content to be rendered in the title media slot (typically an icon or small image)
++   */
++  children: PropTypes.node,
++
++  /**
++   * Optional class name for custom styling
++   */
++  className: PropTypes.string,
++};
+
+diff --git a/packages/react/src/components/Card/__tests__/Card-test.js b/packages/react/src/components/Card/__tests__/Card-test.js
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/__tests__/Card-test.js
+@@ -0,0 +1,719 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React from 'react';
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import {
++  Card,
++  CardHeader,
++  CardBody,
++  CardFooter,
++  CardTitle,
++  CardMedia,
++  CardHeaderMedia,
++  CardTitleMedia,
++  CardActions,
++  CardAction,
++} from '..';
++
++// ---------------------------------------------------------------------------
++// Card (root)
++// ---------------------------------------------------------------------------
++
++describe('Card', () => {
++  it('renders card with children', () => {
++    render(
++      <Card>
++        <CardHeader>Header</CardHeader>
++        <CardBody>Body</CardBody>
++        <CardFooter>Footer</CardFooter>
++      </Card>
++    );
++
++    expect(screen.getByText('Header')).toBeInTheDocument();
++    expect(screen.getByText('Body')).toBeInTheDocument();
++    expect(screen.getByText('Footer')).toBeInTheDocument();
++  });
++
++  it('applies custom className', () => {
++    const { container } = render(
++      <Card className="custom-class">
++        <CardBody>Content</CardBody>
++      </Card>
++    );
++
++    const card = container.firstChild;
++    expect(card).toHaveClass('custom-class');
++  });
++
++  it('handles click events when clickable', async () => {
++    const handleClick = jest.fn();
++    const user = userEvent.setup();
++
++    render(
++      <Card clickable onClick={handleClick}>
++        <CardBody>Clickable content</CardBody>
++      </Card>
++    );
++
++    const card = screen.getByRole('button');
++    await user.click(card);
++
++    expect(handleClick).toHaveBeenCalledTimes(1);
++  });
++
++  it('handles keyboard events when clickable', async () => {
++    const handleClick = jest.fn();
++    const user = userEvent.setup();
++
++    render(
++      <Card clickable onClick={handleClick}>
++        <CardBody>Clickable content</CardBody>
++      </Card>
++    );
++
++    const card = screen.getByRole('button');
++    card.focus();
++    await user.keyboard('{Enter}');
++
++    expect(handleClick).toHaveBeenCalledTimes(1);
++  });
++
++  it('triggers onClick via Space key when clickable', async () => {
++    const handleClick = jest.fn();
++    const user = userEvent.setup();
++
++    render(
++      <Card clickable onClick={handleClick}>
++        <CardBody>Clickable content</CardBody>
++      </Card>
++    );
++
++    const card = screen.getByRole('button');
++    card.focus();
++    await user.keyboard(' ');
++
++    expect(handleClick).toHaveBeenCalledTimes(1);
++  });
++
++  it('does not handle clicks when disabled', async () => {
++    const handleClick = jest.fn();
++    const user = userEvent.setup();
++
++    const { container } = render(
++      <Card clickable disabled onClick={handleClick}>
++        <CardBody>Disabled content</CardBody>
++      </Card>
++    );
++
++    const card = container.firstChild;
++    await user.click(card);
++
++    expect(handleClick).not.toHaveBeenCalled();
++  });
++
++  it('does not fire onClick via keyboard when disabled', async () => {
++    const handleClick = jest.fn();
++    const user = userEvent.setup();
++
++    render(
++      <Card clickable disabled onClick={handleClick}>
++        <CardBody>Disabled content</CardBody>
++      </Card>
++    );
++
++    const card = screen.getByRole('button');
++    card.focus();
++    await user.keyboard('{Enter}');
++
++    expect(handleClick).not.toHaveBeenCalled();
++  });
++
++  it('applies disabled styles', () => {
++    const { container } = render(
++      <Card disabled>
++        <CardBody>Disabled content</CardBody>
++      </Card>
++    );
++
++    const card = container.firstChild;
++    expect(card).toHaveClass('cds--card--disabled');
++  });
++
++  it('applies expressive density class', () => {
++    const { container } = render(
++      <Card density="expressive">
++        <CardBody>Content</CardBody>
++      </Card>
++    );
++    expect(container.firstChild).toHaveClass('cds--card--expressive');
++  });
++
++  it('calls custom onKeyDown handler alongside internal keyboard handling', async () => {
++    const handleKeyDown = jest.fn();
++    const user = userEvent.setup();
++
++    render(
++      <Card clickable onKeyDown={handleKeyDown}>
++        <CardBody>Content</CardBody>
++      </Card>
++    );
++
++    const card = screen.getByRole('button');
++    card.focus();
++    await user.keyboard('{Enter}');
++
++    expect(handleKeyDown).toHaveBeenCalledTimes(1);
++  });
++
++  it('sets tabIndex to -1 on a disabled clickable card', () => {
++    render(
++      <Card clickable disabled>
++        <CardBody>Content</CardBody>
++      </Card>
++    );
++    expect(screen.getByRole('button')).toHaveAttribute('tabindex', '-1');
++  });
++
++  it('sets aria-disabled on a disabled clickable card', () => {
++    render(
++      <Card clickable disabled>
++        <CardBody>Content</CardBody>
++      </Card>
++    );
++    expect(screen.getByRole('button')).toHaveAttribute('aria-disabled', 'true');
++  });
++
++  it('renders horizontal layout: media before content when CardMedia comes first', () => {
++    const { container } = render(
++      <Card horizontal>
++        <CardMedia ratio="16x9">
++          <img src="img.png" alt="" />
++        </CardMedia>
++        <CardBody>Content</CardBody>
++      </Card>
++    );
++    // Content wrapper should be present
++    expect(container.querySelector('.cds--card__content')).toBeInTheDocument();
++  });
++
++  it('renders horizontal layout: content before media when CardMedia comes last', () => {
++    const { container } = render(
++      <Card horizontal>
++        <CardBody>Content</CardBody>
++        <CardMedia ratio="16x9">
++          <img src="img.png" alt="" />
++        </CardMedia>
++      </Card>
++    );
++    expect(container.querySelector('.cds--card__content')).toBeInTheDocument();
++  });
++});
++
++// ---------------------------------------------------------------------------
++// CardHeader
++// ---------------------------------------------------------------------------
++
++describe('CardHeader', () => {
++  it('renders header content', () => {
++    render(
++      <Card>
++        <CardHeader>Header Content</CardHeader>
++      </Card>
++    );
++
++    expect(screen.getByText('Header Content')).toBeInTheDocument();
++  });
++});
++
++// ---------------------------------------------------------------------------
++// CardBody
++// ---------------------------------------------------------------------------
++
++describe('CardBody', () => {
++  it('renders body content', () => {
++    render(
++      <Card>
++        <CardBody>Body Content</CardBody>
++      </Card>
++    );
++
++    expect(screen.getByText('Body Content')).toBeInTheDocument();
++  });
++});
++
++// ---------------------------------------------------------------------------
++// CardFooter
++// ---------------------------------------------------------------------------
++
++describe('CardFooter', () => {
++  it('renders footer content', () => {
++    render(
++      <Card>
++        <CardFooter>Footer Content</CardFooter>
++      </Card>
++    );
++
++    expect(screen.getByText('Footer Content')).toBeInTheDocument();
++  });
++
++  it('applies custom className', () => {
++    const { container } = render(
++      <Card>
++        <CardFooter className="my-footer">Footer</CardFooter>
++      </Card>
++    );
++    expect(container.querySelector('.my-footer')).toBeInTheDocument();
++  });
++});
++
++// ---------------------------------------------------------------------------
++// CardTitle
++// ---------------------------------------------------------------------------
++
++describe('CardTitle', () => {
++  it('renders title text (children)', () => {
++    render(
++      <Card>
++        <CardHeader>
++          <CardTitle>My Title</CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(screen.getByText('My Title')).toBeInTheDocument();
++  });
++
++  it('renders label when provided', () => {
++    render(
++      <Card>
++        <CardHeader>
++          <CardTitle label="Category">Title</CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(screen.getByText('Category')).toBeInTheDocument();
++  });
++
++  it('does not render label element when label prop is absent', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardTitle>Title</CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(
++      container.querySelector('.cds--card__label')
++    ).not.toBeInTheDocument();
++  });
++
++  it('applies single-line label truncation class', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardTitle label="Long label" labelTruncate>
++            Title
++          </CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(
++      container.querySelector('.cds--card__label--truncate')
++    ).toBeInTheDocument();
++  });
++
++  it('applies multi-line label truncation class when labelTruncate is a number', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardTitle label="Long label" labelTruncate={2}>
++            Title
++          </CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(
++      container.querySelector('.cds--card__label--truncate-multi')
++    ).toBeInTheDocument();
++  });
++
++  it('renders description when provided', () => {
++    render(
++      <Card>
++        <CardHeader>
++          <CardTitle description="A description">Title</CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(screen.getByText('A description')).toBeInTheDocument();
++  });
++
++  it('does not render description element when description prop is absent', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardTitle>Title</CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(
++      container.querySelector('.cds--card__description')
++    ).not.toBeInTheDocument();
++  });
++
++  it('applies single-line description truncation class', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardTitle description="Long desc" descriptionTruncate>
++            Title
++          </CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(
++      container.querySelector('.cds--card__description--truncate')
++    ).toBeInTheDocument();
++  });
++
++  it('applies multi-line description truncation class when descriptionTruncate is a number', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardTitle description="Long desc" descriptionTruncate={3}>
++            Title
++          </CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(
++      container.querySelector('.cds--card__description--truncate-multi')
++    ).toBeInTheDocument();
++  });
++
++  it('applies single-line title truncation class', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardTitle titleTruncate>Title</CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(
++      container.querySelector('.cds--card__title-text-row--truncate')
++    ).toBeInTheDocument();
++  });
++
++  it('applies multi-line title truncation class when titleTruncate is a number', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardTitle titleTruncate={2}>Title</CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(
++      container.querySelector('.cds--card__title-text-row--truncate-multi')
++    ).toBeInTheDocument();
++  });
++
++  it('renders titleStart icon slot', () => {
++    render(
++      <Card>
++        <CardHeader>
++          <CardTitle titleStart={<span data-testid="start-icon" />}>
++            Title
++          </CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(screen.getByTestId('start-icon')).toBeInTheDocument();
++  });
++
++  it('renders titleEnd icon slot', () => {
++    render(
++      <Card>
++        <CardHeader>
++          <CardTitle titleEnd={<span data-testid="end-icon" />}>
++            Title
++          </CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(screen.getByTestId('end-icon')).toBeInTheDocument();
++  });
++
++  it('does not render titleStart wrapper when prop is absent', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardTitle>Title</CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(
++      container.querySelector('.cds--card__title-start-icon')
++    ).not.toBeInTheDocument();
++  });
++
++  it('does not render titleEnd wrapper when prop is absent', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardTitle>Title</CardTitle>
++        </CardHeader>
++      </Card>
++    );
++    expect(
++      container.querySelector('.cds--card__title-end-icon')
++    ).not.toBeInTheDocument();
++  });
++});
++
++// ---------------------------------------------------------------------------
++// CardMedia
++// ---------------------------------------------------------------------------
++
++describe('CardMedia', () => {
++  it('renders children in vertical (default) mode via AspectRatio', () => {
++    render(
++      <Card>
++        <CardMedia ratio="16x9">
++          <img src="img.png" alt="media" />
++        </CardMedia>
++      </Card>
++    );
++    expect(screen.getByAltText('media')).toBeInTheDocument();
++  });
++
++  it('renders children in horizontal mode as a plain div', () => {
++    render(
++      <Card horizontal>
++        <CardMedia ratio="16x9">
++          <img src="img.png" alt="horizontal-media" />
++        </CardMedia>
++        <CardBody>Content</CardBody>
++      </Card>
++    );
++    expect(screen.getByAltText('horizontal-media')).toBeInTheDocument();
++  });
++
++  it('applies custom className in vertical mode', () => {
++    const { container } = render(
++      <Card>
++        <CardMedia className="my-media" ratio="16x9">
++          <span />
++        </CardMedia>
++      </Card>
++    );
++    expect(container.querySelector('.my-media')).toBeInTheDocument();
++  });
++
++  it('applies horizontal media class in horizontal mode', () => {
++    const { container } = render(
++      <Card horizontal>
++        <CardMedia ratio="16x9">
++          <span />
++        </CardMedia>
++        <CardBody>Content</CardBody>
++      </Card>
++    );
++    expect(
++      container.querySelector('.cds--card__media--horizontal')
++    ).toBeInTheDocument();
++  });
++});
++
++// ---------------------------------------------------------------------------
++// CardHeaderMedia
++// ---------------------------------------------------------------------------
++
++describe('CardHeaderMedia', () => {
++  it('renders children', () => {
++    render(
++      <Card>
++        <CardHeader>
++          <CardHeaderMedia>
++            <img src="header.png" alt="header media" />
++          </CardHeaderMedia>
++        </CardHeader>
++      </Card>
++    );
++    expect(screen.getByAltText('header media')).toBeInTheDocument();
++  });
++
++  it('applies custom className', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardHeaderMedia className="custom-header-media">
++            <span />
++          </CardHeaderMedia>
++        </CardHeader>
++      </Card>
++    );
++    expect(container.querySelector('.custom-header-media')).toBeInTheDocument();
++  });
++});
++
++// ---------------------------------------------------------------------------
++// CardTitleMedia
++// ---------------------------------------------------------------------------
++
++describe('CardTitleMedia', () => {
++  it('renders children', () => {
++    render(
++      <Card>
++        <CardHeader>
++          <CardTitleMedia>
++            <span data-testid="title-media-icon" />
++          </CardTitleMedia>
++        </CardHeader>
++      </Card>
++    );
++    expect(screen.getByTestId('title-media-icon')).toBeInTheDocument();
++  });
++
++  it('applies custom className', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardTitleMedia className="custom-title-media">
++            <span />
++          </CardTitleMedia>
++        </CardHeader>
++      </Card>
++    );
++    expect(container.querySelector('.custom-title-media')).toBeInTheDocument();
++  });
++});
++
++// ---------------------------------------------------------------------------
++// CardAction
++// ---------------------------------------------------------------------------
++
++describe('CardAction', () => {
++  it('renders children inside the action wrapper', () => {
++    render(
++      <Card>
++        <CardHeader>
++          <CardActions>
++            <CardAction>
++              <button type="button">Delete</button>
++            </CardAction>
++          </CardActions>
++        </CardHeader>
++      </Card>
++    );
++    expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
++  });
++
++  it('applies custom className to the action wrapper', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardActions>
++            <CardAction className="my-action">
++              <button type="button">Save</button>
++            </CardAction>
++          </CardActions>
++        </CardHeader>
++      </Card>
++    );
++    expect(container.querySelector('.my-action')).toBeInTheDocument();
++  });
++});
++
++// ---------------------------------------------------------------------------
++// CardActions
++// ---------------------------------------------------------------------------
++
++describe('CardActions', () => {
++  it('renders action buttons', () => {
++    render(
++      <Card>
++        <CardHeader>
++          <CardActions>
++            <CardAction>
++              <button type="button">Action 1</button>
++            </CardAction>
++            <CardAction>
++              <button type="button">Action 2</button>
++            </CardAction>
++          </CardActions>
++        </CardHeader>
++      </Card>
++    );
++    expect(
++      screen.getByRole('button', { name: 'Action 1' })
++    ).toBeInTheDocument();
++    expect(
++      screen.getByRole('button', { name: 'Action 2' })
++    ).toBeInTheDocument();
++  });
++
++  it('applies custom className to the container', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardActions className="my-actions">
++            <CardAction>
++              <button type="button">Act</button>
++            </CardAction>
++          </CardActions>
++        </CardHeader>
++      </Card>
++    );
++    expect(container.querySelector('.my-actions')).toBeInTheDocument();
++  });
++
++  it('renders without children', () => {
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardActions />
++        </CardHeader>
++      </Card>
++    );
++    expect(container.querySelector('.cds--card__actions')).toBeInTheDocument();
++  });
++
++  it('renders the overflow menu button', () => {
++    // OverflowMenu/next uses a tooltip for its accessible name ("Options").
++    // Verify the overflow trigger is always present in the DOM.
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardActions overflowMenuLabel="Card options">
++            <CardAction label="Edit">
++              <button type="button">Edit</button>
++            </CardAction>
++          </CardActions>
++        </CardHeader>
++      </Card>
++    );
++    expect(container.querySelector('.cds--overflow-menu')).toBeInTheDocument();
++  });
++
++  it('resolves action label from CardAction label prop without throwing', () => {
++    // Exercises the label resolution path in the actionItems useMemo.
++    // The overflow menu trigger is always rendered regardless of overflow state.
++    const { container } = render(
++      <Card>
++        <CardHeader>
++          <CardActions>
++            <CardAction label="Custom Label">
++              <button type="button">Custom action</button>
++            </CardAction>
++          </CardActions>
++        </CardHeader>
++      </Card>
++    );
++    expect(container.querySelector('.cds--overflow-menu')).toBeInTheDocument();
++  });
++});
+
+diff --git a/packages/react/src/components/Card/_story-assets/classic-rebus.png b/packages/react/src/components/Card/_story-assets/classic-rebus.png
+--- a/packages/react/src/components/Card/_story-assets/classic-rebus.png
++++ b/packages/react/src/components/Card/_story-assets/classic-rebus.png
+[... patch truncated — file has too many changes for GitHub API patch field. View full diff on the original repository ...]
+
+diff --git a/packages/react/src/components/Card/_story-assets/data.js b/packages/react/src/components/Card/_story-assets/data.js
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/_story-assets/data.js
+@@ -0,0 +1,29 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++export default [
++  { group: 'Dataset 1', date: '2019-01-01T00:00:00.000Z', value: 1 },
++  { group: 'Dataset 1', date: '2019-01-02T00:00:00.000Z', value: 2 },
++  { group: 'Dataset 1', date: '2019-01-03T00:00:00.000Z', value: 4 },
++  { group: 'Dataset 1', date: '2019-01-04T00:00:00.000Z', value: 7 },
++  { group: 'Dataset 1', date: '2019-01-05T00:00:00.000Z', value: 10 },
++  { group: 'Dataset 1', date: '2019-01-06T00:00:00.000Z', value: 12 },
++  { group: 'Dataset 1', date: '2019-01-07T00:00:00.000Z', value: 11 },
++  { group: 'Dataset 1', date: '2019-01-08T00:00:00.000Z', value: 9 },
++  { group: 'Dataset 1', date: '2019-01-09T00:00:00.000Z', value: 7 },
++  { group: 'Dataset 1', date: '2019-01-10T00:00:00.000Z', value: 6 },
++  { group: 'Dataset 1', date: '2019-01-11T00:00:00.000Z', value: 5 },
++  { group: 'Dataset 1', date: '2019-01-12T00:00:00.000Z', value: 6 },
++  { group: 'Dataset 1', date: '2019-01-13T00:00:00.000Z', value: 8 },
++  { group: 'Dataset 1', date: '2019-01-14T00:00:00.000Z', value: 10 },
++  { group: 'Dataset 1', date: '2019-01-15T00:00:00.000Z', value: 11 },
++  { group: 'Dataset 1', date: '2019-01-16T00:00:00.000Z', value: 10 },
++  { group: 'Dataset 1', date: '2019-01-17T00:00:00.000Z', value: 9 },
++  { group: 'Dataset 1', date: '2019-01-18T00:00:00.000Z', value: 9 },
++  { group: 'Dataset 1', date: '2019-01-19T00:00:00.000Z', value: 10 },
++  { group: 'Dataset 1', date: '2019-01-20T00:00:00.000Z', value: 11 },
++];
+
+diff --git a/packages/react/src/components/Card/_story-assets/illustration-img-1.png b/packages/react/src/components/Card/_story-assets/illustration-img-1.png
+--- a/packages/react/src/components/Card/_story-assets/illustration-img-1.png
++++ b/packages/react/src/components/Card/_story-assets/illustration-img-1.png
+[... patch truncated — file has too many changes for GitHub API patch field. View full diff on the original repository ...]
+
+diff --git a/packages/react/src/components/Card/_story-assets/options.js b/packages/react/src/components/Card/_story-assets/options.js
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/_story-assets/options.js
+@@ -0,0 +1,45 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++export default {
++  height: '150px',
++  grid: {
++    x: {
++      enabled: false,
++    },
++    y: {
++      enabled: false,
++    },
++  },
++  axes: {
++    bottom: {
++      visible: false,
++      title: '2019 Annual Sales Figures',
++      mapsTo: 'date',
++      scaleType: 'time',
++    },
++    left: {
++      visible: false,
++      mapsTo: 'value',
++      scaleType: 'linear',
++    },
++  },
++  color: {
++    gradient: {
++      enabled: true,
++    },
++  },
++  points: {
++    enabled: false,
++  },
++  legend: {
++    enabled: false,
++  },
++  toolbar: {
++    enabled: false,
++  },
++};
+
+diff --git a/packages/react/src/components/Card/_story-assets/placeholder-16x9.png b/packages/react/src/components/Card/_story-assets/placeholder-16x9.png
+--- a/packages/react/src/components/Card/_story-assets/placeholder-16x9.png
++++ b/packages/react/src/components/Card/_story-assets/placeholder-16x9.png
+[... patch truncated — file has too many changes for GitHub API patch field. View full diff on the original repository ...]
+
+diff --git a/packages/react/src/components/Card/_story-assets/placeholder-1x1.png b/packages/react/src/components/Card/_story-assets/placeholder-1x1.png
+--- a/packages/react/src/components/Card/_story-assets/placeholder-1x1.png
++++ b/packages/react/src/components/Card/_story-assets/placeholder-1x1.png
+[... patch truncated — file has too many changes for GitHub API patch field. View full diff on the original repository ...]
+
+diff --git a/packages/react/src/components/Card/card-story.scss b/packages/react/src/components/Card/card-story.scss
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/card-story.scss
+@@ -0,0 +1,57 @@
++//
++// Copyright IBM Corp. 2026
++//
++// This source code is licensed under the Apache-2.0 license found in the
++// LICENSE file in the root directory of this source tree.
++//
++
++@use '@carbon/styles/scss/spacing';
++
++#storybook-root {
++  padding-block-start: spacing.$spacing-07; // 2rem
++}
++
++// Storybook disabled toggle column — aligns the toggle button to the bottom
++.card-story-disabled-toggle {
++  display: flex;
++  align-items: flex-end;
++  padding-block-end: spacing.$spacing-05;
++}
++
++.story-time {
++  display: flex;
++  align-items: center;
++  padding: 0 spacing.$spacing-05;
++  font-size: calc(spacing.$spacing-04 + spacing.$spacing-01);
++  gap: spacing.$spacing-03;
++}
++
++// Metric pair row — used in the WithChart story to lay out two BigNumbers side by side
++.card-story-metrics {
++  display: flex;
++  gap: spacing.$spacing-07; // 2rem
++  padding-block-end: spacing.$spacing-05;
++}
++
++// Body text above the chart in Example 1 of the WithChart story
++.card-story-chart-body-text {
++  padding-block-end: spacing.$spacing-05;
++}
++
++// Metadata row in the GetStarted card footer
++.card-story-get-started-meta {
++  display: flex;
++  flex: 1 0 0;
++  align-items: center;
++  gap: spacing.$spacing-05;
++}
++
++.card-story-get-started-meta__item {
++  display: flex;
++  align-items: center;
++  font-size: 0.75rem; // label-01
++  gap: spacing.$spacing-02;
++  letter-spacing: 0.32px;
++  line-height: 1rem;
++  white-space: nowrap;
++}
+
+diff --git a/packages/react/src/components/Card/index.ts b/packages/react/src/components/Card/index.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/react/src/components/Card/index.ts
+@@ -0,0 +1,31 @@
++/**
++ * Copyright IBM Corp. 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++export {
++  Card,
++  CardHeader,
++  CardBody,
++  CardFooter,
++  CardHeaderMedia,
++  CardMedia,
++  CardTitle,
++  CardTitleMedia,
++  CardActions,
++  CardAction,
++} from './Card';
++
++export type {
++  CardProps,
++  CardHeaderProps,
++  CardBodyProps,
++  CardFooterProps,
++  CardHeaderMediaProps,
++  CardMediaProps,
++  CardTitleProps,
++  CardTitleMediaProps,
++  CardActionsProps,
++  CardActionProps,
++} from './Card';
+
+diff --git a/packages/react/src/index.ts b/packages/react/src/index.ts
+--- a/packages/react/src/index.ts
++++ b/packages/react/src/index.ts
+@@ -17,6 +17,7 @@ export * from './components/AspectRatio';
+ export * from './components/Breadcrumb';
+ export * from './components/Button';
+ export * from './components/ButtonSet';
++export * from './components/Card';
+ export * from './components/Checkbox';
+ export * from './components/CheckboxGroup';
+ export * from './components/ClassPrefix';
+
+diff --git a/packages/styles/scss/components/_index.scss b/packages/styles/scss/components/_index.scss
+--- a/packages/styles/scss/components/_index.scss
++++ b/packages/styles/scss/components/_index.scss
+@@ -11,6 +11,7 @@
+ @use 'badge-indicator';
+ @use 'breadcrumb';
+ @use 'button';
++@use 'card';
+ @use 'chat-button';
+ @use 'checkbox';
+ @use 'code-snippet';
+
+diff --git a/packages/styles/scss/components/card/_card.scss b/packages/styles/scss/components/card/_card.scss
+new file mode 100644
+--- /dev/null
++++ b/packages/styles/scss/components/card/_card.scss
+@@ -0,0 +1,449 @@
++//
++// Copyright IBM Corp. 2026
++//
++// This source code is licensed under the Apache-2.0 license found in the
++// LICENSE file in the root directory of this source tree.
++//
++
++//-----------------------------
++// Card
++//-----------------------------
++
++@use '../../config' as *;
++@use '../../motion' as *;
++@use '../../spacing' as *;
++@use '../../theme' as *;
++@use '../../type' as *;
++@use '../../utilities/ai-gradient' as *;
++@use '../../utilities/focus-outline' as *;
++
++/// Card styles
++/// @access public
++/// @group card
++@mixin card {
++  // ─── Base ────────────────────────────────────────────────────────────
++  .#{$prefix}--card {
++    position: relative;
++    border: 1px solid $border-subtle-01;
++    background-color: $layer-01;
++    color: $text-primary;
++  }
++
++  // ─── Clickable ───────────────────────────────────────────────────────
++  .#{$prefix}--card--clickable {
++    cursor: pointer;
++    transition: background-color $duration-fast-02 motion(standard, productive);
++
++    &:hover {
++      background-color: $layer-hover-01;
++    }
++
++    &:focus {
++      @include focus-outline('outline');
++    }
++
++    &:active {
++      background-color: $layer-active-01;
++    }
++  }
++
++  // ─── Disabled ────────────────────────────────────────────────────────
++  .#{$prefix}--card--disabled {
++    border-color: $border-disabled;
++    background-color: $layer-01;
++    color: $text-disabled;
++    cursor: not-allowed;
++    pointer-events: none;
++  }
++
++  // ─── Header ──────────────────────────────────────────────────────────
++  .#{$prefix}--card__header {
++    position: relative;
++    display: grid;
++    // 16px gap between __title-media and __title
++    column-gap: $spacing-05;
++    grid-template-columns: auto 1fr;
++    // vertical rhythm is handled by margin-block on each child
++    row-gap: 0;
++  }
++
++  // ─── Body ────────────────────────────────────────────────────────────
++  .#{$prefix}--card__body {
++    @include type-style('body-compact-01');
++
++    margin-block: $spacing-05;
++    margin-block-start: 0;
++    margin-inline: $spacing-05;
++  }
++
++  // When body is the first child (no header), restore top padding
++  .#{$prefix}--card > .#{$prefix}--card__body:first-child {
++    margin-block-start: $spacing-05;
++  }
++
++  // ─── Footer ──────────────────────────────────────────────────────────
++  // Default: padded, no border (raw-content slot)
++  .#{$prefix}--card__footer {
++    display: flex;
++    align-items: center;
++    padding: $spacing-05;
++  }
++
++  // Action-set layout: triggered when CardAction children are present
++  .#{$prefix}--card__footer:has(> .#{$prefix}--card__action) {
++    overflow: hidden;
++    padding: 0;
++    border-block-start: 1px solid $border-subtle;
++    gap: 1px;
++  }
++
++  // Text/secondary actions stretch to fill width
++  .#{$prefix}--card__footer
++    > .#{$prefix}--card__action:not(:has(.#{$prefix}--btn--icon-only)) {
++    flex: 1 0 0;
++    min-inline-size: 0;
++
++    > .#{$prefix}--btn,
++    > * > .#{$prefix}--btn {
++      inline-size: 100%;
++      max-inline-size: none;
++    }
++  }
++
++  // Icon-only actions are fixed-width, pushed to the right
++  .#{$prefix}--card__footer
++    > .#{$prefix}--card__action:has(.#{$prefix}--btn--icon-only) {
++    flex: 0 0 auto;
++    margin-inline-start: auto;
++  }
++
++  // Consecutive icon-only actions: only the first gets the auto margin
++  .#{$prefix}--card__footer
++    > .#{$prefix}--card__action:has(.#{$prefix}--btn--icon-only)
++    + .#{$prefix}--card__action:has(.#{$prefix}--btn--icon-only) {
++    margin-inline-start: 0;
++  }
++
++  // ─── Action wrapper ───────────────────────────────────────────────────
++  .#{$prefix}--card__action {
++    display: inline-flex;
++  }
++
++  // ─── Header media (icon / avatar slot) ───────────────────────────────
++  // Spans both grid columns so it always sits above the title-media+title row.
++  .#{$prefix}--card__header-media {
++    display: flex;
++    align-items: flex-start;
++    justify-content: flex-start;
++    grid-column: 1 / -1;
++    margin-block: $spacing-05;
++    margin-inline: $spacing-05;
++    // 64px max height
++    max-block-size: $spacing-10;
++  }
++
++  // ─── Media (AspectRatio slot) ────────────────────────────────────────
++  .#{$prefix}--card__media {
++    grid-column: 1 / -1;
++    inline-size: 100%;
++
++    // Disable Carbon's float-based padding-top trick
++    &::before,
++    &::after {
++      display: none;
++    }
++  }
++
++  // Re-apply aspect ratio using the native CSS property
++  .#{$prefix}--card__media.#{$prefix}--aspect-ratio--16x9 {
++    aspect-ratio: 16 / 9;
++  }
++  .#{$prefix}--card__media.#{$prefix}--aspect-ratio--9x16 {
++    aspect-ratio: 9 / 16;
++  }
++  .#{$prefix}--card__media.#{$prefix}--aspect-ratio--2x1 {
++    aspect-ratio: 2 / 1;
++  }
++  .#{$prefix}--card__media.#{$prefix}--aspect-ratio--1x2 {
++    aspect-ratio: 1 / 2;
++  }
++  .#{$prefix}--card__media.#{$prefix}--aspect-ratio--4x3 {
++    aspect-ratio: 4 / 3;
++  }
++  .#{$prefix}--card__media.#{$prefix}--aspect-ratio--3x4 {
++    aspect-ratio: 3 / 4;
++  }
++  .#{$prefix}--card__media.#{$prefix}--aspect-ratio--3x2 {
++    aspect-ratio: 3 / 2;
++  }
++  .#{$prefix}--card__media.#{$prefix}--aspect-ratio--2x3 {
++    aspect-ratio: 2 / 3;
++  }
++  .#{$prefix}--card__media.#{$prefix}--aspect-ratio--1x1 {
++    aspect-ratio: 1 / 1;
++  }
++
++  // Children of the media slot (images, video) must fill the container
++  .#{$prefix}--card__media > * {
++    position: static;
++    block-size: 100%;
++    inline-size: 100%;
++    object-fit: cover;
++  }
++
++  // ─── Horizontal layout ───────────────────────────────────────────────
++  .#{$prefix}--card--horizontal {
++    display: flex;
++    flex-direction: row;
++    align-items: stretch;
++  }
++
++  .#{$prefix}--card__media--horizontal {
++    overflow: hidden;
++    flex-basis: var(--#{$prefix}--card--media-width, 33.33%);
++    flex-shrink: 0;
++    align-self: stretch;
++  }
++
++  .#{$prefix}--card--horizontal > .#{$prefix}--card__content {
++    display: flex;
++    flex: 1 1 0;
++    flex-direction: column;
++    min-inline-size: 0;
++  }
++
++  .#{$prefix}--card--horizontal
++    > .#{$prefix}--card__content
++    > .#{$prefix}--card__body {
++    flex: 1 0 auto;
++  }
++
++  .#{$prefix}--card--horizontal
++    > .#{$prefix}--card__content
++    > .#{$prefix}--card__footer {
++    margin-block-start: auto;
++  }
++
++  // ─── Label (nested inside __title via label prop on CardTitle) ─────────
++  .#{$prefix}--card__title > .#{$prefix}--card__label {
++    @include type-style('label-01');
++
++    color: $text-secondary;
++  }
++
++  .#{$prefix}--card__label--truncate {
++    overflow: hidden;
++    text-overflow: ellipsis;
++    white-space: nowrap;
++  }
++
++  .#{$prefix}--card__label--truncate-multi {
++    display: -webkit-box;
++    overflow: hidden;
++    -webkit-box-orient: vertical;
++    -webkit-line-clamp: var(--#{$prefix}--card--label-line-clamp);
++    text-overflow: ellipsis;
++  }
++
++  // ─── Title ───────────────────────────────────────────────────────────
++  .#{$prefix}--card__title {
++    display: flex;
++    overflow: hidden;
++    flex-direction: column;
++    color: $text-primary;
++    // 2px between label / text-row / description
++    gap: $spacing-01;
++    margin-inline: $spacing-05;
++    min-inline-size: 0;
++  }
++
++  .#{$prefix}--card__header > .#{$prefix}--card__title {
++    margin-block: $spacing-05;
++  }
++
++  .#{$prefix}--card--expressive .#{$prefix}--card__title-text-row {
++    @include type-style('heading-03');
++  }
++
++  .#{$prefix}--card--productive .#{$prefix}--card__title-text-row {
++    @include type-style('heading-compact-02');
++  }
++
++  // ─── Title text row ──────────────────────────────────────────────────
++  .#{$prefix}--card__title-text-row {
++    display: block;
++  }
++
++  .#{$prefix}--card__title-text-row--truncate {
++    overflow: hidden;
++    max-inline-size: var(--#{$prefix}--card--title-max-width, 100%);
++    text-overflow: ellipsis;
++    white-space: nowrap;
++  }
++
++  .#{$prefix}--card__title-text-row--truncate-multi {
++    display: -webkit-box;
++    overflow: hidden;
++    -webkit-box-orient: vertical;
++    -webkit-line-clamp: var(--#{$prefix}--card--title-line-clamp);
++    max-inline-size: var(--#{$prefix}--card--title-max-width, 100%);
++    text-overflow: ellipsis;
++  }
++
++  // Leading icon: flex row so icon and text sit side-by-side
++  .#{$prefix}--card__title-text-row--with-start-icon {
++    display: flex;
++    align-items: flex-start;
++    gap: $spacing-03;
++  }
++
++  // Trailing icon — no override needed; icon span is inline-flex inside block text
++  .#{$prefix}--card__title-text-row--with-end-icon {
++    display: block;
++  }
++
++  // Title leading icon wrapper
++  .#{$prefix}--card__title-start-icon {
++    display: flex;
++    flex-shrink: 0;
++    // 2px to align with first text line
++    margin-block-start: $spacing-01;
++  }
++
++  // Title trailing icon wrapper — inline so it flows with text
++  .#{$prefix}--card__title-end-icon {
++    display: inline-flex;
++    align-items: center;
++    margin-inline-start: $spacing-03;
++    vertical-align: middle;
++  }
++
++  // ─── Description (nested inside __title via description prop) ──────────
++  .#{$prefix}--card__title > .#{$prefix}--card__description {
++    @include type-style('label-01');
++
++    color: $text-secondary;
++  }
++
++  .#{$prefix}--card__description--truncate {
++    overflow: hidden;
++    text-overflow: ellipsis;
++    white-space: nowrap;
++  }
++
++  .#{$prefix}--card__description--truncate-multi {
++    display: -webkit-box;
++    overflow: hidden;
++    -webkit-box-orient: vertical;
++    -webkit-line-clamp: var(--#{$prefix}--card--description-line-clamp);
++    text-overflow: ellipsis;
++  }
++
++  // ─── Title media ─────────────────────────────────────────────────────
++  .#{$prefix}--card__title-media {
++    display: flex;
++    flex-shrink: 0;
++    // top-align so it tracks the first line on long titles
++    align-items: flex-start;
++    justify-content: center;
++    grid-column: 1;
++    // aligns top edge with title text top margin
++    margin-block-start: $spacing-05;
++    // 16px from card edge
++    margin-inline-start: $spacing-05;
++    // 64px max height
++    max-block-size: $spacing-10;
++  }
++
++  .#{$prefix}--card__header:has(> .#{$prefix}--card__title-media)
++    > .#{$prefix}--card__title {
++    grid-column: 2;
++    // left margin is provided by the gap from __title-media
++    margin-inline-start: 0;
++  }
++
++  // ─── Header actions ───────────────────────────────────────────────────
++  .#{$prefix}--card__actions {
++    position: absolute;
++    display: inline-flex;
++    align-items: center;
++    justify-content: flex-end;
++    block-size: $spacing-07;
++    gap: $spacing-02;
++    inline-size: 50%;
++    inset-block-start: $spacing-03;
++    inset-inline-end: $spacing-03;
++    max-inline-size: 50%;
++  }
++
++  // ─── AI Label (decorator) ─────────────────────────────────────────────
++  .#{$prefix}--card--has-ai-label {
++    @include ai-popover-gradient('default', 0, 'layer');
++
++    border: 1px solid transparent;
++    box-shadow:
++      inset 0 -80px 70px -65px $ai-inner-shadow,
++      0 4px 10px 2px $ai-drop-shadow;
++  }
++
++  .#{$prefix}--card__decorator {
++    position: absolute;
++    z-index: 1;
++    display: flex;
++    align-items: center;
++    block-size: $spacing-07;
++    inset-block-start: $spacing-03;
++    inset-inline-end: $spacing-03;
++  }
++
++  .#{$prefix}--card--has-ai-label .#{$prefix}--card__title {
++    padding-inline-end: calc($spacing-07 + $spacing-05);
++  }
++
++  .#{$prefix}--card--has-ai-label:has(.#{$prefix}--card__actions)
++    .#{$prefix}--card__title {
++    padding-inline-end: $spacing-13;
++  }
++
++  .#{$prefix}--card--has-ai-label .#{$prefix}--card__label {
++    padding-inline-end: calc($spacing-07 + $spacing-05);
++  }
++
++  .#{$prefix}--card--has-ai-label:has(.#{$prefix}--card__actions)
++    .#{$prefix}--card__label {
++    padding-inline-end: $spacing-13;
++  }
++
++  .#{$prefix}--card--has-ai-label .#{$prefix}--card__description {
++    padding-inline-end: calc($spacing-07 + $spacing-05);
++  }
++
++  .#{$prefix}--card--has-ai-label:has(.#{$prefix}--card__actions)
++    .#{$prefix}--card__description {
++    padding-inline-end: $spacing-13;
++  }
++
++  .#{$prefix}--card--has-ai-label .#{$prefix}--card__actions {
++    inset-inline-end: calc($spacing-03 + $spacing-06 + $spacing-03);
++  }
++
++  // AI label hover state for clickable cards
++  .#{$prefix}--card--clickable.#{$prefix}--card--has-ai-label::before {
++    @include ai-popover-gradient('hover', 0, 'layer');
++
++    position: absolute;
++    display: block;
++    block-size: 100%;
++    box-shadow: inset 0 -80px 70px -65px $ai-inner-shadow;
++    content: '';
++    inline-size: 100%;
++    inset-block-start: 0;
++    inset-inline-start: 0;
++    opacity: 0;
++    transition: opacity $duration-fast-02 motion(standard, productive);
++  }
++
++  .#{$prefix}--card--clickable.#{$prefix}--card--has-ai-label:hover::before {
++    opacity: 1;
++  }
++}
+
+diff --git a/packages/styles/scss/components/card/_index.scss b/packages/styles/scss/components/card/_index.scss
+new file mode 100644
+--- /dev/null
++++ b/packages/styles/scss/components/card/_index.scss
+@@ -0,0 +1,11 @@
++//
++// Copyright IBM Corp. 2026
++//
++// This source code is licensed under the Apache-2.0 license found in the
++// LICENSE file in the root directory of this source tree.
++//
++
++@forward 'card';
++@use 'card';
++
++@include card.card;
