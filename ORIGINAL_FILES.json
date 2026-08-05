@@ -1,0 +1,74 @@
+[
+  {
+    "sha": "938a4c1de9acfe752932803ba218ff8a082db3de",
+    "filename": "e2e/components/Popover/Popover-test.avt.e2e.js",
+    "status": "modified",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/fff5f10469a0a978a325c491c05748565372e00b/e2e%2Fcomponents%2FPopover%2FPopover-test.avt.e2e.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/fff5f10469a0a978a325c491c05748565372e00b/e2e%2Fcomponents%2FPopover%2FPopover-test.avt.e2e.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/e2e%2Fcomponents%2FPopover%2FPopover-test.avt.e2e.js?ref=fff5f10469a0a978a325c491c05748565372e00b",
+    "patch": "@@ -64,6 +64,11 @@ test.describe('@avt Popover', () => {\n     await page.keyboard.press('Space');\n     await expect(page.locator('.cds--popover--open')).toBeVisible();\n     await page.keyboard.press('Escape');\n+\n+    // should not close on Esc, focus is not inside the content\n+    await expect(page.locator('.cds--popover--open')).toBeVisible();\n+\n+    await page.keyboard.press('Space');\n     await expect(page.locator('.cds--popover--open')).toBeHidden();\n \n     // Testing right popover"
+  },
+  {
+    "sha": "83e15d71ddacee483b177a3ffb6ff48922e9af35",
+    "filename": "packages/react/src/components/Popover/Popover.stories.js",
+    "status": "modified",
+    "additions": 0,
+    "deletions": 8,
+    "changes": 8,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/fff5f10469a0a978a325c491c05748565372e00b/packages%2Freact%2Fsrc%2Fcomponents%2FPopover%2FPopover.stories.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/fff5f10469a0a978a325c491c05748565372e00b/packages%2Freact%2Fsrc%2Fcomponents%2FPopover%2FPopover.stories.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FPopover%2FPopover.stories.js?ref=fff5f10469a0a978a325c491c05748565372e00b",
+    "patch": "@@ -14,9 +14,6 @@ import RadioButtonGroup from '../RadioButtonGroup';\n import { default as Checkbox } from '../Checkbox';\n import mdx from './Popover.mdx';\n import { Settings } from '@carbon/icons-react';\n-import { keys, match } from '../../internal/keyboard';\n-import OverflowMenu from '../OverflowMenu/OverflowMenu';\n-import OverflowMenuItem from '../OverflowMenuItem';\n \n const prefix = 'cds';\n \n@@ -80,11 +77,6 @@ export const TabTip = (args) => {\n       <Popover\n         align={align}\n         open={open}\n-        onKeyDown={(evt) => {\n-          if (match(evt, keys.Escape)) {\n-            setOpen(false);\n-          }\n-        }}\n         isTabTip\n         onRequestClose={() => setOpen(false)}\n         {...args}>"
+  },
+  {
+    "sha": "cd9e8d507ab5c9ce409234d77ec0002a04777f87",
+    "filename": "packages/react/src/components/Popover/__tests__/Popover-test.js",
+    "status": "modified",
+    "additions": 42,
+    "deletions": 0,
+    "changes": 42,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/fff5f10469a0a978a325c491c05748565372e00b/packages%2Freact%2Fsrc%2Fcomponents%2FPopover%2F__tests__%2FPopover-test.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/fff5f10469a0a978a325c491c05748565372e00b/packages%2Freact%2Fsrc%2Fcomponents%2FPopover%2F__tests__%2FPopover-test.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FPopover%2F__tests__%2FPopover-test.js?ref=fff5f10469a0a978a325c491c05748565372e00b",
+    "patch": "@@ -375,6 +375,48 @@ describe('Popover', () => {\n \n       expect(onRequestClose).toHaveBeenCalled();\n     });\n+\n+    it('should call onRequestClose when pressing Escape while the popover content is focused', async () => {\n+      const onRequestClose = jest.fn();\n+      render(\n+        <Popover open onRequestClose={() => onRequestClose()}>\n+          <button type=\"button\" data-testid=\"trigger\">\n+            Settings\n+          </button>\n+          <PopoverContent>\n+            <button data-testid=\"inside-button\">Inside Button</button>\n+          </PopoverContent>\n+        </Popover>\n+      );\n+\n+      screen.getByTestId('inside-button').focus();\n+      await userEvent.keyboard('{Escape}');\n+\n+      expect(onRequestClose).toHaveBeenCalled();\n+\n+      // focus should return to trigger\n+      expect(screen.getByTestId('trigger')).toHaveFocus();\n+    });\n+\n+    it('should NOT call onRequestClose when pressing Escape while the trigger is focused', async () => {\n+      const onRequestClose = jest.fn();\n+      render(\n+        <Popover open onRequestClose={() => onRequestClose()}>\n+          <button type=\"button\" data-testid=\"trigger\">\n+            Settings\n+          </button>\n+          <PopoverContent>test</PopoverContent>\n+        </Popover>\n+      );\n+\n+      screen.getByTestId('trigger').focus();\n+      await userEvent.keyboard('{Escape}');\n+\n+      expect(onRequestClose).not.toHaveBeenCalled();\n+\n+      // focus should remain on trigger\n+      expect(screen.getByTestId('trigger')).toHaveFocus();\n+    });\n   });\n \n   it('should NOT call onRequestClose when clicking inside the popover content', async () => {"
+  },
+  {
+    "sha": "cd3c35032b4e9eed4c253b62d7108d33302832c2",
+    "filename": "packages/react/src/components/Popover/index.tsx",
+    "status": "modified",
+    "additions": 16,
+    "deletions": 0,
+    "changes": 16,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/fff5f10469a0a978a325c491c05748565372e00b/packages%2Freact%2Fsrc%2Fcomponents%2FPopover%2Findex.tsx",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/fff5f10469a0a978a325c491c05748565372e00b/packages%2Freact%2Fsrc%2Fcomponents%2FPopover%2Findex.tsx",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Freact%2Fsrc%2Fcomponents%2FPopover%2Findex.tsx?ref=fff5f10469a0a978a325c491c05748565372e00b",
+    "patch": "@@ -20,6 +20,7 @@ import { isComponentElement } from '../../internal';\n import { useMergedRefs } from '../../internal/useMergedRefs';\n import { usePrefix } from '../../internal/usePrefix';\n import { useWindowEvent, useEvent } from '../../internal/useEvent';\n+import { selectorTabbable } from '../../internal/keyboard/navigation';\n import { mapPopoverAlign } from '../../tools/mapPopoverAlign';\n import {\n   useFloating,\n@@ -276,6 +277,21 @@ export const Popover: PopoverComponent & {\n     }\n   });\n \n+  useEvent(popover, 'keydown', (event) => {\n+    if (event.key !== 'Escape') return;\n+\n+    // Esc should only close the popover if focus is inside the popover content\n+    if (!refs.floating.current?.contains(document.activeElement)) {\n+      return;\n+    }\n+    onRequestClose?.();\n+\n+    // return focus to the trigger while making sure it is tabbable\n+    const trigger =\n+      popover.current?.querySelector<HTMLElement>(selectorTabbable);\n+    trigger?.focus();\n+  });\n+\n   useWindowEvent('click', ({ target }) => {\n     if (\n       open &&"
+  },
+  {
+    "sha": "2c2d90f619a62f13a2eefae333762da43771331c",
+    "filename": "packages/web-components/src/components/popover/__tests__/popover-test.js",
+    "status": "modified",
+    "additions": 65,
+    "deletions": 0,
+    "changes": 65,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/fff5f10469a0a978a325c491c05748565372e00b/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fpopover%2F__tests__%2Fpopover-test.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/fff5f10469a0a978a325c491c05748565372e00b/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fpopover%2F__tests__%2Fpopover-test.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fpopover%2F__tests__%2Fpopover-test.js?ref=fff5f10469a0a978a325c491c05748565372e00b",
+    "patch": "@@ -561,6 +561,71 @@ describe('cds-popover focusout/outsideclick', () => {\n     expect(document.activeElement).to.equal(outside);\n   });\n \n+  it('closes when pressing Escape while focus is inside the popover content', async () => {\n+    const el = await fixture(html`\n+      <div>\n+        <cds-popover open id=\"popover\">\n+          <button id=\"trigger\" type=\"button\">Test</button>\n+          <cds-popover-content>\n+            <button id=\"inside\">Inside</button>\n+          </cds-popover-content>\n+        </cds-popover>\n+      </div>\n+    `);\n+\n+    await el.updateComplete;\n+    const popover = el.querySelector('#popover');\n+    const trigger = popover.querySelector('#trigger');\n+    const inside = popover.querySelector('#inside');\n+\n+    let eventFired = false;\n+    popover.addEventListener('cds-popover-closed', () => {\n+      eventFired = true;\n+    });\n+\n+    expect(popover.hasAttribute('open')).to.be.true;\n+\n+    inside.focus();\n+    await el.updateComplete;\n+\n+    await sendKeys({ press: 'Escape' });\n+    await el.updateComplete;\n+\n+    expect(eventFired).to.be.true;\n+    expect(popover.hasAttribute('open')).to.be.false;\n+\n+    // focus should return to trigger\n+    expect(document.activeElement).to.equal(trigger);\n+  });\n+\n+  it('does NOT close when pressing Escape while the trigger is focused', async () => {\n+    const el = await fixture(html`\n+      <div>\n+        <cds-popover open id=\"popover\">\n+          <button id=\"trigger\" type=\"button\">Test</button>\n+          <cds-popover-content></cds-popover-content>\n+        </cds-popover>\n+      </div>\n+    `);\n+\n+    await el.updateComplete;\n+    const popover = el.querySelector('#popover');\n+    const trigger = popover.querySelector('#trigger');\n+\n+    expect(popover.hasAttribute('open')).to.be.true;\n+\n+    trigger.focus();\n+    await el.updateComplete;\n+\n+    await sendKeys({ press: 'Escape' });\n+    await el.updateComplete;\n+\n+    expect(popover.hasAttribute('open')).to.be.true;\n+\n+    // focus should remain on trigger\n+    expect(document.activeElement).to.equal(trigger);\n+  });\n+\n   it('should properly handle keyboard nav within elements inside popover', async () => {\n     const el = await fixture(html`\n       <cds-popover open id=\"popover\">"
+  },
+  {
+    "sha": "94468c86474b2ae0f1c91535a6e553d12196742e",
+    "filename": "packages/web-components/src/components/popover/popover.ts",
+    "status": "modified",
+    "additions": 42,
+    "deletions": 0,
+    "changes": 42,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/fff5f10469a0a978a325c491c05748565372e00b/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fpopover%2Fpopover.ts",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/fff5f10469a0a978a325c491c05748565372e00b/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fpopover%2Fpopover.ts",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fweb-components%2Fsrc%2Fcomponents%2Fpopover%2Fpopover.ts?ref=fff5f10469a0a978a325c491c05748565372e00b",
+    "patch": "@@ -150,6 +150,48 @@ class CDSPopover extends HostListenerMixin(LitElement) {\n     } else {\n       this._tabKeyPressed = false;\n     }\n+\n+    if (event.key === 'Escape') {\n+      // Esc should only close the popover if focus is inside the popover content\n+      const content = this.querySelector(\n+        (this.constructor as typeof CDSPopover).selectorPopoverContent\n+      );\n+      if (!content || !deepShadowContains(content, event.target)) {\n+        return;\n+      }\n+\n+      if (\n+        this.dispatchEvent(\n+          new CustomEvent(\n+            (this.constructor as typeof CDSPopover).eventBeforeClose,\n+            {\n+              bubbles: true,\n+              cancelable: true,\n+              composed: true,\n+              detail: {\n+                triggeredBy: event.target,\n+              },\n+            }\n+          )\n+        )\n+      ) {\n+        this.open = false;\n+        this.dispatchEvent(\n+          new CustomEvent(\n+            (this.constructor as typeof CDSPopover).eventOnClose,\n+            {\n+              bubbles: true,\n+              composed: true,\n+            }\n+          )\n+        );\n+\n+        // return focus to the trigger\n+        const trigger =\n+          this._triggerSlotNode.assignedElements()[0] as HTMLElement;\n+        trigger?.focus();\n+      }\n+    }\n   }\n \n   @HostListener('focusout')"
+  }
+]
