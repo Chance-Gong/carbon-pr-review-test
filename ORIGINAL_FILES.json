@@ -1,0 +1,74 @@
+[
+  {
+    "sha": "876782075915da2946de08f1ac3362f786f6f07b",
+    "filename": "packages/upgrade/transforms/__testfixtures__/preview-pagination-to-pagination.input.tsx",
+    "status": "added",
+    "additions": 23,
+    "deletions": 0,
+    "changes": 23,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Fpreview-pagination-to-pagination.input.tsx",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Fpreview-pagination-to-pagination.input.tsx",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Fpreview-pagination-to-pagination.input.tsx?ref=e2b173caac16443b31ec4188bf8411e4d32ef854",
+    "patch": "@@ -0,0 +1,23 @@\n+// @ts-nocheck — preview_Pagination and preview_PageSelector are untyped JS\n+// components with no TypeScript declarations, so TS would error on every prop.\n+import React from 'react';\n+import {\n+  preview_PageSelector as PageSelector,\n+  preview_Pagination as Pagination,\n+} from '@carbon/react';\n+\n+export const Demo = () => (\n+  <Pagination\n+    onChange={() => {}}\n+    pageSize={10}\n+    pageSizes={[10, 20]}\n+    totalItems={100}>\n+    {({ currentPage, onSetPage, totalPages }) => (\n+      <PageSelector\n+        currentPage={currentPage}\n+        onChange={(e) => onSetPage(e.target.value)}\n+        totalPages={totalPages}\n+      />\n+    )}\n+  </Pagination>\n+);"
+  },
+  {
+    "sha": "5841c4d809fbfb1a618c68ecd8efe8af8e200444",
+    "filename": "packages/upgrade/transforms/__testfixtures__/preview-pagination-to-pagination.output.tsx",
+    "status": "added",
+    "additions": 9,
+    "deletions": 0,
+    "changes": 9,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Fpreview-pagination-to-pagination.output.tsx",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Fpreview-pagination-to-pagination.output.tsx",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Fpreview-pagination-to-pagination.output.tsx?ref=e2b173caac16443b31ec4188bf8411e4d32ef854",
+    "patch": "@@ -0,0 +1,9 @@\n+// @ts-nocheck — preview_Pagination and preview_PageSelector are untyped JS\n+// components with no TypeScript declarations, so TS would error on every prop.\n+import React from 'react';\n+import { Pagination } from '@carbon/react';\n+\n+export const Demo = () => (\n+  // TODO: manually migrate children to the renderPageSelect prop if necessary.\n+  <Pagination onChange={() => {}} pageSize={10} pageSizes={[10, 20]} totalItems={100} />\n+);"
+  },
+  {
+    "sha": "b2b174dd05265812878f58df584539d6d5ffb741",
+    "filename": "packages/upgrade/transforms/__testfixtures__/unstable-pagination-to-pagination.input.tsx",
+    "status": "added",
+    "additions": 25,
+    "deletions": 0,
+    "changes": 25,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Funstable-pagination-to-pagination.input.tsx",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Funstable-pagination-to-pagination.input.tsx",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Funstable-pagination-to-pagination.input.tsx?ref=e2b173caac16443b31ec4188bf8411e4d32ef854",
+    "patch": "@@ -0,0 +1,25 @@\n+// @ts-nocheck — unstable_Pagination and unstable_PageSelector are untyped JS\n+// components with no TypeScript declarations, so TS would error on every prop.\n+import React from 'react';\n+import {\n+  unstable_PageSelector as PageSelector,\n+  unstable_Pagination as Pagination,\n+} from '@carbon/react';\n+\n+// Basic usage: unstable Pagination with a PageSelector\n+export const WithPageSelector = () => (\n+  <Pagination\n+    onChange={() => {}}\n+    pageSize={10}\n+    pageSizes={[10, 20, 30]}\n+    totalItems={350}>\n+    {({ currentPage, onSetPage, totalPages }) => (\n+      <PageSelector\n+        currentPage={currentPage}\n+        id=\"select-1\"\n+        onChange={(event) => onSetPage(event.target.value)}\n+        totalPages={totalPages}\n+      />\n+    )}\n+  </Pagination>\n+);"
+  },
+  {
+    "sha": "e32fe00d778d23983a5cbe2172e2add4160c0b10",
+    "filename": "packages/upgrade/transforms/__testfixtures__/unstable-pagination-to-pagination.output.tsx",
+    "status": "added",
+    "additions": 15,
+    "deletions": 0,
+    "changes": 15,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Funstable-pagination-to-pagination.output.tsx",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Funstable-pagination-to-pagination.output.tsx",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fupgrade%2Ftransforms%2F__testfixtures__%2Funstable-pagination-to-pagination.output.tsx?ref=e2b173caac16443b31ec4188bf8411e4d32ef854",
+    "patch": "@@ -0,0 +1,15 @@\n+// @ts-nocheck — unstable_Pagination and unstable_PageSelector are untyped JS\n+// components with no TypeScript declarations, so TS would error on every prop.\n+import React from 'react';\n+import { Pagination } from '@carbon/react';\n+\n+// Basic usage: unstable Pagination with a PageSelector\n+export const WithPageSelector = () => (\n+  // TODO: manually migrate children to the renderPageSelect prop if necessary.\n+  <Pagination\n+    onChange={() => {}}\n+    pageSize={10}\n+    pageSizes={[10, 20, 30]}\n+    totalItems={350} />\n+);\n+"
+  },
+  {
+    "sha": "7c17fe06814d142aa5d11cf6828036303f9b012a",
+    "filename": "packages/upgrade/transforms/__tests__/unstable-pagination-to-pagination-test.js",
+    "status": "added",
+    "additions": 21,
+    "deletions": 0,
+    "changes": 21,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2F__tests__%2Funstable-pagination-to-pagination-test.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2F__tests__%2Funstable-pagination-to-pagination-test.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fupgrade%2Ftransforms%2F__tests__%2Funstable-pagination-to-pagination-test.js?ref=e2b173caac16443b31ec4188bf8411e4d32ef854",
+    "patch": "@@ -0,0 +1,21 @@\n+/**\n+ * Copyright IBM Corp. 2026\n+ *\n+ * This source code is licensed under the Apache-2.0 license found in the\n+ * LICENSE file in the root directory of this source tree.\n+ */\n+\n+'use strict';\n+\n+const { defineTest } = require('jscodeshift/dist/testUtils');\n+\n+// unstable_ prefix — PageSelector render-prop child + bare usage\n+defineTest(__dirname, 'unstable-pagination-to-pagination');\n+\n+// preview_ prefix — same transform, different fixtures\n+defineTest(\n+  __dirname,\n+  'unstable-pagination-to-pagination',\n+  null,\n+  'preview-pagination-to-pagination'\n+);"
+  },
+  {
+    "sha": "fc99a1d28e264fbeebc3cbc40d4bfe7d3c708574",
+    "filename": "packages/upgrade/transforms/unstable-pagination-to-pagination.js",
+    "status": "added",
+    "additions": 157,
+    "deletions": 0,
+    "changes": 157,
+    "blob_url": "https://github.com/carbon-design-system/carbon/blob/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2Funstable-pagination-to-pagination.js",
+    "raw_url": "https://github.com/carbon-design-system/carbon/raw/e2b173caac16443b31ec4188bf8411e4d32ef854/packages%2Fupgrade%2Ftransforms%2Funstable-pagination-to-pagination.js",
+    "contents_url": "https://api.github.com/repos/carbon-design-system/carbon/contents/packages%2Fupgrade%2Ftransforms%2Funstable-pagination-to-pagination.js?ref=e2b173caac16443b31ec4188bf8411e4d32ef854",
+    "patch": "@@ -0,0 +1,157 @@\n+/**\n+ * Copyright IBM Corp. 2026\n+ *\n+ * This source code is licensed under the Apache-2.0 license found in the\n+ * LICENSE file in the root directory of this source tree.\n+ */\n+\n+/**\n+ * Migrate unstable_Pagination / preview_Pagination to the stable Pagination\n+ * component. Removes the PageSelector import and children render-prop, since\n+ * the stable Pagination renders an equivalent page-select control by default.\n+ */\n+\n+'use strict';\n+\n+const defaultOptions = {\n+  quote: 'single',\n+  trailingComma: true,\n+};\n+\n+// All known import names for the deprecated components\n+const UNSTABLE_PAGINATION_NAMES = new Set([\n+  'unstable_Pagination',\n+  'preview_Pagination',\n+]);\n+\n+const UNSTABLE_PAGE_SELECTOR_NAMES = new Set([\n+  'unstable_PageSelector',\n+  'preview_PageSelector',\n+]);\n+\n+function transform(fileInfo, api, options) {\n+  const j = api.jscodeshift;\n+  const root = j(fileInfo.source);\n+  const printOptions = options.printOptions || defaultOptions;\n+\n+  // Collect the local names for the deprecated components from @carbon/react imports\n+  let paginationLocalName = null; // local JSX name, e.g. \"Pagination\"\n+  let paginationLocalAlias = null; // stable replacement name, e.g. \"Pagination\"\n+\n+  const carbonImports = root.find(j.ImportDeclaration, {\n+    source: { value: '@carbon/react' },\n+  });\n+\n+  if (!carbonImports.length) {\n+    return null;\n+  }\n+\n+  carbonImports.forEach((path) => {\n+    path.node.specifiers.forEach((spec) => {\n+      if (spec.type !== 'ImportSpecifier') return;\n+      const importedName = spec.imported.name;\n+      if (UNSTABLE_PAGINATION_NAMES.has(importedName) && !paginationLocalName) {\n+        paginationLocalName = spec.local.name;\n+        paginationLocalAlias =\n+          paginationLocalName === importedName\n+            ? 'Pagination'\n+            : paginationLocalName;\n+      }\n+    });\n+  });\n+\n+  if (!paginationLocalName) {\n+    return null; // nothing to transform\n+  }\n+\n+  // Rewrite import specifiers — swap unstable/preview for stable Pagination,\n+  // drop PageSelector (no longer needed)\n+  carbonImports.forEach((path) => {\n+    const kept = [];\n+    path.node.specifiers.forEach((spec) => {\n+      if (spec.type !== 'ImportSpecifier') {\n+        kept.push(spec);\n+        return;\n+      }\n+      const importedName = spec.imported.name;\n+\n+      if (UNSTABLE_PAGINATION_NAMES.has(importedName)) {\n+        // Replace with stable `Pagination`.\n+        // Only emit `as localName` when the user chose a different local alias.\n+        const localName = paginationLocalAlias;\n+        const newSpec =\n+          localName === 'Pagination'\n+            ? j.importSpecifier(j.identifier('Pagination'))\n+            : j.importSpecifier(\n+                j.identifier('Pagination'),\n+                j.identifier(localName)\n+              );\n+        kept.push(newSpec);\n+        return;\n+      }\n+\n+      if (UNSTABLE_PAGE_SELECTOR_NAMES.has(importedName)) {\n+        // Drop — no longer needed once the children block is removed\n+        return;\n+      }\n+\n+      kept.push(spec);\n+    });\n+    path.node.specifiers = kept;\n+  });\n+\n+  // Sort alphabetically for consistency\n+  carbonImports\n+    .get(0)\n+    .node.specifiers.sort((a, b) =>\n+      (a.imported?.name ?? '').localeCompare(b.imported?.name ?? '')\n+    );\n+\n+  // Rename JSX elements to use the stable Pagination name\n+  root\n+    .find(j.JSXOpeningElement, { name: { name: paginationLocalName } })\n+    .forEach((path) => {\n+      path.node.name = j.jsxIdentifier(paginationLocalAlias);\n+    });\n+  root\n+    .find(j.JSXClosingElement, { name: { name: paginationLocalName } })\n+    .forEach((path) => {\n+      path.node.name = j.jsxIdentifier(paginationLocalAlias);\n+    });\n+\n+  // Drop any children and make the element self-closing, adding a TODO comment\n+  // so the user knows to migrate manually using the renderPageSelect prop\n+  root\n+    .find(j.JSXElement, {\n+      openingElement: { name: { name: paginationLocalAlias } },\n+    })\n+    .forEach((path) => {\n+      const element = path.node;\n+\n+      // Filter out whitespace-only JSX text children\n+      const meaningfulChildren = element.children.filter(\n+        (child) => !(child.type === 'JSXText' && child.value.trim() === '')\n+      );\n+\n+      if (meaningfulChildren.length === 0) return;\n+\n+      // Drop children, make self-closing, and attach a TODO comment so the\n+      // user knows to migrate manually using the renderPageSelect prop\n+      element.children = [];\n+      element.openingElement.selfClosing = true;\n+      element.closingElement = null;\n+\n+      const todoComment = j.line(\n+        ' TODO: manually migrate children to the renderPageSelect prop if necessary.'\n+      );\n+      path.node.comments = path.node.comments || [];\n+      todoComment.leading = true;\n+      todoComment.trailing = false;\n+      path.node.comments.push(todoComment);\n+    });\n+\n+  return root.toSource(printOptions);\n+}\n+\n+module.exports = transform;\n+module.exports.parser = 'tsx';"
+  }
+]
