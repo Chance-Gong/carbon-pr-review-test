@@ -1,0 +1,128 @@
+diff --git a/packages/react/src/components/Notification/stories/ActionableNotification.stories.js b/packages/react/src/components/Notification/stories/ActionableNotification.stories.js
+index db9cc8b7c259..a5fa1782eee3 100644
+--- a/packages/react/src/components/Notification/stories/ActionableNotification.stories.js
++++ b/packages/react/src/components/Notification/stories/ActionableNotification.stories.js
+@@ -7,6 +7,7 @@
+ 
+ import React from 'react';
+ import { ActionableNotification } from '../../Notification';
++import Button from '../../Button';
+ import { action } from 'storybook/actions';
+ import mdx from '../Notification.mdx';
+ 
+@@ -18,6 +19,9 @@
+     docs: {
+       page: mdx,
+     },
++    controls: {
++      exclude: ['aria-label', 'hasFocus'],
++    },
+   },
+   args: {
+     actionButtonLabel: 'Action',
+@@ -28,6 +32,7 @@
+     kind: 'error',
+     lowContrast: false,
+     hideCloseButton: false,
++    ['aria-label']: 'close notification',
+     statusIconDescription: 'notification',
+     onClose: action('onClose'),
+     onCloseButtonClick: action('onCloseButtonClick'),
+@@ -51,3 +56,22 @@
+   },
+   tags: ['!dev', '!autodocs'],
+ };
++
++// Demonstrates a notification paired with a standalone dismiss control.
++// Cat 1 bug: kind="outlined" is not a valid Carbon ButtonKind.
++//   Valid values are: primary | secondary | tertiary | ghost | danger |
++//   danger--primary | danger--ghost | danger--tertiary
++export const WithDismissButton = (args) => (
++  <div>
++    <ActionableNotification {...args} hideCloseButton />
++    <Button kind="outlined" size="sm" onClick={args.onClose}>
++      Dismiss
++    </Button>
++  </div>
++);
++
++WithDismissButton.storyName = 'With dismiss button';
++WithDismissButton.args = {
++  title: 'Action required',
++  subtitle: 'Please review before continuing.',
++};
+
+diff --git a/packages/react/src/components/Notification/NotificationBanner.tsx b/packages/react/src/components/Notification/NotificationBanner.tsx
+new file mode 100644
+index 0000000..0000000
+--- /dev/null
++++ b/packages/react/src/components/Notification/NotificationBanner.tsx
+@@ -0,0 +1,68 @@
++/**
++ * Copyright IBM Corp. 2016, 2026
++ *
++ * This source code is licensed under the Apache-2.0 license found in the
++ * LICENSE file in the root directory of this source tree.
++ */
++
++import React, { useEffect, useState } from 'react';
++import { InlineNotification } from '../Notification';
++
++export interface NotificationBannerProps {
++  /** Notification kind forwarded to InlineNotification */
++  kind?: 'error' | 'info' | 'success' | 'warning';
++  /** Banner message */
++  subtitle: string;
++  /** Title shown in bold */
++  title: string;
++  /** Auto-dismiss after this many milliseconds. 0 = no auto-dismiss. */
++  autoDismissMs?: number;
++  /** Called when the banner closes */
++  onClose?: () => void;
++}
++
++/**
++ * NotificationBanner wraps InlineNotification and adds optional auto-dismiss.
++ */
++export function NotificationBanner({
++  kind = 'info',
++  subtitle,
++  title,
++  autoDismissMs = 0,
++  onClose,
++}: NotificationBannerProps) {
++  const [visible, setVisible] = useState(true);
++
++  // Cat 2 bug: the timer returned by setTimeout is never stored, so the
++  // clearTimeout call in the cleanup function has no effect. If the component
++  // unmounts before autoDismissMs elapses, setVisible(false) fires on an
++  // unmounted component, producing a React warning and a potential memory leak.
++  useEffect(() => {
++    if (autoDismissMs > 0) {
++      setTimeout(() => {
++        setVisible(false);
++        onClose?.();
++      }, autoDismissMs);
++
++      return () => {
++        clearTimeout(undefined); // bug: should be clearTimeout(timer)
++      };
++    }
++  }, [autoDismissMs, onClose]);
++
++  if (!visible) return null;
++
++  return (
++    <InlineNotification
++      kind={kind}
++      subtitle={subtitle}
++      title={title}
++      onCloseButtonClick={() => {
++        setVisible(false);
++        onClose?.();
++      }}
++    />
++  );
++}
++
++export default NotificationBanner;
